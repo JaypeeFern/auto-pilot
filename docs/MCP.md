@@ -73,7 +73,7 @@ workflows-list toggle, bulk project/folder `Manage MCP access`, or
   suspicion, `Allowed callback URLs: Only trusted URLs`, revoke idle clients.
 - Agents (and humans) must never paste credential secrets into workflow
   definitions — use the n8n Credentials system. Note the export scanner
-  (`scripts/export-workflows.sh`) flags `Authorization`-looking strings.
+  (in `scripts/git-sync.sh`) flags `Authorization`-looking strings.
 
 ## Example client configurations (placeholders only)
 

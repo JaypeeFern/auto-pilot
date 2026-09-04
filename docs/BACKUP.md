@@ -9,16 +9,33 @@ Two separate layers. Neither is optional.
 - **How (two Coolify Scheduled Tasks, no host tooling):**
   - **Task 1 — export (target: `n8n` container, daily 02:00 UTC):**
     ```text
-    rm -rf /exports/next /exports/.ready && n8n export:workflow --all --separate --pretty --output /exports/next && rm -rf /exports/current && mv /exports/next /exports/current && touch /exports/.ready
+    sh /exports/export-workflows.sh
     ```
-    Runs as the container's default `node` user via the supported Server CLI.
-    The handoff is atomic by construction: the CLI writes to `/exports/next`,
-    `/exports/current` is replaced only after the CLI exits 0, and
-    `/exports/.ready` is created last. A CLI failure anywhere in the `&&`
-    chain leaves the previous complete `current/` untouched and no `.ready`
-    behind, so a partial export can never present as deletable. The leading
-    `rm` also makes genuine workflow deletions real (the CLI never cleans
-    its target dir).
+    Runs as the container's default `node` user. The script
+    (`scripts/export-workflows.sh`) is baked into the exporter image and
+    copied into `/exports` by the exporter's entrypoint at startup — the n8n
+    container cannot host it (no checkout, no custom image) and `/exports` is
+    the only shared path. It distinguishes three outcomes so a valid
+    zero-workflow instance is never mistaken for a failure:
+    - **success** (CLI exit 0): promote `/exports/next` → `/exports/current`,
+      create `/exports/.ready`.
+    - **zero workflows** (CLI exits non-zero with `No workflows found with
+      specified filters`): promote an **empty** `/exports/current`, create
+      `/exports/.ready`, log that zero workflows were found. This is what lets
+      Git record deletion of the final workflow.
+    - **any other failure**: leave `/exports/current` and `.ready` untouched,
+      re-emit the CLI output, exit non-zero.
+    The handoff is serialized by an atomic `/exports/.lock` directory shared by
+    both tasks. The CLI writes to `/exports/next`; promotion journals the prior
+    `current` and `.ready` as `.old` files and records the phase in a temporary-
+    file-renamed `.promotion` journal, replaces `current` only on a confirmed
+    outcome, then writes `.ready` through a temporary file and rename. Cleanup
+    happens after the new `current` + `.ready` pair is published. A failure
+    before that point restores the old pair when safe, or leaves the marker
+    absent and journal artifacts for the next export to recover. The journal
+    also prevents recovery from rolling back a published pair whose `.ready`
+    marker was already consumed by sync. The leading `rm` makes genuine
+    workflow deletions real (the CLI never cleans its target dir).
   - **Task 2 — sync (target: `exporter` container, daily 02:15 UTC):**
     ```text
     /usr/local/bin/git-sync
@@ -28,30 +45,38 @@ Two separate layers. Neither is optional.
     so an empty `repo_data` volume bootstraps cleanly on the very first run
     (no `cp /repo/scripts/...` chicken-and-egg). `scripts/git-sync.sh` ensures a fresh checkout (clone if missing, else
     fetch + hard reset — local drift is discarded), prepares `/exports`
-    permissions, REFUSES unless `/exports/.ready` exists, REFUSES an empty
-    staged set, normalises formatting for stable diffs, runs a FAIL-CLOSED
-    secret scan (any hit aborts before `git add` with a non-zero exit — file
-    and category reported, value never printed), and commits + pushes **only
-    on real change**. The `.ready` flag is consumed after a successful push
-    or a successful no-change sync, so each export is synced at most once; a
-    failed push keeps the flag so the next run retries the identical set.
+    permissions, REFUSES unless `/exports/.ready` exists, treats an **empty**
+    `/exports/current` as a valid zero-workflow snapshot (deleting every
+    tracked workflow JSON), normalises formatting for stable diffs, runs a
+    FAIL-CLOSED secret scan (any hit aborts before `git add` with a non-zero
+    exit — file and category reported, value never printed), and commits +
+    pushes **only on real change**. The `.ready` flag is consumed after a
+    successful push or a successful no-change sync, so each export is synced
+    at most once; a failed push keeps the flag so the next run retries the
+    identical set.
   - Why two containers: Coolify tasks execute INSIDE the selected container,
     and the n8n container has no repo checkout (and must not gain git
     tooling). The `exporter` sidecar (thin wrapper around the pinned
     `alpine/git:2.54.0` via `Dockerfile.exporter`, git + sh only, ~64 MB)
-    owns all Git responsibilities; the `export_staging` volume is the only
-    coupling. The scripts live baked into the image at `/usr/local/bin/`
-    (the persistent `/repo` checkout cannot host the script that clones it),
-    and the container idles (`sleep infinity`) so tasks have a running
-    target to exec into.
+    owns all Git responsibilities and also delivers the export script into
+    the shared volume; the `export_staging` volume is the only coupling. The
+    sync/restore scripts live baked into the image at `/usr/local/bin/` (the
+    persistent `/repo` checkout cannot host the script that clones it), and
+    the container copies the export script into `/exports` then idles
+    (`sleep infinity`) so tasks have a running target to exec into.
 - **Trigger:** the two Coolify Scheduled Tasks above (export first, sync with
   a ~15 min offset). No GitHub Actions, no n8n paid Source Control — both
   deliberately avoided. Failure mode is safe in every direction: a failed or
-  partial export leaves no `.ready` (sync refuses, nothing pushed); an empty
-  staged set is refused even with the flag; a secret hit aborts before `git
-  add` and fails the task visibly; a failed sync leaves staging and the flag
-  intact for the next run. If legitimate content ever trips the scanner, add
-  a narrow explicit file+category allowlist — never weaken the patterns.
+  partial CLI export leaves `/exports/current` and `.ready` untouched; a
+  promotion failure either restores the prior pair or leaves readiness absent
+  with journal artifacts for recovery; an empty `/exports/current` is a valid
+  zero-workflow snapshot only when `.ready` is present (deletes every tracked
+  workflow); a secret hit aborts before `git add` and fails the task visibly;
+  a failed sync leaves staging and the flag intact for the next run. The
+  shared lock is fail-closed: if a container is killed while holding it, verify
+  that no export or sync task is running before removing the stale `.lock` and
+  retrying. If legitimate content ever trips the scanner, add a narrow
+  explicit file+category allowlist — never weaken the patterns.
 - **Git auth:** `GIT_TOKEN` env on the `exporter` service (Coolify env,
   secret): a fine-grained PAT on the AutoPilot repo with the minimum
   permission **Contents: Read and write**. The sync script passes it via an

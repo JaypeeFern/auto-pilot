@@ -12,8 +12,15 @@ FROM alpine/git:2.54.0
 
 COPY scripts/git-sync.sh /usr/local/bin/git-sync
 COPY scripts/restore-workflows.sh /usr/local/bin/restore-workflows
+COPY scripts/export-workflows.sh /usr/local/bin/export-workflows
 
-RUN chmod +x /usr/local/bin/git-sync /usr/local/bin/restore-workflows
+RUN chmod +x /usr/local/bin/git-sync /usr/local/bin/restore-workflows /usr/local/bin/export-workflows
 
-# Idle shell so Coolify Scheduled Tasks have a running container to exec into.
-ENTRYPOINT ["/bin/sh", "-c", "sleep infinity"]
+# Deliver the export script into the shared export_staging volume, then idle.
+# The export task runs in the n8n container (it owns the n8n CLI + SQLite),
+# which has no checkout and cannot be given a custom image — so this sidecar
+# bakes the script into the image and copies it to /exports at startup, where
+# the n8n task runs it as `sh /exports/export-workflows.sh`. The `&& exec`
+# parks the idle shell AFTER the copy, so Coolify Scheduled Tasks still have a
+# running container to exec into.
+ENTRYPOINT ["/bin/sh", "-c", "mkdir -p /exports && chmod 777 /exports && cp /usr/local/bin/export-workflows /exports/export-workflows.sh && exec sleep infinity"]

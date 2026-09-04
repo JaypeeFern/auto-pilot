@@ -37,10 +37,13 @@ one place. Local `docker compose` is only for validating config shape.
 7. **Schedule workflow exports** (docs/BACKUP.md): two Coolify Scheduled
    Tasks — remember tasks run a shell command INSIDE the selected container,
    never `docker exec`, never on the host:
-   - Task `autopilot-export`, target container `auto-pilot-n8n`, daily 02:00:
-     ```text
-     rm -rf /exports/next /exports/.ready && n8n export:workflow --all --separate --pretty --output /exports/next && rm -rf /exports/current && mv /exports/next /exports/current && touch /exports/.ready
-     ```
+    - Task `autopilot-export`, target container `auto-pilot-n8n`, daily 02:00:
+      ```text
+      sh /exports/export-workflows.sh
+      ```
+      (The script is baked into the exporter image and copied into `/exports`
+      at startup, so the exporter service must be running — which it always is
+      after a deploy — before the export task runs.)
     - Task `autopilot-git-sync`, target container `auto-pilot-exporter`,
       daily 02:15:
       ```text
@@ -68,7 +71,8 @@ one place. Local `docker compose` is only for validating config shape.
   `n8n_data` volume persists SQLite + key; `N8N_ENCRYPTION_KEY` MUST be
   unchanged in Coolify env.
 - n8n upgrades: deliberate/manual only.
-  1. Take a Coolify volume backup AND run `scripts/export-workflows.sh` first.
+  1. Take a Coolify volume backup AND run the export task ("Execute Now" on
+     `autopilot-export`) first.
   2. Bump the exact pin in `docker-compose.yml` (never `:latest`).
   3. Redeploy, watch `/healthz`, smoke-test UI + one workflow execution.
   4. Roll back by re-pinning + restoring the volume backup if needed.

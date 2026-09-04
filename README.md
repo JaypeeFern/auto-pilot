@@ -54,9 +54,9 @@ Internet → Cloudflare Tunnel → Coolify Proxy → AutoPilot / n8n (SQLite)
 
 ## Backup strategy
 
-Two layers: **Git** (daily workflow JSON exports via the n8n `export:workflow`
-CLI + `/usr/local/bin/git-sync` in the exporter sidecar — portable history,
-no secrets) and
+Two layers: **Git** (daily workflow JSON exports via `sh
+/exports/export-workflows.sh` in the n8n container + `/usr/local/bin/git-sync`
+in the exporter sidecar — portable history, no secrets) and
 **Coolify → R2** (scheduled `auto-pilot_n8n_data` volume archive —
 full disaster recovery incl. credentials). SQLite needs a stopped-container
 archive; the procedure and the success/failure-retention limitation are
@@ -65,11 +65,14 @@ documented in `docs/BACKUP.md`.
 ## Workflow export / versioning
 
 Two daily Coolify Scheduled Tasks: the n8n container exports all workflows
-with the supported `n8n export:workflow` CLI into a shared staging volume,
-and the tiny `exporter` sidecar (`/usr/local/bin/git-sync`, baked into the
-image via `Dockerfile.exporter`) normalises formatting
-for stable diffs, scans for secret-looking patterns, and commits + pushes
-only on change. Restores go the other way via `/usr/local/bin/restore-workflows`
+into a shared staging volume with `scripts/export-workflows.sh` (delivered
+into that same volume by the exporter sidecar at startup), and the tiny
+`exporter` sidecar
+(`/usr/local/bin/git-sync`, baked into the image via `Dockerfile.exporter`)
+normalises formatting for stable diffs, scans for secret-looking patterns, and
+commits + pushes only on change. A zero-workflow instance is a valid state:
+the export records an empty snapshot and the sync deletes the last tracked
+workflow JSON. Restores go the other way via `/usr/local/bin/restore-workflows`
 (stage from git) + `n8n import:workflow` (workflows arrive INACTIVE).
 No GitHub Actions, no paid n8n Source Control. Details: `docs/BACKUP.md`.
 

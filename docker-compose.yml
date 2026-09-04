@@ -97,8 +97,9 @@ services:
 
   # Git sync sidecar for workflow exports. Coolify Scheduled Tasks execute
   # INSIDE a service container, and the n8n container has no repo checkout —
-  # so export runs as a CLI one-liner in n8n (Task 1) and this tiny service
-  # turns the staging output into Git commits (Task 2).
+  # so export runs scripts/export-workflows.sh inside n8n (Task 1; this image
+  # copies it into /exports at startup, since n8n cannot be re-imaged) and
+  # this tiny service turns the staging output into Git commits (Task 2).
   # It never touches n8n_data, so R2 volume backups stop only the n8n
   # container. See docs/BACKUP.md for the end-to-end flow.
   exporter:

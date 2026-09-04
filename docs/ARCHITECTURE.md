@@ -49,8 +49,11 @@ SQLite is the live source of truth. Git never sees the database.
 
 ```text
 n8n workflows (live in SQLite)
-   ↓  Task 1, inside n8n container: n8n export:workflow --all --separate --pretty
-/exports/current (export_staging volume — transient CLI output, no secrets)
+   ↓  Task 1, inside n8n container: sh /exports/export-workflows.sh (script
+      baked into the exporter image, copied into /exports at startup)
+/exports/current (export_staging volume — transient CLI output, no secrets;
+                  `.lock` serializes export/sync and `.ready` identifies the
+                  complete published snapshot)
 /repo (exporter sidecar clones this repo into the repo_data volume)
    ↓  Task 2, inside exporter container: /usr/local/bin/git-sync (baked into
       the exporter image via Dockerfile.exporter — never loaded from /repo)
