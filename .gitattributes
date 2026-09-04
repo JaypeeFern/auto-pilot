@@ -1,0 +1,5 @@
+# Shell scripts and Dockerfiles must keep LF endings everywhere (a CRLF
+# shebang or stray CR breaks /bin/sh on Alpine), regardless of the OS that
+# clones this repo — including the Linux host Coolify builds/deploys from.
+*.sh text eol=lf
+Dockerfile* text eol=lf

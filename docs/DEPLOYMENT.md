@@ -41,15 +41,17 @@ one place. Local `docker compose` is only for validating config shape.
      ```text
      rm -rf /exports/next /exports/.ready && n8n export:workflow --all --separate --pretty --output /exports/next && rm -rf /exports/current && mv /exports/next /exports/current && touch /exports/.ready
      ```
-   - Task `autopilot-git-sync`, target container `auto-pilot-exporter`,
-     daily 02:15:
-     ```text
-     cp /repo/scripts/git-sync.sh /tmp/git-sync.sh && sh /tmp/git-sync.sh
-     ```
-     (On the very first run the clone does not exist yet — use "Execute Now"
-     on the sync task once: it clones, prepares `/exports` permissions, and
-     refuses on the missing `.ready` flag. Then "Execute Now" the export
-     task, then the sync task again to verify the first commit lands.)
+    - Task `autopilot-git-sync`, target container `auto-pilot-exporter`,
+      daily 02:15:
+      ```text
+      /usr/local/bin/git-sync
+      ```
+      (The script is baked into the exporter image, so an empty `repo_data`
+      volume bootstraps cleanly — no checkout needs to pre-exist. On the very
+      first run the clone does not exist yet — use "Execute Now"
+      on the sync task once: it clones, prepares `/exports` permissions, and
+      refuses on the missing `.ready` flag. Then "Execute Now" the export
+      task, then the sync task again to verify the first commit lands.)
    Create a fine-grained PAT on the AutoPilot repo (minimum permission
    **Contents: Read and write**) and store it as `GIT_TOKEN` in the Coolify
    environment — never in this repo.

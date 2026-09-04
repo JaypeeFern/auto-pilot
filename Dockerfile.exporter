@@ -1,0 +1,19 @@
+# Exporter sidecar image: thin wrapper around the pinned alpine/git image.
+#
+# Why this exists (and why it is NOT a fork of n8n): Coolify Scheduled Tasks
+# execute INSIDE a service container, and the n8n container has no repo
+# checkout. The sync scripts must therefore live somewhere with git — but a
+# persistent /repo checkout cannot bootstrap itself (chicken-and-egg: the
+# task needs git-sync.sh to clone /repo, yet git-sync.sh was expected inside
+# /repo). Baking the scripts into this image breaks the cycle: the image
+# provides the scripts, the repo_data volume provides the checkout.
+# The n8n image itself is untouched.
+FROM alpine/git:2.54.0
+
+COPY scripts/git-sync.sh /usr/local/bin/git-sync
+COPY scripts/restore-workflows.sh /usr/local/bin/restore-workflows
+
+RUN chmod +x /usr/local/bin/git-sync /usr/local/bin/restore-workflows
+
+# Idle shell so Coolify Scheduled Tasks have a running container to exec into.
+ENTRYPOINT ["/bin/sh", "-c", "sleep infinity"]

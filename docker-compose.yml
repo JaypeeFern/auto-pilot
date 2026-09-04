@@ -98,16 +98,21 @@ services:
   # Git sync sidecar for workflow exports. Coolify Scheduled Tasks execute
   # INSIDE a service container, and the n8n container has no repo checkout —
   # so export runs as a CLI one-liner in n8n (Task 1) and this tiny service
-  # (git + sh only, ~20 MB) turns the staging output into Git commits (Task 2).
+  # turns the staging output into Git commits (Task 2).
   # It never touches n8n_data, so R2 volume backups stop only the n8n
   # container. See docs/BACKUP.md for the end-to-end flow.
   exporter:
-    image: alpine/git:2.54.0
+    # Thin wrapper (Dockerfile.exporter) around pinned alpine/git:2.54.0 with
+    # the sync scripts baked into /usr/local/bin. Baking breaks the bootstrap
+    # cycle (the scripts clone /repo, so they cannot live only in /repo).
+    # The n8n image itself is untouched.
+    build:
+      context: .
+      dockerfile: Dockerfile.exporter
+    image: auto-pilot-exporter:2.54.0
     container_name: auto-pilot-exporter
     restart: unless-stopped
-    # alpine/git defaults to ENTRYPOINT ["git"] CMD ["--help"] (exits at once),
-    # so override both to park an idle shell for Scheduled Tasks to exec into.
-    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+    # Entrypoint is baked into the image (idle shell for tasks to exec into).
     mem_limit: 64m
     mem_reservation: 32m
     volumes:

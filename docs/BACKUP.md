@@ -21,9 +21,12 @@ Two separate layers. Neither is optional.
     its target dir).
   - **Task 2 — sync (target: `exporter` container, daily 02:15 UTC):**
     ```text
-    cp /repo/scripts/git-sync.sh /tmp/git-sync.sh && sh /tmp/git-sync.sh
+    /usr/local/bin/git-sync
     ```
-    `scripts/git-sync.sh` ensures a fresh checkout (clone if missing, else
+    The sync script is baked into the exporter image (`Dockerfile.exporter`,
+    derived from the pinned `alpine/git:2.54.0`) — never loaded from `/repo`,
+    so an empty `repo_data` volume bootstraps cleanly on the very first run
+    (no `cp /repo/scripts/...` chicken-and-egg). `scripts/git-sync.sh` ensures a fresh checkout (clone if missing, else
     fetch + hard reset — local drift is discarded), prepares `/exports`
     permissions, REFUSES unless `/exports/.ready` exists, REFUSES an empty
     staged set, normalises formatting for stable diffs, runs a FAIL-CLOSED
@@ -34,16 +37,13 @@ Two separate layers. Neither is optional.
     failed push keeps the flag so the next run retries the identical set.
   - Why two containers: Coolify tasks execute INSIDE the selected container,
     and the n8n container has no repo checkout (and must not gain git
-    tooling). The `exporter` sidecar (`alpine/git:2.54.0`, git + sh only,
-    ~64 MB) owns all Git responsibilities; the `export_staging` volume is the
-    only coupling. The script is copied to /tmp before running because it
-    hard-resets the checkout it was loaded from.
-  - Why two containers: Coolify tasks execute INSIDE the selected container,
-    and the n8n container has no repo checkout (and must not gain git
-    tooling). The `exporter` sidecar (`alpine/git:2.54.0`, git + sh only,
-    ~64 MB) owns all Git responsibilities; the `export_staging` volume is the
-    only coupling. The script is copied to /tmp before running because it
-    hard-resets the checkout it was loaded from.
+    tooling). The `exporter` sidecar (thin wrapper around the pinned
+    `alpine/git:2.54.0` via `Dockerfile.exporter`, git + sh only, ~64 MB)
+    owns all Git responsibilities; the `export_staging` volume is the only
+    coupling. The scripts live baked into the image at `/usr/local/bin/`
+    (the persistent `/repo` checkout cannot host the script that clones it),
+    and the container idles (`sleep infinity`) so tasks have a running
+    target to exec into.
 - **Trigger:** the two Coolify Scheduled Tasks above (export first, sync with
   a ~15 min offset). No GitHub Actions, no n8n paid Source Control — both
   deliberately avoided. Failure mode is safe in every direction: a failed or

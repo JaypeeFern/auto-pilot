@@ -52,7 +52,8 @@ n8n workflows (live in SQLite)
    ↓  Task 1, inside n8n container: n8n export:workflow --all --separate --pretty
 /exports/current (export_staging volume — transient CLI output, no secrets)
 /repo (exporter sidecar clones this repo into the repo_data volume)
-   ↓  Task 2, inside exporter container: scripts/git-sync.sh
+   ↓  Task 2, inside exporter container: /usr/local/bin/git-sync (baked into
+      the exporter image via Dockerfile.exporter — never loaded from /repo)
 workflows/*.json (one file per workflow, deterministic formatting)
    ↓  git commit + push (HTTPS + GIT_TOKEN)
 GitHub (portable backups + per-workflow version history)
@@ -72,7 +73,7 @@ volume backup (same `N8N_ENCRYPTION_KEY` required to decrypt after restore).
 | Restart | `unless-stopped` |
 | Ports | None published; `expose: 5678` for the Coolify proxy (host port mapping would bypass the proxy) |
 | Health | Custom `healthcheck` against `GET /healthz` (the official image ships no `HEALTHCHECK`; `/healthz` = reachable, `/healthz/readiness` = DB-ready) |
-| Export sidecar | `exporter` service, `alpine/git:2.54.0` pinned (git + sh only, 64 MB cap), idle `sleep infinity` for tasks to exec into; owns checkout + push, never touches `n8n_data` |
+| Export sidecar | `exporter` service, thin wrapper (`Dockerfile.exporter`) around pinned `alpine/git:2.54.0` (git + sh only, 64 MB cap) with the sync scripts baked into `/usr/local/bin`, idle `sleep infinity` for tasks to exec into; owns checkout + push, never touches `n8n_data` |
 | Staging | `export_staging` volume at `/exports` in both containers (transient, excluded from R2 backups); `repo_data` volume holds the exporter's replaceable clone |
 | Proxy config | `N8N_PROTOCOL=https`, `N8N_HOST` + `N8N_EDITOR_BASE_URL` + `N8N_WEBHOOK_URL` = public URL, `N8N_PROXY_HOPS=1` |
 | Pruning | `EXECUTIONS_DATA_PRUNE=true`, `MAX_AGE=168` (~7 d), `PRUNE_MAX_COUNT=10000`, manual/progress saves off (see `docs/BACKUP.md` for the success/failure limitation) |

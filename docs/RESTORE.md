@@ -11,7 +11,7 @@ container can import (it owns the DB) and only the exporter has git.
 
 ```bash
 # Step 1 — in the EXPORTER container (Scheduled Task command, or Execute Now):
-sh /repo/scripts/restore-workflows.sh --file <name>.json
+/usr/local/bin/restore-workflows --file <name>.json
 # (add --commit <ref> to restore from an older commit instead of the tip)
 
 # Step 2 — in the N8N container (Scheduled Task command, or Execute Now):
@@ -63,11 +63,17 @@ fails). You get workflows back; credential **secrets** must be recreated.
 
 1. Deploy the stack fresh via docs/DEPLOYMENT.md (new `N8N_ENCRYPTION_KEY` is
    fine here — there are no old secrets to decrypt).
-2. Stage everything from Git (exporter container), then import (n8n container):
+2. Bootstrap the exporter checkout first (fresh `repo_data` volume is empty
+   and `restore-workflows` refuses without one), then stage everything from
+   Git (exporter container) and import (n8n container):
    ```text
-   sh /repo/scripts/restore-workflows.sh --all
+   /usr/local/bin/git-sync
+   /usr/local/bin/restore-workflows --all
    n8n import:workflow --separate --input /exports/restore
    ```
+   (The first `git-sync` clones `/repo` and then refuses on the missing
+   `.ready` flag — that refusal is expected here; the clone is what the
+   restore step needed.)
 3. In the n8n UI, for EACH workflow:
    1. Recreate the credential secrets in Credentials (values from your
       password manager — prefer n8n Credentials over env vars for services).

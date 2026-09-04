@@ -5,9 +5,11 @@
 # Runs INSIDE the exporter sidecar (git + sh only). It cannot import directly:
 # only the n8n container owns the SQLite DB, so restore is two steps:
 #
-#   Step 1 (exporter — this script): copy JSONs from Git history to staging:
-#     sh /repo/scripts/restore-workflows.sh --file <name>.json
-#     sh /repo/scripts/restore-workflows.sh --all [--commit <ref>]
+#   Step 1 (exporter — this script, baked into the image as
+#   /usr/local/bin/restore-workflows via Dockerfile.exporter): copy JSONs
+#   from Git history to staging:
+#     /usr/local/bin/restore-workflows --file <name>.json
+#     /usr/local/bin/restore-workflows --all [--commit <ref>]
 #
 #   Step 2 (n8n container — Coolify Scheduled Task with a pasted command,
 #   or "Execute Now" for a one-off restore):

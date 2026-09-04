@@ -4,10 +4,13 @@
 #
 # Runs INSIDE the exporter sidecar (alpine/git: git + sh only — no python, no
 # jq, no docker). Invoked by Coolify Scheduled Task 2 (see docs/BACKUP.md).
-# The recommended task command copies this script to /tmp first, because the
-# script resets the very checkout it was loaded from:
+# The script is baked into the exporter image as /usr/local/bin/git-sync
+# (see Dockerfile.exporter) — deliberately NOT loaded from /repo, because
+# the script itself clones /repo (loading it from /repo would be a
+# chicken-and-egg bootstrap failure on an empty volume). The task command is
+# simply:
 #
-#   cp /repo/scripts/git-sync.sh /tmp/git-sync.sh && sh /tmp/git-sync.sh
+#   /usr/local/bin/git-sync
 #
 # What it does:
 #   1. ensures /repo is a fresh checkout of origin/$GIT_BRANCH
@@ -64,8 +67,11 @@ command -v git >/dev/null 2>&1 || fail "git not found"
 # --- 1. Fresh checkout -------------------------------------------------------
 if [ ! -d "$REPO_DIR/.git" ]; then
   log "no checkout at $REPO_DIR — cloning $GIT_BRANCH"
-  rm -rf "$REPO_DIR"
-  mkdir -p "$(dirname "$REPO_DIR")"
+  # $REPO_DIR is a volume mountpoint: removing it outright fails with
+  # "Resource busy", so clear its contents instead (empty on first run,
+  # stale/corrupt after a failed clone) and clone into the emptied dir.
+  mkdir -p "$REPO_DIR"
+  find "$REPO_DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
   git clone --branch "$GIT_BRANCH" "$GIT_REPO_URL" "$REPO_DIR" \
     || fail "clone failed (check GIT_REPO_URL and token/visibility)"
 fi
@@ -77,8 +83,16 @@ git checkout -B "$GIT_BRANCH" "origin/$GIT_BRANCH"
 git reset --hard "origin/$GIT_BRANCH"
 
 # --- 2. Staging permissions (exporter is root; n8n writes as node) ------------
+# Both the staging dir AND its parent: on a fresh export_staging volume the
+# export task (n8n container, unprivileged node user) must create
+# /exports/next and /exports/.ready inside the parent before this script ever
+# promotes anything into $STAGING_DIR. Without the parent chmod the very
+# first export fails with permission denied.
 mkdir -p "$STAGING_DIR"
-chmod 777 "$STAGING_DIR"
+STAGING_PARENT="$(dirname "$STAGING_DIR")"
+# Never chmod the filesystem root even under a pathological STAGING_DIR.
+[ "$STAGING_PARENT" != "/" ] || fail "refusing to chmod / (check STAGING_DIR)"
+chmod 777 "$STAGING_DIR" "$STAGING_PARENT"
 
 # --- 3. Require the export-completion flag ------------------------------------
 # The export task removes .ready first, writes /exports/next, promotes it to
@@ -133,10 +147,22 @@ log "scanning for secret-looking patterns…"
 scan_hits=""
 check_category() {
   _cat="$1"; _pat="$2"
-  _files="$(grep -rlinE "$_pat" "$WORKFLOWS_SUBDIR" --include='*.json' 2>/dev/null || true)"
+  # BusyBox grep (alpine/git) has no --include option: scope to workflow
+  # JSONs via the shell glob instead. A non-matching glob stays literal and
+  # grep errors (suppressed) — equivalent to "no files matched".
+  # Fail CLOSED on grep errors (exit >= 2): only exit 0 (hits) and exit 1 (no
+  # hits) may proceed. An errored scan must never read as a clean scan.
+  set +e
+  _files="$(grep -rlinE "$_pat" "$WORKFLOWS_SUBDIR"/*.json 2>/dev/null)"
+  _rc=$?
+  set -e
+  [ "$_rc" -le 1 ] || fail "secret scan errored (grep exit $_rc, category $_cat) — refusing to sync"
   if [ -n "$_files" ]; then
     for _f in $_files; do
       _lines="$(grep -nEoi "$_pat" "$_f" | cut -d: -f1 | tr '\n' ',' | sed 's/,$//')"
+      # A matched file must yield match locations; an empty result means the
+      # detail extraction failed, so refuse rather than log a hollow BLOCKED.
+      [ -n "$_lines" ] || fail "secret scan errored (no match lines for $_f, category $_cat) — refusing to sync"
       log "BLOCKED: $_f (category: $_cat, line(s): $_lines)"
       scan_hits="${scan_hits} ${_f}:${_cat}"
     done
