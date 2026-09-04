@@ -1,0 +1,132 @@
+# AutoPilot — n8n Community Edition (self-hosted automation layer)
+#
+# Pinned image: 2.37.10 stable (released 2026-09-04). Upgrades are
+# deliberate/manual — never use :latest.
+#
+# Deploy via Coolify as a Docker Compose service. Coolify owns the runtime
+# environment values, domain routing (Coolify proxy), and R2 volume backups.
+# This file defines shape and safe defaults, never secrets.
+#
+# Networking: no host ports are published. Coolify's proxy routes
+# auto-pilot.jpfernandez.online -> container port 5678 over the internal
+# Docker network (see docs/ARCHITECTURE.md). The commented `ports:` block is
+# for local development only.
+
+name: auto-pilot
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.37.10
+    container_name: auto-pilot-n8n
+    restart: unless-stopped
+    # Initial ceiling: 512 MB. No CPU limit. Raise by editing this one line
+    # if real-world workflows need it (see docs/ARCHITECTURE.md).
+    mem_limit: 512m
+    mem_reservation: 256m
+    stop_grace_period: 30s
+    expose:
+      - "5678"
+    # Local development only — never enable in Coolify (a host port mapping
+    # bypasses the Coolify proxy and disables rolling updates).
+    # ports:
+    #   - "127.0.0.1:5678:5678"
+    volumes:
+      # Live source of truth: SQLite DB, encryption key, credentials, settings.
+      # This is the exact path Coolify must back up to R2 (see docs/BACKUP.md).
+      - n8n_data:/home/node/.n8n
+      # Transient workflow-export staging shared with the exporter service.
+      # Holds CLI output only (no secrets); NOT part of the R2 backup.
+      # The exporter (root) chmods it world-writable so the node user can
+      # write here; see docs/BACKUP.md bootstrap step.
+      - export_staging:/exports
+    environment:
+      # --- Reverse proxy / public URL (behind Cloudflare Tunnel + Coolify proxy) ---
+      - N8N_HOST=${N8N_HOST:-auto-pilot.jpfernandez.online}
+      - N8N_PORT=${N8N_PORT:-5678}
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
+      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL:-https://auto-pilot.jpfernandez.online}
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-https://auto-pilot.jpfernandez.online/}
+      - N8N_PROXY_HOPS=${N8N_PROXY_HOPS:-1}
+      # --- Critical secret: must remain stable across redeploys/restores ---
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      # --- Timezone ---
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
+      - TZ=${TZ:-UTC}
+      # --- Database: SQLite, persisted via the n8n_data volume ---
+      - DB_TYPE=${DB_TYPE:-sqlite}
+      # Reclaim space freed by execution pruning on startup. Slightly slower
+      # starts on a small DB; worth it on a disk-constrained VPS.
+      - DB_SQLITE_VACUUM_ON_STARTUP=${DB_SQLITE_VACUUM_ON_STARTUP:-true}
+      # --- Hardening ---
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=${N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS:-true}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=${N8N_BLOCK_ENV_ACCESS_IN_NODE:-true}
+      # --- Execution pruning (disk management, see docs/BACKUP.md) ---
+      # NOTE: n8n Community Edition supports only ONE retention age for all
+      # finished executions — separate success/failure periods do not exist.
+      # 168h = ~7 days for everything. See .env.example for the documented
+      # alternative if failures must be kept longer.
+      - EXECUTIONS_DATA_PRUNE=${EXECUTIONS_DATA_PRUNE:-true}
+      - EXECUTIONS_DATA_MAX_AGE=${EXECUTIONS_DATA_MAX_AGE:-168}
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=${EXECUTIONS_DATA_PRUNE_MAX_COUNT:-10000}
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=${EXECUTIONS_DATA_SAVE_ON_SUCCESS:-all}
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=${EXECUTIONS_DATA_SAVE_ON_ERROR:-all}
+      - EXECUTIONS_DATA_SAVE_ON_PROGRESS=${EXECUTIONS_DATA_SAVE_ON_PROGRESS:-false}
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=${EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS:-false}
+      # --- Built-in instance-level MCP server (see docs/MCP.md) ---
+      # Managed via environment so the setting survives redeploys.
+      - N8N_MCP_MANAGED_BY_ENV=${N8N_MCP_MANAGED_BY_ENV:-true}
+      - N8N_MCP_ACCESS_ENABLED=${N8N_MCP_ACCESS_ENABLED:-true}
+    healthcheck:
+      # Custom check — the official n8n image ships no HEALTHCHECK.
+      # /healthz returns 200 when the instance is reachable (DB status NOT
+      # included; /healthz/readiness covers DB but is stricter than needed here).
+      # Uses node (always present in the image) instead of wget/curl.
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://localhost:5678/healthz').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Git sync sidecar for workflow exports. Coolify Scheduled Tasks execute
+  # INSIDE a service container, and the n8n container has no repo checkout —
+  # so export runs as a CLI one-liner in n8n (Task 1) and this tiny service
+  # (git + sh only, ~20 MB) turns the staging output into Git commits (Task 2).
+  # It never touches n8n_data, so R2 volume backups stop only the n8n
+  # container. See docs/BACKUP.md for the end-to-end flow.
+  exporter:
+    image: alpine/git:2.54.0
+    container_name: auto-pilot-exporter
+    restart: unless-stopped
+    # alpine/git defaults to ENTRYPOINT ["git"] CMD ["--help"] (exits at once),
+    # so override both to park an idle shell for Scheduled Tasks to exec into.
+    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+    mem_limit: 64m
+    mem_reservation: 32m
+    volumes:
+      - export_staging:/exports
+      # Checkout cache: the repo clone lives here so it survives container
+      # recreation (Coolify preserves named volumes across redeploys).
+      # git-sync.sh re-clones automatically if it is ever missing/corrupt.
+      # NOT part of the R2 backup (GitHub is the source of truth for this).
+      - repo_data:/repo
+    environment:
+      - GIT_REPO_URL=${GIT_REPO_URL}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+      - GIT_TOKEN=${GIT_TOKEN}
+      - GIT_AUTHOR_NAME=${GIT_AUTHOR_NAME:-autopilot-export}
+      - GIT_AUTHOR_EMAIL=${GIT_AUTHOR_EMAIL:-autopilot-export@localhost}
+
+volumes:
+  n8n_data:
+    # Coolify backs up this volume to Cloudflare R2 (see docs/BACKUP.md).
+    name: auto-pilot_n8n_data
+  export_staging:
+    # Transient CLI output. Never select for R2 backup.
+    name: auto-pilot_export_staging
+  repo_data:
+    # Replaceable clone cache. Never select for R2 backup.
+    name: auto-pilot_repo_data

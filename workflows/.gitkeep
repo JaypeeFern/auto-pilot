@@ -1,0 +1,11 @@
+Workflow JSON exports live here (one file per workflow, committed to Git).
+
+Exported files contain workflow definitions plus credential *names/IDs* —
+never credential secret values. HTTP Request nodes imported from cURL may
+embed auth headers; review exports before committing (the export script warns
+about suspicious patterns automatically).
+
+Managed by the two Coolify Scheduled Tasks (see docs/BACKUP.md): the n8n
+container exports here via the staging volume, and the exporter sidecar runs
+scripts/git-sync.sh to commit the result. Do not hand-edit exports that are
+meant to be re-imported; edit in the n8n UI, then wait for the next export.

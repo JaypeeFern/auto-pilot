@@ -1,0 +1,23 @@
+# Secrets / local runtime — never commit
+.env
+.env.*
+!.env.example
+
+# n8n persistent data (live SQLite DB, keys, settings) — protected by
+# Coolify/R2 backups, never by Git
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+.n8n/
+backups/
+
+# Temporary export staging (final output lives in workflows/)
+.tmp-n8n-export/
+.tmp-n8n-restore/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
