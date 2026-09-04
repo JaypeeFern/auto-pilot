@@ -16,7 +16,7 @@ Cloudflare Tunnel  (exists on the VPS, managed outside this repo)
    ↓
 Coolify Proxy      (routes auto-pilot.jpfernandez.online → container :5678)
    ↓
-AutoPilot / n8n    (single container, SQLite, 512 MB ceiling)
+AutoPilot / n8n    (single container, SQLite, 768 MB ceiling)
    ├── Web UI            https://auto-pilot.jpfernandez.online
    ├── MCP Server        https://auto-pilot.jpfernandez.online/mcp-server/http
    ├── Workflows         (live state in SQLite)
@@ -68,7 +68,7 @@ volume backup (same `N8N_ENCRYPTION_KEY` required to decrypt after restore).
 |---|---|
 | Image | Official, exact pin `2.37.10` |
 | Database | SQLite (`DB_TYPE=sqlite`), volume `n8n_data:/home/node/.n8n` |
-| Memory | `mem_limit: 512m`, `mem_reservation: 256m`, no CPU limit |
+| Memory | `mem_limit: 768m`, `mem_reservation: 384m`, no CPU limit. Verified floor for 2.37.x (512 MB OOMs the JS heap at boot); heap explicitly capped at 512 MB via `NODE_OPTIONS` leaving room for native SQLite/task-runner memory |
 | Restart | `unless-stopped` |
 | Ports | None published; `expose: 5678` for the Coolify proxy (host port mapping would bypass the proxy) |
 | Health | Custom `healthcheck` against `GET /healthz` (the official image ships no `HEALTHCHECK`; `/healthz` = reachable, `/healthz/readiness` = DB-ready) |
@@ -90,7 +90,7 @@ volume backup (same `N8N_ENCRYPTION_KEY` required to decrypt after restore).
 
 ## Resource thinking
 
-The VPS has ~2 GB RAM / ~25 GB free disk with other apps running. n8n gets 512 MB
-max. To raise it later, change the single `mem_limit` line in
+The VPS has ~2 GB RAM / ~25 GB free disk with other apps running. n8n gets 768 MB
+max (verified floor for 2.37.x — 512 MB OOMs at boot). To raise it later, change the single `mem_limit` line in
 `docker-compose.yml` (and mirror it in the Coolify resource settings if set).
 Execution pruning + `DB_SQLITE_VACUUM_ON_STARTUP=true` keep disk bounded.

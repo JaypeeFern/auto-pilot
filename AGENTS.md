@@ -8,7 +8,9 @@ Keep it simple, reliable, secure, recoverable, and lightweight.
 - SQLite only. No PostgreSQL / MySQL / Redis / queue workers / external DBs.
 - Single container from the official image, exact version pin (`:2.37.10`).
   Never use `:latest`. Upgrades are deliberate/manual.
-- 512 MB memory ceiling (`mem_limit: 512m`). No CPU limit.
+- 768 MB memory ceiling (`mem_limit: 768m`, heap capped at 512 MB via
+  `NODE_OPTIONS`). No CPU limit. 512 MB was tried and fails: n8n 2.37.x OOMs
+  its JS heap during boot under a 512 MB cgroup.
 - One hostname (`auto-pilot.jpfernandez.online`) for UI + MCP. No `cloudflared`
   service in Compose. No host ports published (Coolify proxy routes to :5678).
 - Do not modify or fork n8n. No custom Docker image without a proven,

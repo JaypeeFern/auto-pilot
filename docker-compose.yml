@@ -19,10 +19,11 @@ services:
     image: docker.n8n.io/n8nio/n8n:2.37.10
     container_name: auto-pilot-n8n
     restart: unless-stopped
-    # Initial ceiling: 512 MB. No CPU limit. Raise by editing this one line
-    # if real-world workflows need it (see docs/ARCHITECTURE.md).
-    mem_limit: 512m
-    mem_reservation: 256m
+    # Verified floor: 768 MB. n8n 2.37.x OOMs its JS heap during boot at
+    # 512 MB (heap capped ~256 MB by the cgroup). No CPU limit. Raise by
+    # editing this one line if real-world workflows need it.
+    mem_limit: 768m
+    mem_reservation: 384m
     stop_grace_period: 30s
     expose:
       - "5678"
@@ -52,6 +53,9 @@ services:
       # --- Timezone ---
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
       - TZ=${TZ:-UTC}
+      # --- Node.js heap cap: ~2/3 of the container ceiling, leaving room for
+      # native RSS (SQLite, task broker). Scale proportionally with mem_limit.
+      - NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=512}
       # --- Database: SQLite, persisted via the n8n_data volume ---
       - DB_TYPE=${DB_TYPE:-sqlite}
       # Reclaim space freed by execution pruning on startup. Slightly slower

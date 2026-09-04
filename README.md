@@ -8,7 +8,7 @@ scripts, exported workflows, and docs. We do not build, modify, or fork n8n.
 - Image: official `docker.n8n.io/n8nio/n8n:2.37.10` (exact pin, never `latest`)
 - Hostname: `auto-pilot.jpfernandez.online` (Web UI + MCP on one hostname)
 - Database: SQLite, persisted in the `n8n_data` Docker volume
-- Memory ceiling: 512 MB, no CPU limit
+- Memory ceiling: 768 MB, no CPU limit
 - Deployment/backups: Coolify (+ Cloudflare R2); workflow history: GitHub
 
 ## Architecture at a glance

@@ -24,8 +24,9 @@ one place. Local `docker compose` is only for validating config shape.
      on this repo), optionally `GIT_BRANCH`.
    - Optional: leave everything else at the compose defaults unless you have
      a reason (see `.env.example` for the full classified list).
-4. **Resources.** Confirm the 512 MB memory limit is reflected
-   (`mem_limit: 512m` in compose). Set no CPU limit.
+4. **Resources.** Confirm the 768 MB memory limit is reflected
+   (`mem_limit: 768m` in compose, and the same value in Coolify's own
+   resource settings if it has a memory field). Set no CPU limit.
 5. **Deploy.** Start the service, then open
    `https://auto-pilot.jpfernandez.online` and create the owner account
    (n8n native auth — first user becomes owner).
