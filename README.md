@@ -87,3 +87,17 @@ model, security, and example client configs: `docs/MCP.md`.
 ## For AI agents
 
 Read `AGENTS.md` before changing anything in this repo.
+
+## Agent onboarding
+
+`skills/n8n-workflow-safety/SKILL.md` is the canonical skill. Sync it to the
+supported Claude Code, Codex, and OpenCode skill directories with:
+
+```powershell
+./scripts/onboard-agents.ps1
+./scripts/onboard-agents.ps1 -Providers claude,codex
+```
+
+Re-running updates installed copies when the canonical file changes. The skill
+is portable; current infrastructure details live in this repository's docs,
+not in the skill.

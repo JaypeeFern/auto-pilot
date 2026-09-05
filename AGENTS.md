@@ -3,6 +3,16 @@
 This repo is infrastructure/configuration for a self-hosted n8n instance.
 Keep it simple, reliable, secure, recoverable, and lightweight.
 
+## Mandatory n8n workflow safety skill
+
+For any n8n workflow creation, modification, activation, deactivation,
+execution, review or testing, webhook, credential or auth, workflow
+import/export or JSON, Code node, or MCP task, load and follow
+`skills/n8n-workflow-safety/SKILL.md` first. For infrastructure assumptions,
+inspect the current `docs/ARCHITECTURE.md`, `docs/DEPLOYMENT.md`,
+`docs/MCP.md`, and `docs/BACKUP.md`; do not rely on stale topology or auth
+assumptions.
+
 ## Locked decisions (do not redesign without a proven incompatibility)
 
 - SQLite only. No PostgreSQL / MySQL / Redis / queue workers / external DBs.

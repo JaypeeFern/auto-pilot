@@ -25,8 +25,8 @@ AutoPilot / n8n    (single container, SQLite, 768 MB ceiling)
 ```
 
 One hostname serves both the Web UI and the built-in MCP HTTP endpoint — there
-is deliberately no separate MCP hostname (see `docs/MCP.md` for auth, which is
-why this is safe without Cloudflare Access in front).
+is deliberately no separate MCP hostname. The current route-level auth and
+bypass policy is recorded below and in `docs/MCP.md`.
 
 What is NOT in this stack, on purpose: PostgreSQL, MySQL/MariaDB, Redis, queue
 workers, external databases, a custom n8n image, `cloudflared` (already on the
@@ -44,6 +44,25 @@ Cloudflare R2  (off-server disaster recovery)
 ```
 
 SQLite is the live source of truth. Git never sees the database.
+
+## Current deployment facts
+
+These facts describe the current AutoPilot deployment and are separate from the
+portable workflow-safety skill. Re-check them when deployment or routing
+changes:
+
+- Runtime is n8n Community Edition using the official image, with SQLite and
+  persistent data at `/home/node/.n8n`.
+- n8n instance-level MCP is enabled. The GUI currently sits behind Cloudflare
+  Access; webhook routes intentionally bypass Cloudflare Access. MCP routes
+  also intentionally bypass Cloudflare Access and rely on n8n's own MCP OAuth.
+- Workflow exports sync separately to Git. Credentials and secrets must never
+  enter Git.
+- `N8N_ENCRYPTION_KEY` is secret and must remain stable across redeploys and
+  restores.
+- The current n8n memory baseline is 768 MB.
+- SQLite/full-instance backups are separate from workflow Git exports; the
+  former is handled through the deployment backup system.
 
 ## Versioning topology
 

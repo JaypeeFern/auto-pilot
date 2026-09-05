@@ -33,8 +33,17 @@ and NOT the primary integration — this document covers the instance server.)
 
 ## Authentication
 
-Two supported mechanisms (official). No Cloudflare Access in front of the
-hostname — clients authenticate directly against n8n:
+The current deployment intentionally bypasses Cloudflare Access for MCP
+routes, so clients authenticate directly against n8n. The current deployment
+relies on n8n's own MCP OAuth. n8n also supports the API-key mechanism below
+when deliberately configured:
+
+The current Access exceptions cover the instance MCP/OAuth paths
+`/mcp-server/*`, `/.well-known/oauth-protected-resource/*`,
+`/.well-known/oauth-authorization-server`, and `/mcp-oauth/*`. Webhook
+exceptions cover `/webhook/*` and `/webhook-test/*`. Revalidate these paths
+after n8n or routing upgrades; they are deployment-specific, not portable MCP
+paths.
 
 - **OAuth (recommended):** client opens `Connect → OAuth`, approves access in
   n8n. Per-client grants, reviewable/revocable under
