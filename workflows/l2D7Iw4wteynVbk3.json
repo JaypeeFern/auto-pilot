@@ -1,0 +1,867 @@
+{
+   "active" : true,
+   "activeVersionId" : "9afd2feb-16c5-4172-902a-6e8d1a967a46",
+   "connections" : {
+      "Build No-Booking Message" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram No-Booking Note",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Build Reminder Message" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram Reminder",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Calculate Tomorrow" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Iphone 13 Bookings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Canon EOS R50 Bookings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Insta360 X5 Bookings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read DJI Osmo Pocket 3 Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Check Has Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build Reminder Message",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build No-Booking Message",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Combine Device Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Filter Tomorrow's Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Filter Tomorrow's Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Check Has Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "On-Demand Entry" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Run Settings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Canon EOS R50 Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Canon EOS R50",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read DJI Osmo Pocket 3 Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag DJI Osmo Pocket 3",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Insta360 X5 Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Insta360 X5",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Iphone 13 Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Iphone 13",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Run Settings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Calculate Tomorrow",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Canon EOS R50" : {
+         "main" : [
+            [
+               {
+                  "index" : 1,
+                  "node" : "Combine Device Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag DJI Osmo Pocket 3" : {
+         "main" : [
+            [
+               {
+                  "index" : 3,
+                  "node" : "Combine Device Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Insta360 X5" : {
+         "main" : [
+            [
+               {
+                  "index" : 2,
+                  "node" : "Combine Device Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Iphone 13" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Combine Device Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Twice-Daily Reminder Trigger" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Run Settings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-05T20:11:46.403Z",
+   "description" : "Daily 08:00 Manila check of device booking sheets for rentals starting tomorrow, compiled into one Telegram reminder.",
+   "id" : "l2D7Iw4wteynVbk3",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp",
+      "templateCredsSetupCompleted" : true
+   },
+   "name" : "Next-Day Booking Reminder",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "id" : "ff0f8dc8-947b-4aa3-9bca-2886ed57483d",
+         "name" : "Twice-Daily Reminder Trigger",
+         "parameters" : {
+            "rule" : {
+               "interval" : [
+                  {},
+                  {
+                     "triggerAtHour" : 12
+                  }
+               ]
+            }
+         },
+         "position" : [
+            240,
+            400
+         ],
+         "type" : "n8n-nodes-base.scheduleTrigger",
+         "typeVersion" : 1.4
+      },
+      {
+         "id" : "0097904e-890a-4706-bca4-378ffbf8f897",
+         "name" : "Calculate Tomorrow",
+         "parameters" : {
+            "jsCode" : "const TIMEZONE = 'Asia/Manila'; const now = new Date(); const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now); const p = todayDate.split('-'); const t = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]))); t.setUTCDate(t.getUTCDate() + 1); const targetDate = t.toISOString().slice(0, 10); const displayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(t); const todayDisplayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(now); const clock = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false }).format(now); const cp = clock.split(':'); const nowMinutes = Number(cp[0]) * 60 + Number(cp[1]); return [{ json: { targetDate: targetDate, displayDate: displayDate, todayDate: todayDate, todayDisplayDate: todayDisplayDate, timezone: TIMEZONE, nowMinutes: nowMinutes } }];"
+         },
+         "position" : [
+            464,
+            400
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "c78c4404-6a17-43a5-9b71-4605fb8f3d86",
+         "name" : "Read Iphone 13 Bookings",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Iphone 13"
+            }
+         },
+         "position" : [
+            688,
+            208
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "0b829d55-56a6-4774-98aa-0488815c130e",
+         "name" : "Tag Iphone 13",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "device-tag-a",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Iphone 13"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            912,
+            208
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "9e0a27f3-0891-41bd-94ae-ee823de639eb",
+         "name" : "Combine Device Bookings",
+         "parameters" : {
+            "numberInputs" : 4
+         },
+         "position" : [
+            1120,
+            400
+         ],
+         "type" : "n8n-nodes-base.merge",
+         "typeVersion" : 3.2
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "3c30d9b7-8744-4bf4-add9-7d851d02201f",
+         "name" : "Read Canon EOS R50 Bookings",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Canon EOS R50"
+            }
+         },
+         "position" : [
+            688,
+            400
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "3fb01bde-293d-477e-915f-0e086fc10c1f",
+         "name" : "Tag Canon EOS R50",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "device-tag-b",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Canon EOS R50"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            912,
+            400
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "bad8c0d4-803c-44cd-b7b9-df64a50cda47",
+         "name" : "Read Insta360 X5 Bookings",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Insta360 X5"
+            }
+         },
+         "position" : [
+            688,
+            608
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "91b870ba-6830-45db-8d13-4d6a4d8d6b86",
+         "name" : "Tag Insta360 X5",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "device-tag-c",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Insta360 X5"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            912,
+            608
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "caed1fc9-d1a9-49b3-ba36-c24a09e90b80",
+         "name" : "Filter Tomorrow's Bookings",
+         "parameters" : {
+            "jsCode" : "const START_DATE_FIELD = 'Start Date'; const STATUS_FIELD = 'Status'; const RENTER_FIELD = 'Renter Name'; const PICKUP_TIME_FIELD = 'Time'; const RETURN_FIELD = 'End Date'; const DEVICE_FIELD = 'device'; const ADDRESS_FIELD = 'Address'; const NOTES_FIELD = 'Notes'; const REMAINING_FIELD = 'Remaining'; const DOWN_PAYMENT_FIELD = 'Down Payment'; const DIVE_CASE_FIELD = 'Dive Case'; const ACTIVE_STATUSES = ['booked']; const DIVE_NO = ['no', 'n', 'none', 'n/a', 'na', 'nil', 'null', '-', '—', '0', 'false', 'x']; const ref = $('Calculate Tomorrow').first().json; const target = ref.targetDate; const today = ref.todayDate; const nowM = ref.nowMinutes; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const s = String(v).trim(); const m = s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(s); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function shortDate(iso) { if (iso === '') return ''; const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d.getTime())) return iso; return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(d); } function cleanTime(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return ''; const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*([AaPp][Mm])?$/); if (m) return m[1] + ':' + m[2] + (m[4] ? ' ' + m[4].toUpperCase() : ''); return s; } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const s = String(t).trim().toUpperCase(); const m = s.match(/(\\d{1,2})(:(\\d{2}))?\\s*(AM|PM)?/); if (!m) return 99999; let h = Number(m[1]); const mi = m[3] ? Number(m[3]) : 0; const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function daysBetween(a, b) { if (a === '' || b === '') return null; const da = new Date(a + 'T00:00:00Z'); const db = new Date(b + 'T00:00:00Z'); if (isNaN(da.getTime()) || isNaN(db.getTime())) return null; const n = Math.round((db - da) / 86400000); return n < 1 ? 1 : n; } function isActive(st) { const slow = st.trim().toLowerCase(); for (const k of ACTIVE_STATUSES) { if (slow === k) return true; } return false; } function diveYes(v) { const s = v === null || v === undefined ? '' : String(v).trim().toLowerCase(); if (s === '') return 'No'; for (const k of DIVE_NO) { if (s === k) return 'No'; } return 'Yes'; } const out = []; for (const item of $input.all()) { const j = item.json; const sd = normDate(j[START_DATE_FIELD]); const ed = normDate(j[RETURN_FIELD]); const st = j[STATUS_FIELD] !== undefined && j[STATUS_FIELD] !== null ? String(j[STATUS_FIELD]) : ''; if (!isActive(st)) continue; const rawTime = j[PICKUP_TIME_FIELD] !== undefined && j[PICKUP_TIME_FIELD] !== null ? String(j[PICKUP_TIME_FIELD]).trim() : ''; const pt = rawTime; const tDisp = cleanTime(rawTime); const section = sd === today ? 'today' : (sd === target ? 'tomorrow' : ''); const pickupAt = sd !== '' && tDisp !== '' ? shortDate(sd) + ', ' + tDisp : (sd !== '' ? shortDate(sd) : tDisp); const returnAt = ed !== '' && tDisp !== '' ? shortDate(ed) + ', ' + tDisp : (ed !== '' ? shortDate(ed) : ''); const base = { device: j[DEVICE_FIELD] || '', renter: j[RENTER_FIELD] || '', bookingDate: sd, pickupTime: pt, pickupAt: pickupAt, returnInfo: j[RETURN_FIELD] || '', returnAt: returnAt, status: st, address: j[ADDRESS_FIELD] || '', notes: j[NOTES_FIELD] || '', remaining: j[REMAINING_FIELD] || '', downPayment: j[DOWN_PAYMENT_FIELD] || '', diveCase: diveYes(j[DIVE_CASE_FIELD]), durationDays: daysBetween(sd, ed) }; if (section === 'today' && mins(pt) >= nowM) { base.section = 'today'; out.push({ json: base }); } else if (section === 'tomorrow') { base.section = 'tomorrow'; out.push({ json: base }); } else if (section === '' && ed === today && sd !== today) { base.section = 'return'; out.push({ json: base }); } } out.sort((a, b) => { const order = { today: 0, tomorrow: 1, return: 2 }; const o = order[a.json.section] - order[b.json.section]; if (o !== 0) return o; if (a.json.section !== 'return') { const d = mins(a.json.pickupTime) - mins(b.json.pickupTime); if (d !== 0) return d; } const dv = String(a.json.device).localeCompare(String(b.json.device)); if (dv !== 0) return dv; return String(a.json.renter).localeCompare(String(b.json.renter)); }); const rows = out.map(o => o.json); return [{ json: { targetDate: target, displayDate: ref.displayDate, todayDate: today, todayDisplayDate: ref.todayDisplayDate, todayShort: shortDate(today), displayShort: shortDate(target), timezone: ref.timezone, count: rows.length, bookings: rows } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1328,
+            400
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "dc3d5542-a66e-4a0a-8a14-6b94e48ca8c2",
+         "name" : "Check Has Bookings",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "or",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.count }}",
+                     "operator" : {
+                        "operation" : "larger",
+                        "type" : "number"
+                     },
+                     "rightValue" : 0
+                  },
+                  {
+                     "leftValue" : "={{ $json.bookings }}",
+                     "operator" : {
+                        "operation" : "notEmpty",
+                        "type" : "array"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 2
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            1520,
+            400
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "id" : "de3b4b96-7288-4dbc-98f6-8f915b93078b",
+         "name" : "Build Reminder Message",
+         "parameters" : {
+            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; const SEP = '━━━━━━━━━━━━━━━━━━'; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } function val(v, emptyText) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return emptyText === undefined ? '—' : emptyText; return esc(s); } function dpVal(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return '₱0'; const n = parseFloat(s.replace(/[^0-9.\\-]/g, '')); if (isNaN(n)) return esc(s); return '₱' + n.toLocaleString('en-US'); } function durVal(n) { if (n === null || n === undefined) return '—'; return n + (n === 1 ? ' day' : ' days'); } function isInsta(b) { return String(b.device || '').trim().toLowerCase() === 'insta360 x5'; } function head(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); return icon + '<b>' + esc(name) + '</b>'; } function block(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('🕐 <b>Pickup:</b> ' + val(b.pickupAt)); L.push('↩️ <b>Return:</b> ' + val(b.returnAt)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } function returnBlock(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('📤 <b>Out since:</b> ' + val(b.bookingDate)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } const lines = []; lines.push('📅 <b>UPCOMING BOOKINGS</b>'); const td = d.bookings.filter(b => b.section === 'today'); const tm = d.bookings.filter(b => b.section !== 'today' && b.section !== 'return'); const rt = d.bookings.filter(b => b.section === 'return'); if (td.length > 0) { lines.push(''); lines.push('<b>Today, ' + esc(d.todayShort || d.todayDisplayDate) + ' — ' + td.length + (td.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of td) lines.push(block(b)); } if (tm.length > 0) { lines.push(''); lines.push('<b>Tomorrow, ' + esc(d.displayShort || d.displayDate) + ' — ' + tm.length + (tm.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of tm) lines.push(block(b)); } if (rt.length > 0) { lines.push(''); lines.push('<b>Returns due, ' + esc(d.todayShort || d.todayDisplayDate) + ' — ' + rt.length + (rt.length === 1 ? ' unit</b>' : ' units</b>')); lines.push(''); for (const b of rt) lines.push(returnBlock(b)); } return [{ json: { telegramMessage: lines.join('\\n').trim(), count: d.count, displayDate: d.displayDate } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1728,
+            304
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "ffbdbefc-7197-4ff4-bee1-69826e7f5c15",
+         "name" : "Send Telegram Reminder",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "-5579280398",
+            "inlineKeyboard" : {
+               "rows" : [
+                  {
+                     "row" : {
+                        "buttons" : [
+                           {
+                              "additionalFields" : {
+                                 "callback_data" : "refresh"
+                              },
+                              "text" : "🔄 Check Bookings Now"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            },
+            "replyMarkup" : "inlineKeyboard",
+            "text" : "={{ $('Build Reminder Message').item.json.telegramMessage }}"
+         },
+         "position" : [
+            1920,
+            304
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "51bf7380-2cc7-41d0-9b87-52030781863e"
+      },
+      {
+         "id" : "314a3251-9814-4270-b632-e682b302b95c",
+         "name" : "Build No-Booking Message",
+         "parameters" : {
+            "jsCode" : "const d = $input.first().json; return [{ json: { telegramMessage: 'No upcoming bookings today or tomorrow (' + d.todayDisplayDate + ' \\u2013 ' + d.displayDate + ').', count: 0, displayDate: d.displayDate } }];"
+         },
+         "position" : [
+            1728,
+            512
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "1fde3017-e4eb-4950-94e6-c631e52a97fc",
+         "name" : "Send Telegram No-Booking Note",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "-5579280398",
+            "inlineKeyboard" : {
+               "rows" : [
+                  {
+                     "row" : {
+                        "buttons" : [
+                           {
+                              "additionalFields" : {
+                                 "callback_data" : "refresh"
+                              },
+                              "text" : "🔄 Check Bookings Now"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            },
+            "replyMarkup" : "inlineKeyboard",
+            "text" : "={{ $('Build No-Booking Message').item.json.telegramMessage }}"
+         },
+         "position" : [
+            1920,
+            512
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "18c45749-7d0c-429c-99fc-ff73ead5ce3d"
+      },
+      {
+         "id" : "fa316915-57bb-495c-aaa1-f763ccc88032",
+         "name" : "README Live Config",
+         "parameters" : {
+            "color" : 4,
+            "content" : "## Next-Day Booking Reminder — live config\nSchedule: 08:00 + 20:00 Asia/Manila daily (workflow timezone set; instance default UTC).\nSheets: 4 branches (Iphone 13, Canon EOS R50, Insta360 X5, DJI Osmo Pocket 3), spreadsheet ID set, OAuth credential attached to all reads.\nColumns: Start Date / End Date / Time (= pickup) / Status / Renter Name / Address / Notes / Remaining / Down Payment. Insta360-only: Dive Case → Yes/No.\nFilter: status allowlist = Booked only. Window = today (pickup still ahead) + tomorrow, plus returns due today.\nMessage: single Telegram send from Build Reminder Message — fan out future channels (Discord/Messenger) from that node.\nTelegram: bot credential attached; chat ID pasted on both Send nodes.\nDo not add :latest, do not embed secrets (credentials only).",
+            "height" : 364,
+            "width" : 484
+         },
+         "position" : [
+            32,
+            -32
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "06c76c8e-c956-4e9f-a0d2-a183ec43fb47",
+         "name" : "Read DJI Osmo Pocket 3 Bookings",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "DJI Osmo Pocket 3"
+            }
+         },
+         "position" : [
+            688,
+            800
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "9c6427c3-3d44-4800-b308-3f2b50f56436",
+         "name" : "Tag DJI Osmo Pocket 3",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "device-tag-d",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "DJI Osmo Pocket 3"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            912,
+            800
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "5840cf89-2f8c-46e2-bcc9-d3c0e4c989e7",
+         "name" : "On-Demand Entry",
+         "parameters" : {
+            "inputSource" : "passthrough"
+         },
+         "position" : [
+            460,
+            560
+         ],
+         "type" : "n8n-nodes-base.executeWorkflowTrigger",
+         "typeVersion" : 1.2
+      },
+      {
+         "id" : "df80d6bf-b518-459d-8f5b-a4e6312138b3",
+         "name" : "Run Settings",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "is-debug-flag",
+                     "name" : "isDebug",
+                     "type" : "boolean",
+                     "value" : false
+                  }
+               ]
+            },
+            "includeOtherFields" : false,
+            "mode" : "manual"
+         },
+         "position" : [
+            352,
+            400
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "b7a43eb3-2d65-4df0-aad1-2677a2943595",
+         "name" : "Debug Send?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $('Run Settings').first().json.isDebug }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            0,
+            0
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "f4806ece-8640-4e2b-bd14-07f6f31e7912",
+         "name" : "Send Telegram Reminder (Dev)",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "5854600701",
+            "operation" : "sendMessage",
+            "resource" : "message",
+            "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Build Reminder Message').item.json.telegramMessage }}"
+         },
+         "position" : [
+            0,
+            0
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "9763b729-157d-4302-a8b3-3ca64a75c399"
+      },
+      {
+         "id" : "8ca31854-9eed-4fe1-bd10-9126aae45208",
+         "name" : "Debug Send? (Empty)",
+         "parameters" : {},
+         "position" : [
+            0,
+            0
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      }
+   ],
+   "pinData" : {},
+   "settings" : {
+      "availableInMCP" : true,
+      "binaryMode" : "separate",
+      "executionOrder" : "v1",
+      "timezone" : "Asia/Manila"
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-05T20:11:46.478Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-05T20:11:46.478Z",
+         "workflowId" : "l2D7Iw4wteynVbk3"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : {
+      "node:Twice-Daily Reminder Trigger" : {
+         "recurrenceRuleSignatures" : [
+            null,
+            null
+         ],
+         "recurrenceRules" : [
+            null,
+            null
+         ]
+      }
+   },
+   "tags" : [],
+   "triggerCount" : 1,
+   "updatedAt" : "2026-09-05T22:26:06.480Z",
+   "versionCounter" : 107,
+   "versionId" : "4b6f58dd-4ed1-4842-a1ab-38fd78ad702b",
+   "versionMetadata" : {
+      "description" : "Added nodes: Debug Send? (Empty)",
+      "name" : "Add debug gate for no-booking path"
+   }
+}

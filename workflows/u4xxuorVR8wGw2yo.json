@@ -1,0 +1,262 @@
+{
+   "active" : true,
+   "activeVersionId" : "e27f0ee1-3b14-461c-96fb-fced1e727371",
+   "connections" : {
+      "Answer Button Tap" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Run Reminder Now",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Is Button Tap?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Answer Button Tap",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Run Reminder Now",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Refresh Requested?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Is Button Tap?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Telegram Updates" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Refresh Requested?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-05T22:12:26.019Z",
+   "description" : "Runs the booking reminder on demand when the team taps Refresh or sends /check in the group.",
+   "id" : "u4xxuorVR8wGw2yo",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "Booking Reminder On-Demand",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "01dd53a9-b519-4514-a60a-0e0d459e9d57",
+         "name" : "Telegram Updates",
+         "parameters" : {
+            "additionalFields" : {
+               "chatIds" : "-5579280398"
+            },
+            "updates" : [
+               "message",
+               "callback_query"
+            ]
+         },
+         "position" : [
+            240,
+            400
+         ],
+         "type" : "n8n-nodes-base.telegramTrigger",
+         "typeVersion" : 1.5,
+         "webhookId" : "364df27f-4905-49bf-a615-1a0ed2a009e0"
+      },
+      {
+         "id" : "52205b40-be96-47cf-b61a-37e80a432189",
+         "name" : "Refresh Requested?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "or",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.message?.text ?? '' }}",
+                     "operator" : {
+                        "operation" : "contains",
+                        "type" : "string"
+                     },
+                     "rightValue" : "/check"
+                  },
+                  {
+                     "leftValue" : "={{ $json.callback_query?.data ?? '' }}",
+                     "operator" : {
+                        "operation" : "equals",
+                        "type" : "string"
+                     },
+                     "rightValue" : "refresh"
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            464,
+            400
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "id" : "9dac1845-5a60-4b03-bfc3-696b7cc10ab9",
+         "name" : "Is Button Tap?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.callback_query?.id ?? \"\" }}",
+                     "operator" : {
+                        "operation" : "notEquals",
+                        "type" : "string"
+                     },
+                     "rightValue" : ""
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            688,
+            400
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "003c3521-acb5-404f-99f7-40211e9bdbb8",
+         "name" : "Answer Button Tap",
+         "parameters" : {
+            "additionalFields" : {
+               "text" : "Checking all 4 device sheets — fresh reminder incoming…"
+            },
+            "queryId" : "={{ $json.callback_query.id }}",
+            "resource" : "callback"
+         },
+         "position" : [
+            912,
+            304
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "68b1b34c-8ecb-4786-a264-82ebfefadbb8"
+      },
+      {
+         "id" : "352480eb-466c-4adf-850b-0c622d6ed51e",
+         "name" : "Run Reminder Now",
+         "parameters" : {
+            "options" : {},
+            "workflowId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "l2D7Iw4wteynVbk3"
+            }
+         },
+         "position" : [
+            1120,
+            400
+         ],
+         "type" : "n8n-nodes-base.executeWorkflow",
+         "typeVersion" : 1.3
+      },
+      {
+         "id" : "a2df5cfc-a7dc-492c-ac7c-74c67cbdb953",
+         "name" : "Sticky Note 6f8973e7",
+         "parameters" : {
+            "color" : 5,
+            "content" : "## Booking Reminder On-Demand\nListens in the team group only (chat ID gated on the trigger).\nRuns the main Next-Day Booking Reminder when:\n- anyone taps the Refresh button under a reminder message, or\n- anyone sends /check in the group.\nAll other messages are ignored. The fresh reminder is sent by the main workflow itself.",
+            "height" : 260,
+            "width" : 420
+         },
+         "position" : [
+            -128,
+            80
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      }
+   ],
+   "pinData" : {},
+   "settings" : {
+      "availableInMCP" : true,
+      "binaryMode" : "separate",
+      "executionOrder" : "v1"
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-05T22:12:26.158Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-05T22:12:26.158Z",
+         "workflowId" : "u4xxuorVR8wGw2yo"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 1,
+   "updatedAt" : "2026-09-05T22:21:06.138Z",
+   "versionCounter" : 4,
+   "versionId" : "e27f0ee1-3b14-461c-96fb-fced1e727371",
+   "versionMetadata" : {
+      "description" : "Updated nodes: Answer Button Tap",
+      "name" : "Explicit refresh toast text"
+   }
+}
