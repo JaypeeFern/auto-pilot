@@ -1,0 +1,96 @@
+{
+   "active" : true,
+   "activeVersionId" : "2466479b-27e4-4878-ae3b-fc79d72bfaa9",
+   "connections" : {
+      "Webhook" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond OK",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-04T21:17:28.631Z",
+   "description" : "GET webhook that returns {\"status\":\"ok\",\"source\":\"AutoPilot\"}",
+   "id" : "f89FqMe9b0oz7zyC",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "AutoPilot Webhook Test",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "id" : "46e423b9-79b5-4d99-a190-729d1a30d52a",
+         "name" : "Webhook",
+         "parameters" : {
+            "httpMethod" : "GET",
+            "path" : "autopilot-webhook-test",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            0
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "02d36fdc-52cd-4b9f-bb24-389bc6bac560"
+      },
+      {
+         "id" : "08ba1b23-c79d-416c-a251-d1f8e50d71e6",
+         "name" : "Respond OK",
+         "parameters" : {
+            "options" : {},
+            "respondWith" : "json",
+            "responseBody" : "{\"status\":\"ok\",\"source\":\"AutoPilot\"}"
+         },
+         "position" : [
+            224,
+            0
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      }
+   ],
+   "pinData" : null,
+   "settings" : {
+      "availableInMCP" : true,
+      "executionOrder" : "v1"
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-04T21:17:28.653Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-04T21:17:28.653Z",
+         "workflowId" : "f89FqMe9b0oz7zyC"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 1,
+   "updatedAt" : "2026-09-04T21:17:28.631Z",
+   "versionCounter" : 1,
+   "versionId" : "2466479b-27e4-4878-ae3b-fc79d72bfaa9",
+   "versionMetadata" : {
+      "description" : "Created with 2 nodes: Webhook, Respond OK",
+      "name" : "Initial webhook test workflow"
+   }
+}
