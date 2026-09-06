@@ -21,15 +21,22 @@ day's prep; evening run catches bookings entered during the day.
 Schedule (08:00 + 20:00 Manila)
   → Run Settings (debug switch, normally off)
     → Calculate Tomorrow (today + tomorrow dates in Manila time)
-      → Read 4 device tabs → tag each row with its device
+      → Read Bot State (last sent message id) → Read 4 device tabs
+        → tag each row with its device
         → Combine → Filter → Check Has Bookings?
-          → yes: build message → group send (or DM send in debug)
-          → no:  short "no bookings" note → group send (or DM send in debug)
+          → yes: build message → debug gate → delete previous group
+               message → send new → save new message id
+          → no:  short "no bookings" note → same delete → send → save
 ```
 
-- **One message per run.** All matching bookings from all tabs are merged,
-  sorted (today first, then pickup time, then device/renter), and sent
-  together. Never one message per row.
+- **One message, always current.** Each group send first deletes the
+  previous group message, then sends fresh and records the new message
+  id in the `_State` tab. The group chat holds exactly one reminder;
+  every run still notifies normally (unlike silent message edits). A
+  missing old message never blocks the new send.
+- All matching bookings from all tabs are merged and sorted (today
+  first, then pickup time, then device/renter). Never one message
+  per row.
 - **Sheet/API failure fails the run.** A read error never turns into a
   fake "no bookings" message. If the team gets no message at all, check
   Executions — something broke before the send step.
@@ -56,6 +63,10 @@ Columns used:
 | `Renter Name`, `Address`, `Notes` | Shown as-is |
 | `Remaining`, `Down Payment` | Shown as peso amounts (`₱0` when empty) |
 | `Dive Case` | Insta360 tab only, normalised to Yes/No, shown on Insta360 rows only |
+
+Plus a `_State` tab (`Key` | `Value`) holding one row, `lastMessageId` —
+the bot's own bookkeeping for replacing the previous group message. Hide
+it if you like, but don't delete it; hidden tabs stay API-accessible.
 
 ## Repeat rule (status-driven)
 
