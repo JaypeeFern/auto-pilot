@@ -11,22 +11,30 @@ delivers a single readable message to the team group.
 
 ## Schedule
 
-Twice daily: **08:00 + 20:00 Asia/Manila**. The workflow timezone is set
-explicitly because the instance default is UTC. Morning run covers the
-day's prep; evening run catches bookings entered during the day.
+Hourly. The workflow timezone is set explicitly because the instance
+default is UTC. A stable-hash change gate (`Compute Stable Hash` vs the
+`lastReminderHash` key in `_State`) stops unchanged runs silently before
+any delete/send — the group only hears when bookings actually changed.
+Same-day bookings therefore surface within the hour, and quiet hours
+cost zero notifications. The hash covers device, renter, dates, times,
+status, section, address, notes, payments, and the next-check label —
+deliberately not the live countdown figures, which would resend hourly.
 
 ## Flow, step by step
 
 ```text
-Schedule (08:00 + 20:00 Manila)
+Schedule (hourly)
   → Run Settings (debug switch, normally off)
     → Calculate Tomorrow (today + tomorrow dates in Manila time)
-      → Read Bot State (last sent message id) → Read 4 device tabs
-        → tag each row with its device
-        → Combine → Filter → Check Has Bookings?
-          → yes: build message → debug gate → delete previous group
-               message → send new → save new message id
-          → no:  short "no bookings" note → same delete → send → save
+      → Read Bot State (last sent message id)
+        → Read Reminder Hash (inline, keeps item pairing for the gate)
+        → Fetch Core Bookings (Bookings Core sub-workflow: 4 tabs +
+           normalize) → Filter → Compute Stable Hash → Check Has Bookings?
+          → yes: build message → Send Reminder? (changed only)
+               → debug gate → delete previous group message
+               → send new → save new message id + hash
+          → no:  short "no bookings" note → Send Note? (changed only)
+               → same delete → send → save
 ```
 
 - **One message, always current.** Each group send first deletes the
@@ -49,8 +57,12 @@ Schedule (08:00 + 20:00 Manila)
 
 ## Booking source
 
-One Google spreadsheet, four tabs: `Iphone 13`, `Canon EOS R50`,
-`Insta360 X5`, `DJI Osmo Pocket 3`. Each tab is read in full every run.
+`Bookings Core` (`docs/workflows/bookings-core/WORKFLOW.md`) reads one
+Google spreadsheet, four tabs (`Iphone 13`, `Canon EOS R50`,
+`Insta360 X5`, `DJI Osmo Pocket 3`), tags each row with its device, and
+returns normalized rows. This workflow maps those rows onto its legacy
+field shape in `Filter Tomorrow's Bookings` and keeps all section,
+sort, and message logic unchanged.
 
 Columns used:
 
@@ -61,12 +73,21 @@ Columns used:
 | `Time` | Pickup time. Return time reuses it (24-hour minimum booking) |
 | `Status` | `Booked` (secured, upcoming) and `Released` (unit out, return tracked) remind — see status model below |
 | `Renter Name`, `Address`, `Notes` | Shown as-is |
-| `Balance`, `Down Payment` | Shown as peso amounts (`₱0` when empty) |
+| `Balance`, `Down Payment` | Shown as peso amounts (`₱0` when empty).
+  `Balance` falls back to a `Remaining` column — tabs vary, see
+  `docs/workflows/bookings-core/WORKFLOW.md` |
 | `Dive Case` | Insta360 tab only, normalised to Yes/No, shown on Insta360 rows only |
 
-Plus a `_State` tab (`Key` | `Value`) holding one row, `lastMessageId` —
-the bot's own bookkeeping for replacing the previous group message. Hide
+Plus a `_State` tab (`Key` | `Value`) holding `lastMessageId` —
+the bot's own bookkeeping for replacing the previous group message — and
+`lastReminderHash`, the stable hash of the last sent content. Hide
 it if you like, but don't delete it; hidden tabs stay API-accessible.
+
+**Draft convention: Status is the commit signal — fill it in last.**
+A row with blank `Status` is invisible to every output, so half-typed
+rows never alert or unverify a device. (A row with `Status` set but
+dates/times still being typed will briefly flag its device unverified
+in the checker — honest, and it clears on the next hourly run.)
 
 ## Status model and repeat rule
 
@@ -114,7 +135,8 @@ it is on, the team gets nothing, including from the scheduled runs.
 
 ## Credentials (names only — values live in n8n)
 
-- `Google Sheets account` (OAuth2): attached to all four Read nodes.
+- `Google Sheets account` (OAuth2): attached to the Core read nodes and
+  the `_State` reads/writes in this workflow.
 - `Telegram account` (bot token): attached to all Telegram nodes
   (group + DM sends, deletes).
 

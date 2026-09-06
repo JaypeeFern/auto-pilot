@@ -94,7 +94,7 @@ volume backup (same `N8N_ENCRYPTION_KEY` required to decrypt after restore).
 | Memory | `mem_limit: 768m`, `mem_reservation: 384m`, no CPU limit. Verified floor for 2.37.x (512 MB OOMs the JS heap at boot); heap explicitly capped at 512 MB via `NODE_OPTIONS` leaving room for native SQLite/task-runner memory |
 | Restart | `unless-stopped` |
 | Ports | None published; `expose: 5678` for the Coolify proxy (host port mapping would bypass the proxy) |
-| Health | Custom `healthcheck` against `GET /healthz` (the official image ships no `HEALTHCHECK`; `/healthz` = reachable, `/healthz/readiness` = DB-ready) |
+| Health | n8n: custom `healthcheck` against `GET /healthz` via node (official image ships no `HEALTHCHECK`; `/healthz` = reachable, `/healthz/readiness` = DB-ready; uses `127.0.0.1` + `${N8N_PORT}`). Exporter: checks baked scripts executable, git runnable, and `/exports/export-workflows.sh` delivered |
 | Export sidecar | `exporter` service, thin wrapper (`Dockerfile.exporter`) around pinned `alpine/git:2.54.0` (git + sh only, 64 MB cap) with the sync scripts baked into `/usr/local/bin`, idle `sleep infinity` for tasks to exec into; owns checkout + push, never touches `n8n_data` |
 | Staging | `export_staging` volume at `/exports` in both containers (transient, excluded from R2 backups); `repo_data` volume holds the exporter's replaceable clone |
 | Proxy config | `N8N_PROTOCOL=https`, `N8N_HOST` + `N8N_EDITOR_BASE_URL` + `N8N_WEBHOOK_URL` = public URL, `N8N_PROXY_HOPS=1` |

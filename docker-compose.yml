@@ -85,10 +85,13 @@ services:
       # /healthz returns 200 when the instance is reachable (DB status NOT
       # included; /healthz/readiness covers DB but is stricter than needed here).
       # Uses node (always present in the image) instead of wget/curl.
+      # 127.0.0.1 instead of localhost: newer Docker Engines can resolve
+      # localhost to ::1 inside the container while n8n listens on IPv4.
+      # Port follows N8N_PORT so a non-default port keeps the check valid.
       test:
         [
           "CMD-SHELL",
-          "node -e \"fetch('http://localhost:5678/healthz').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))\"",
+          "node -e \"fetch('http://127.0.0.1:${N8N_PORT:-5678}/healthz').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))\"",
         ]
       interval: 30s
       timeout: 10s
@@ -129,6 +132,22 @@ services:
       - GIT_TOKEN=${GIT_TOKEN}
       - GIT_AUTHOR_NAME=${GIT_AUTHOR_NAME:-autopilot-export}
       - GIT_AUTHOR_EMAIL=${GIT_AUTHOR_EMAIL:-autopilot-export@localhost}
+    healthcheck:
+      # Idle sidecar: no ports, no daemon. The meaningful signal is that the
+      # image is intact and the entrypoint finished — baked sync scripts are
+      # executable, git runs, and export-workflows.sh was delivered to the
+      # shared /exports volume for the n8n task to run. Uses only busybox
+      # builtins + git (both guaranteed in alpine/git). /repo is NOT checked:
+      # git-sync.sh re-clones it on demand, so an empty checkout is valid.
+      test:
+        [
+          "CMD-SHELL",
+          "test -x /usr/local/bin/git-sync && test -f /exports/export-workflows.sh && git --version",
+        ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 
 volumes:
   n8n_data:

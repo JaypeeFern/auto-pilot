@@ -33,7 +33,9 @@ Telegram Updates (group chat only)
     → Run Settings (debug switch, normally off)
       → Parse Request (month + daily start time)
         → Request Understood?
-          → yes: Read Answer State → Read 4 device tabs → Combine
+          → yes: Read Answer State
+                   → Fetch Core Bookings (Bookings Core sub-workflow:
+                      4 tabs + normalize)
                    → Check Availability → Build → Has Prior?
                      → delete previous answer → delete /avail command
                      → Debug? → group send + save id (or DM send in debug)
@@ -97,7 +99,8 @@ Set back to `false` and publish when done testing.
 
 - `RentalAvailabilityBot` (bot token): trigger, deletes, sends, pin.
   The bot must be group admin with message-delete permission.
-- `Google Sheets account` (OAuth2): all four Read nodes.
+- `Google Sheets account` (OAuth2): the Core read nodes (plus the
+  `_State` reads/writes in this workflow).
 
 No tokens, chat IDs, or spreadsheet IDs are documented here on purpose.
 
@@ -106,7 +109,8 @@ No tokens, chat IDs, or spreadsheet IDs are documented here on purpose.
 - **Someone reports a wrong free/blocked day:** check the booking's
   Start/End/Time cells and Status (`Booked`/`Released` count; everything
   else is ignored). Times with seconds are fine.
-- **New device tab:** duplicate a Read + Tag pair, add the device to the
-  device lists in `Check Availability` and the emoji map in the builder.
+- **New device tab:** add the tab + tag in `Bookings Core`, add the
+  device to the device list in `Check Availability` and the emoji map in
+  the builder.
 - **Changing the 24-hour minimum:** it is a constant in the overlap
   check — one place.
