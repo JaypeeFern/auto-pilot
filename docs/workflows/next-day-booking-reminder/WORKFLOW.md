@@ -59,25 +59,25 @@ Columns used:
 | `Start Date` | Decides whether a row belongs in the message |
 | `End Date` | Shown as the return; also feeds duration and the returns section |
 | `Time` | Pickup time. Return time reuses it (24-hour minimum booking) |
-| `Status` | Only `Booked` rows remind (see repeat rule below) |
+| `Status` | `Booked` (secured, upcoming) and `Released` (unit out, return tracked) remind — see status model below |
 | `Renter Name`, `Address`, `Notes` | Shown as-is |
-| `Remaining`, `Down Payment` | Shown as peso amounts (`₱0` when empty) |
+| `Balance`, `Down Payment` | Shown as peso amounts (`₱0` when empty) |
 | `Dive Case` | Insta360 tab only, normalised to Yes/No, shown on Insta360 rows only |
 
 Plus a `_State` tab (`Key` | `Value`) holding one row, `lastMessageId` —
 the bot's own bookkeeping for replacing the previous group message. Hide
 it if you like, but don't delete it; hidden tabs stay API-accessible.
 
-## Repeat rule (status-driven)
+## Status model and repeat rule
 
-A booking keeps appearing until the team marks it handled:
+- `Booked` = requirements complete, schedule secured. Shows in the
+  pickup sections while its dates match.
+- `Released` = unit handed to the customer, rental clock running. Shows
+  in the return sections while its End Date is today or tomorrow.
+- `Returned`, `Available`, `Pending`, anything else → skipped.
 
-- `Booked` → reminds every run while its dates match.
-- `Released`, `Returned`, `Available`, `Pending` (or anything else) → skipped.
-- The message footer says this outright: *"Bookings keep showing
-  until marked Released."*
-
-Team habit: after handing over a unit, flip its Status to `Released`.
+A booking keeps appearing until the team moves it forward: flip a
+handed-over unit to `Released`, and a returned unit to `Returned`.
 Same-day window covers pickups from up to 30 minutes ago, so schedule
 drift can't drop an on-the-hour booking.
 
@@ -85,14 +85,17 @@ drift can't drop an on-the-hour booking.
 
 ```text
 Upcoming Bookings
-Today, <date> — N bookings
-  ...one block per booking, pickup-time order...
-Tomorrow, <date> — N bookings
-  ...
-Returns due today — N units
-  ...units whose End Date is today but started earlier...
+[Today ...] [Tomorrow ... full blocks, or an explicit none-line]
+Due for Return - N units
+  ...one compact countdown line each, soonest first...
 Next check: <Today/Tomorrow, 8:00 AM/PM>
 ```
+
+Two sections. Upcoming pickups render as full blocks (or a "No upcoming
+bookings today or tomorrow (dates)" line when empty). Due-for-return
+renders one compact line per unit with a live countdown, limited to
+rentals due back within 24 hours (past-due included); the header always
+shows with its true count, even 0.
 
 Each booking block shows: device, renter, pickup (date + time), return
 (date + time), duration in days, address, status, notes, down payment,
@@ -112,8 +115,8 @@ it is on, the team gets nothing, including from the scheduled runs.
 ## Credentials (names only — values live in n8n)
 
 - `Google Sheets account` (OAuth2): attached to all four Read nodes.
-- `Telegram account` (bot token): attached to all four Send nodes
-  (group + DM variants on each path).
+- `Telegram account` (bot token): attached to all Telegram nodes
+  (group + DM sends, deletes).
 
 No tokens, chat IDs, or spreadsheet IDs are documented here on purpose —
 they live in the workflow definitions and n8n credentials, never in Git
@@ -130,7 +133,9 @@ only, never secret values).
   The "Next check" footer derives from the 08:00/20:00 slots — keep them
   in sync if the schedule changes.
 - **Someone reports a missing booking:** check three things in order —
-  Status is exactly `Booked`, Start Date matches today/tomorrow in Manila
-  time, pickup time hasn't passed (30-minute grace applies).
-- **Someone reports a booking that won't go away:** its Status is still
-  `Booked`. Flip it to `Released`.
+  Status is `Booked` (upcoming) or `Released` (returns), dates match
+  today/tomorrow in Manila time, pickup time hasn't passed (30-minute
+  grace applies).
+- **Someone reports a booking that won't go away:** its Status never
+  moved forward. `Booked` → flip to `Released` after handover;
+  `Released` → flip to `Returned` when the unit is back.
