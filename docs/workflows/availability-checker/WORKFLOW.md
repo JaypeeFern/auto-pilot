@@ -15,8 +15,8 @@ does the overlap math so the team doesn't have to.
 
 In the team group only:
 
-- **`/avail`** — current month at 8:00 AM daily starts.
-- **`/avail October`** — that month (time defaults to 8:00 AM).
+- **`/avail`** — current month at 12:00 AM daily starts.
+- **`/avail October`** — that month (time defaults to 12:00 AM).
 - **`/avail Sep 20 9am`** — September view computed at 9:00 AM starts.
   Also accepted: `20 Sep 9am`, `9am Sep 20`, `20/9 2pm`,
   `today 9am`, `tomorrow 9am`. Past months roll to next year.
@@ -64,7 +64,7 @@ of guessing.
 
 ```text
 September 2026 Availability
-24-hour rentals from 8:00 AM daily
+24-hour rentals from 12:00 AM daily
 
 Iphone 13
 September 11 to 18
@@ -74,13 +74,13 @@ September 27 onwards
 Not free
 Iphone 13
 Sep 19 - next pickup Sep 19, 9:00 AM
-Sep 20 - back Sep 20, 9:00 AM
+Sep 20 - return Sep 20, 9:00 AM
 ...
 ```
 
 Free days compress into ranges (`Sep 6`, `Sep 11 to 18`, `Sep 27
 onwards` for tails reaching month-end). Below, a per-device Not-free
-section explains each blocked day (`back X` = unit returns too late;
+section explains each blocked day (`return X` = unit returns too late;
 `next pickup X` = following booking starts too early).
 
 ## Debug switch
