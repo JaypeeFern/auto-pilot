@@ -1,6 +1,6 @@
 {
    "active" : true,
-   "activeVersionId" : "8d981b18-a1fc-4809-a367-3e9238fbd9a8",
+   "activeVersionId" : "4e406c75-abc9-40d1-8b49-17dc42bc0ccd",
    "connections" : {
       "Answer Button Tap" : {
          "main" : [
@@ -69,14 +69,14 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "01dd53a9-b519-4514-a60a-0e0d459e9d57",
          "name" : "Telegram Updates",
          "parameters" : {
             "additionalFields" : {
-               "chatIds" : "-5579280398,5854600701"
+               "chatIds" : "-1003771124764,5854600701"
             },
             "updates" : [
                "message",
@@ -167,7 +167,7 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "003c3521-acb5-404f-99f7-40211e9bdbb8",
@@ -252,11 +252,11 @@
    "staticData" : null,
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T01:28:30.791Z",
-   "versionCounter" : 5,
-   "versionId" : "8d981b18-a1fc-4809-a367-3e9238fbd9a8",
+   "updatedAt" : "2026-09-06T02:08:56.468Z",
+   "versionCounter" : 7,
+   "versionId" : "4e406c75-abc9-40d1-8b49-17dc42bc0ccd",
    "versionMetadata" : {
       "description" : "Updated nodes: Telegram Updates",
-      "name" : "Listen for taps in group and DM"
+      "name" : "Listen on supergroup and DM"
    }
 }

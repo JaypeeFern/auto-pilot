@@ -1,6 +1,6 @@
 {
    "active" : true,
-   "activeVersionId" : "5f5fc457-95bd-49e4-87a2-023cce6c260d",
+   "activeVersionId" : "a8d2f124-cd29-475d-a550-1a1db0df843f",
    "connections" : {
       "Availability Requests" : {
          "main" : [
@@ -46,12 +46,48 @@
             ]
          ]
       },
+      "Debug Send?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Dev Availability Send",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Availability",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Debug Usage?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Dev Usage Send",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Usage Hint",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "Delete Command" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Send Availability",
+                  "node" : "Debug Send?",
                   "type" : "main"
                }
             ]
@@ -68,12 +104,35 @@
             ]
          ]
       },
+      "Delete Prior Usage Answer" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Usage Command",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "Delete Usage Command" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Send Usage Hint",
+                  "node" : "Debug Usage?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Has Handbook?" : {
+         "main" : [
+            null,
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Handbook",
                   "type" : "main"
                }
             ]
@@ -97,12 +156,35 @@
             ]
          ]
       },
+      "Has Prior Usage Answer?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Prior Usage Answer",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Usage Command",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "Is Avail Command?" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Parse Request",
+                  "node" : "Run Settings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Handbook State",
                   "type" : "main"
                }
             ]
@@ -114,11 +196,6 @@
                {
                   "index" : 0,
                   "node" : "Request Understood?",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Answer State",
                   "type" : "main"
                }
             ]
@@ -150,6 +227,17 @@
             ]
          ]
       },
+      "Read Answer State (Usage)" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Prior Usage Answer?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "Read Canon Rows" : {
          "main" : [
             [
@@ -167,6 +255,17 @@
                {
                   "index" : 0,
                   "node" : "Tag DJI Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Handbook State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Handbook?",
                   "type" : "main"
                }
             ]
@@ -206,7 +305,18 @@
             [
                {
                   "index" : 0,
-                  "node" : "Delete Usage Command",
+                  "node" : "Read Answer State (Usage)",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Run Settings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Parse Request",
                   "type" : "main"
                }
             ]
@@ -218,6 +328,22 @@
                {
                   "index" : 0,
                   "node" : "Save Answer State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Handbook" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Pin Handbook",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Save Handbook State",
                   "type" : "main"
                }
             ]
@@ -301,14 +427,14 @@
          "name" : "Availability Requests",
          "parameters" : {
             "additionalFields" : {
-               "chatIds" : "-5579280398"
+               "chatIds" : "-1003771124764"
             },
             "updates" : [
                "message"
             ]
          },
          "position" : [
-            240,
+            64,
             400
          ],
          "type" : "n8n-nodes-base.telegramTrigger",
@@ -319,12 +445,12 @@
          "id" : "d50f5cf2-b8a6-43d1-95ce-eaadace15670",
          "name" : "Parse Request",
          "parameters" : {
-            "jsCode" : "const raw = String((($input.first().json.message || {}).text) || ''); const t = raw.replace(/^\\/avail(@[A-Za-z0-9_]+)?\\b/i, '').trim(); function mIdx(n) { n = String(n || '').toLowerCase(); if (/^\\d+$/.test(n)) { const v = Number(n); if (v >= 1 && v <= 12) return v - 1; return -1; } const k = n.slice(0, 3); const all = 'janfebmaraprmayjunjulaugsepoctnovdec'; const i = all.indexOf(k); if (i < 0 || i % 3 !== 0) return -1; return i / 3; } function pTime(s) { s = String(s || '').trim().toLowerCase().replace(/\\./g, ''); if (s === '') return 480; const m = s.match(/^(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?$/); if (!m) return null; let h = Number(m[1]); const mi = m[2] ? Number(m[2]) : 0; const ap = m[3]; if (ap) { if (h < 1 || h > 12) return null; if (ap === 'pm' && h < 12) h += 12; if (ap === 'am' && h === 12) h = 0; } else { if (h > 23) return null; } if (mi > 59) return null; return h * 60 + mi; } function manilaToday() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); } function fmtDay(y, mo, d) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(Date.UTC(y, mo, d) - 8 * 3600000)); } function fmtTime(mins) { let h = Math.floor(mins / 60); const mi = mins % 60; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + (mi < 10 ? '0' + mi : mi) + ' ' + ap; } let day = -1, mo = -1, rest = '', m = null; const low = t.toLowerCase(); if ((m = low.match(/^(today|tomorrow)\\b\\s*(.*)$/))) { const td = manilaToday().split('-'); const y = Number(td[0]); mo = Number(td[1]) - 1; day = Number(td[2]) + (m[1] === 'tomorrow' ? 1 : 0); rest = m[2]; const tmp = new Date(Date.UTC(y, mo, day)); var yy = tmp.getUTCFullYear(); var mmo = tmp.getUTCMonth(); var ddo = tmp.getUTCDate(); const mins = pTime(rest); if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail Sep 20 9am' } }]; const startMs = Date.UTC(yy, mmo, ddo) + mins * 60000 - 8 * 3600000; return [{ json: { ok: true, startMs: startMs, endMs: startMs + 24 * 3600000, dayLabel: fmtDay(yy, mmo, ddo), timeLabel: fmtTime(mins) } }]; } else if ((m = low.match(/^(\\d{1,2})(st|nd|rd|th)?\\s+([a-z]+)\\b\\s*(.*)$/))) { day = Number(m[1]); mo = mIdx(m[3]); rest = m[4]; } else if ((m = low.match(/^([a-z]+)\\s+(\\d{1,2})(st|nd|rd|th)?\\b\\s*(.*)$/))) { mo = mIdx(m[1]); day = Number(m[2]); rest = m[4]; } else if ((m = low.match(/^(\\d{1,2})[\\/\\-](\\d{1,2})\\s*(.*)$/))) { day = Number(m[1]); mo = Number(m[2]) - 1; if (mo < 0 || mo > 11) mo = -1; rest = m[3]; } else { return [{ json: { ok: false, error: 'Could not understand the date. Try /avail Sep 20 9am' } }]; } if (day < 1 || day > 31 || mo < 0) return [{ json: { ok: false, error: 'Could not understand the date. Try /avail Sep 20 9am' } }]; const mins = pTime(rest); if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail Sep 20 9am' } }]; const td0 = manilaToday().split('-'); let y0 = Number(td0[0]); const todayKey = Number(td0[0]) * 10000 + Number(td0[1]) * 100 + Number(td0[2]); let roll = 0; while ((y0 * 10000 + (mo + 1) * 100 + day) < todayKey && roll < 12) { mo += 1; if (mo > 11) { mo = 0; y0 += 1; } roll += 1; } const dd = new Date(Date.UTC(y0, mo, day)); const y = dd.getUTCFullYear(); const mm = dd.getUTCMonth(); const dd2 = dd.getUTCDate(); const startMs = Date.UTC(y, mm, dd2) + mins * 60000 - 8 * 3600000; return [{ json: { ok: true, startMs: startMs, endMs: startMs + 24 * 3600000, dayLabel: fmtDay(y, mm, dd2), timeLabel: fmtTime(mins) } }];",
+            "jsCode" : "const raw = String((($input.first().json.message || {}).text) || ''); const t0 = raw.replace(/^\\/avail(@[A-Za-z0-9_]+)?\\b/i, '').trim(); function mIdx(n) { n = String(n || '').toLowerCase(); if (/^\\d+$/.test(n)) { const v = Number(n); if (v >= 1 && v <= 12) return v - 1; return -1; } const k = n.slice(0, 3); const all = 'janfebmaraprmayjunjulaugsepoctnovdec'; const i = all.indexOf(k); if (i < 0 || i % 3 !== 0) return -1; return i / 3; } function pTime(s) { s = String(s || '').trim().toLowerCase().replace(/\\./g, ''); if (s === '') return 480; const m = s.match(/^(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?$/); if (!m) return null; let h = Number(m[1]); const mi = m[2] ? Number(m[2]) : 0; const ap = m[3]; if (ap) { if (h < 1 || h > 12) return null; if (ap === 'pm' && h < 12) h += 12; if (ap === 'am' && h === 12) h = 0; } else { if (h > 23) return null; } if (mi > 59) return null; return h * 60 + mi; } function manilaParts() { const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-'); return { y: Number(p[0]), mo: Number(p[1]) - 1, d: Number(p[2]) }; } function fmtTime(mins) { let h = Math.floor(mins / 60); const mi = mins % 60; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + (mi < 10 ? '0' + mi : mi) + ' ' + ap; } function monthLabel(y, mo) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'long', year: 'numeric' }).format(new Date(Date.UTC(y, mo, 1))); } const now = manilaParts(); let t = t0.toLowerCase(); let timeFirst = null; const mt = t.match(/^(\\d{1,2}:\\d{2}|\\d{1,2}\\s*(?:am|pm))\\s+(.+)$/); if (mt) { const pv = pTime(mt[1]); if (pv !== null) { timeFirst = pv; t = mt[2]; } } let mo = -1, rest = '', m = null; const low = t; if (low === '') { mo = now.mo; rest = ''; var yy0 = now.y; } else if ((m = low.match(/^(today|tomorrow)\\b\\s*(.*)$/))) { mo = now.mo; rest = m[2]; var yy0 = now.y; } else if ((m = low.match(/^([a-z]+)\\s+(\\d{1,2})(st|nd|rd|th)?\\b\\s*(.*)$/)) && mIdx(m[1]) >= 0) { mo = mIdx(m[1]); rest = m[4]; var yy0 = now.y; if (mo < now.mo) yy0 += 1; } else if ((m = low.match(/^([a-z]+)\\s*(.*)$/)) && mIdx(m[1]) >= 0 && !/\\d/.test(m[1])) { mo = mIdx(m[1]); rest = m[2]; var yy0 = now.y; if (mo < now.mo) yy0 += 1; } else if ((m = low.match(/^(\\d{1,2})(st|nd|rd|th)?\\s+([a-z]+)\\b\\s*(.*)$/))) { mo = mIdx(m[3]); rest = m[4]; var yy0 = now.y; if (mo >= 0 && mo < now.mo) yy0 += 1; } else if ((m = low.match(/^(\\d{1,2})[\\/\\-](\\d{1,2})\\s*(.*)$/))) { mo = Number(m[2]) - 1; if (mo < 0 || mo > 11) mo = -1; rest = m[3]; var yy0 = now.y; if (mo >= 0 && mo < now.mo) yy0 += 1; } else { return [{ json: { ok: false, error: 'Could not understand that. Try /avail October 9am' } }]; } if (mo < 0) return [{ json: { ok: false, error: 'Could not understand the month. Try /avail October 9am' } }]; let mins; if (timeFirst !== null) { mins = timeFirst; } else { mins = pTime(rest); } if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail October 9am' } }]; return [{ json: { ok: true, year: yy0, month: mo, timeMins: mins, monthLabel: monthLabel(yy0, mo), timeLabel: fmtTime(mins) } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
-            460,
-            400
+            448,
+            512
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
@@ -347,12 +473,14 @@
                "options" : {
                   "caseSensitive" : true,
                   "leftValue" : "",
-                  "typeValidation" : "strict"
+                  "typeValidation" : "strict",
+                  "version" : 1
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            680,
+            688,
             400
          ],
          "type" : "n8n-nodes-base.if",
@@ -373,7 +501,6 @@
                "mode" : "id",
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
-            "operation" : "read",
             "options" : {
                "dataLocationOnSheet" : {
                   "values" : {
@@ -385,10 +512,8 @@
                      "date" : "FORMATTED_STRING",
                      "general" : "UNFORMATTED_VALUE"
                   }
-               },
-               "returnAllMatches" : "returnAllMatches"
+               }
             },
-            "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -396,7 +521,7 @@
             }
          },
          "position" : [
-            900,
+            912,
             160
          ],
          "type" : "n8n-nodes-base.googleSheets",
@@ -417,10 +542,10 @@
                ]
             },
             "includeOtherFields" : true,
-            "mode" : "manual"
+            "options" : {}
          },
          "position" : [
-            1100,
+            1104,
             160
          ],
          "type" : "n8n-nodes-base.set",
@@ -430,12 +555,11 @@
          "id" : "ad8814cf-af86-4579-9c9c-799072ae9df6",
          "name" : "Combine Rows",
          "parameters" : {
-            "mode" : "append",
             "numberInputs" : 4
          },
          "position" : [
-            1300,
-            460
+            1312,
+            464
          ],
          "type" : "n8n-nodes-base.merge",
          "typeVersion" : 3.2
@@ -453,13 +577,11 @@
             "additionalFields" : {
                "appendAttribution" : false
             },
-            "chatId" : "-5579280398",
-            "operation" : "sendMessage",
-            "resource" : "message",
+            "chatId" : "-1003771124764",
             "text" : "={{ $('Parse Request').item.json.error }}"
          },
          "position" : [
-            1900,
+            1904,
             560
          ],
          "type" : "n8n-nodes-base.telegram",
@@ -481,7 +603,6 @@
                "mode" : "id",
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
-            "operation" : "read",
             "options" : {
                "dataLocationOnSheet" : {
                   "values" : {
@@ -493,10 +614,8 @@
                      "date" : "FORMATTED_STRING",
                      "general" : "UNFORMATTED_VALUE"
                   }
-               },
-               "returnAllMatches" : "returnAllMatches"
+               }
             },
-            "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -504,8 +623,8 @@
             }
          },
          "position" : [
-            900,
-            360
+            912,
+            368
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
@@ -525,11 +644,11 @@
                ]
             },
             "includeOtherFields" : true,
-            "mode" : "manual"
+            "options" : {}
          },
          "position" : [
-            1100,
-            360
+            1104,
+            368
          ],
          "type" : "n8n-nodes-base.set",
          "typeVersion" : 3.5
@@ -549,7 +668,6 @@
                "mode" : "id",
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
-            "operation" : "read",
             "options" : {
                "dataLocationOnSheet" : {
                   "values" : {
@@ -561,10 +679,8 @@
                      "date" : "FORMATTED_STRING",
                      "general" : "UNFORMATTED_VALUE"
                   }
-               },
-               "returnAllMatches" : "returnAllMatches"
+               }
             },
-            "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -572,7 +688,7 @@
             }
          },
          "position" : [
-            900,
+            912,
             560
          ],
          "type" : "n8n-nodes-base.googleSheets",
@@ -593,10 +709,10 @@
                ]
             },
             "includeOtherFields" : true,
-            "mode" : "manual"
+            "options" : {}
          },
          "position" : [
-            1100,
+            1104,
             560
          ],
          "type" : "n8n-nodes-base.set",
@@ -617,7 +733,6 @@
                "mode" : "id",
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
-            "operation" : "read",
             "options" : {
                "dataLocationOnSheet" : {
                   "values" : {
@@ -629,10 +744,8 @@
                      "date" : "FORMATTED_STRING",
                      "general" : "UNFORMATTED_VALUE"
                   }
-               },
-               "returnAllMatches" : "returnAllMatches"
+               }
             },
-            "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -640,8 +753,8 @@
             }
          },
          "position" : [
-            900,
-            760
+            912,
+            768
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
@@ -661,11 +774,11 @@
                ]
             },
             "includeOtherFields" : true,
-            "mode" : "manual"
+            "options" : {}
          },
          "position" : [
-            1100,
-            760
+            1104,
+            768
          ],
          "type" : "n8n-nodes-base.set",
          "typeVersion" : 3.5
@@ -674,12 +787,12 @@
          "id" : "06332599-b7ff-4b6a-adfa-e8fb31044414",
          "name" : "Check Availability",
          "parameters" : {
-            "jsCode" : "const req = $('Parse Request').first().json; const s = req.startMs; const e = req.endMs; const DEVICES = ['Iphone 13', 'Canon EOS R50', 'Insta360 X5', 'DJI Osmo Pocket 3']; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const str = String(v).trim(); const m = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(str); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const str = String(t).trim().toUpperCase(); const m = str.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function stamp(iso, m) { const p = iso.split('-'); return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; } function shortD(ms) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(new Date(ms)); } function shortT(ms) { const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms)).split(':'); let h = Number(parts[0]); const mi = parts[1]; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + mi + ' ' + ap; } const rows = []; for (const it of $input.all()) { const j = it.json || {}; if (!j.device || DEVICES.indexOf(j.device) < 0) continue; rows.push(j); } const out = []; for (const dev of DEVICES) { let state = 'free'; let by = ''; let until = ''; for (const j of rows) { if (j.device !== dev) continue; const st = String(j.Status || '').trim().toLowerCase(); if (st !== 'booked' && st !== 'released') continue; const sd = normDate(j['Start Date']); const ed = normDate(j['End Date']); const m = mins(j.Time); if (sd === '' || ed === '' || m >= 99999) { if (state === 'free') state = 'unknown'; continue; } const rs = stamp(sd, m); const re = stamp(ed, m); if (s < re && rs < e) { state = 'taken'; by = String(j['Renter Name'] || '').trim(); until = shortD(re) + ', ' + shortT(re); break; } } out.push({ device: dev, state: state, by: by, until: until }); } return [{ json: { startMs: s, endMs: e, dayLabel: req.dayLabel, timeLabel: req.timeLabel, results: out } }];",
+            "jsCode" : "const req = $('Parse Request').first().json; const Y = req.year; const MO = req.month; const T = req.timeMins; const DEVICES = ['Iphone 13', 'Canon EOS R50', 'Insta360 X5', 'DJI Osmo Pocket 3']; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const str = String(v).trim(); const m = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(str); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const str = String(t).trim().toUpperCase(); const m = str.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function stamp(iso, m) { const p = iso.split('-'); return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; } function shortDT(ms) { const d = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(new Date(ms)); const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(ms)); return d + ', ' + t; } const rows = []; for (const it of $input.all()) { const j = it.json || {}; if (!j.device || DEVICES.indexOf(j.device) < 0) continue; rows.push(j); } const tp = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-'); const tKey = Number(tp[0]) * 10000 + Number(tp[1]) * 100 + Number(tp[2]); const lastDay = new Date(Date.UTC(Y, MO + 1, 0)).getUTCDate(); const out = []; for (const dev of DEVICES) { const mine = rows.filter(j => j.device === dev); let unknown = false; const act = []; for (const j of mine) { const st = String(j.Status || '').trim().toLowerCase(); if (st !== 'booked' && st !== 'released') continue; const sd = normDate(j['Start Date']); const ed = normDate(j['End Date']); const m = mins(j.Time); if (sd === '' || ed === '' || m >= 99999) { unknown = true; continue; } act.push({ s: stamp(sd, m), e: stamp(ed, m) }); } const freeDays = []; const blocked = []; if (!unknown) { for (let d = 1; d <= lastDay; d += 1) { if (Y * 10000 + (MO + 1) * 100 + d < tKey) continue; const s = Date.UTC(Y, MO, d) + T * 60000 - 8 * 3600000; const e = s + 24 * 3600000; const reasons = []; for (const a of act) { if (s < a.e && a.s < e) { if (a.e > s && a.s <= s) reasons.push('return ' + shortDT(a.e)); else reasons.push('next pickup ' + shortDT(a.s)); if (reasons.length >= 2) break; } } if (reasons.length === 0) { freeDays.push(d); } else { blocked.push({ d: d, why: reasons.join('; ') }); } } } const ranges = []; let rs = -1, prev = -2; for (const d of freeDays) { if (d !== prev + 1) { if (rs >= 0) ranges.push([rs, prev]); rs = d; } prev = d; } if (rs >= 0) ranges.push([rs, prev]); out.push({ device: dev, unknown: unknown, ranges: ranges, blocked: blocked }); } return [{ json: { year: Y, month: MO, timeMins: T, monthLabel: req.monthLabel, timeLabel: req.timeLabel, results: out } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
-            1500,
-            460
+            1504,
+            464
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
@@ -688,12 +801,12 @@
          "id" : "2c265733-f88b-455a-a276-d6d6254ea3b9",
          "name" : "Build Availability Message",
          "parameters" : {
-            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } const lines = []; lines.push('📅 <b>Availability - ' + esc(d.dayLabel) + ', ' + esc(d.timeLabel) + '</b>'); lines.push('<i>24-hour window</i>'); lines.push(''); let free = 0; for (const r of d.results) { const icon = EMOJI[r.device] ? EMOJI[r.device] + ' ' : ''; if (r.state === 'free') { free += 1; lines.push(icon + '<b>' + esc(r.device) + '</b> - FREE ✅'); } else if (r.state === 'taken') { let extra = r.until !== '' ? ' (back ' + r.until + ')' : ''; lines.push(icon + '<b>' + esc(r.device) + '</b> - taken' + esc(extra)); } else { lines.push(icon + '<b>' + esc(r.device) + '</b> - unknown ⚠️'); } } if (free === 0) lines.push('No units free for this window.'); return [{ json: { telegramMessage: lines.join('\\n') } }];",
+            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } function mName(y, mo) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'long' }).format(new Date(Date.UTC(y, mo, 1))); } function fmtRange(y, mo, r, lastDay) { const mn = mName(y, mo); if (r[0] === r[1]) return mn + ' ' + r[0]; if (r[1] >= lastDay) return mn + ' ' + r[0] + ' onwards'; return mn + ' ' + r[0] + ' to ' + r[1]; } function shortDay(y, mo, dd) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(new Date(Date.UTC(y, mo, dd))); } function devLabel(dev) { const icon = EMOJI[dev] ? EMOJI[dev] + ' ' : ''; return icon + '<b>' + esc(dev) + '</b>'; } const lastDay = new Date(Date.UTC(d.year, d.month + 1, 0)).getUTCDate(); const lines = []; lines.push('📅 <b>' + esc(d.monthLabel) + ' Availability</b>'); lines.push('<i>24-hour rentals from ' + esc(d.timeLabel) + ' daily</i>'); for (const r of d.results) { lines.push(''); lines.push(devLabel(r.device)); if (r.unknown) { lines.push('Unverified entries - check sheet ⚠️'); } else if (r.ranges.length === 0) { lines.push('No free days.'); } else { for (const g of r.ranges) lines.push(fmtRange(d.year, d.month, g, lastDay)); } } let anyBlocked = false; for (const r of d.results) { if (!r.unknown && r.blocked && r.blocked.length > 0) { anyBlocked = true; break; } } if (anyBlocked) { lines.push(''); lines.push('🚫 <b>Not free</b>'); for (const r of d.results) { if (r.unknown || !r.blocked || r.blocked.length === 0) continue; lines.push(''); lines.push(devLabel(r.device)); const groups = []; let cur = null; for (const b of r.blocked) { if (cur && b.d === cur.end + 1 && b.why === cur.why) { cur.end = b.d; } else { if (cur) groups.push(cur); cur = { start: b.d, end: b.d, why: b.why }; } } if (cur) groups.push(cur); for (const g of groups) { const dl = g.start === g.end ? shortDay(d.year, d.month, g.start) : shortDay(d.year, d.month, g.start) + ' to ' + g.end; lines.push(dl + ' - ' + esc(g.why)); } } } return [{ json: { telegramMessage: lines.join('\\n') } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
-            1700,
-            360
+            1712,
+            368
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
@@ -712,14 +825,12 @@
                "appendAttribution" : false,
                "parse_mode" : "HTML"
             },
-            "chatId" : "-5579280398",
-            "operation" : "sendMessage",
-            "resource" : "message",
+            "chatId" : "-1003771124764",
             "text" : "={{ $('Build Availability Message').item.json.telegramMessage }}"
          },
          "position" : [
-            2100,
-            360
+            2112,
+            368
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -730,13 +841,13 @@
          "name" : "Sticky Note a499fe0e",
          "parameters" : {
             "color" : 6,
-            "content" : "## Availability Checker — setup\n1) Create a second bot via @BotFather, add it to the team group AS ADMIN with message-delete permission (needed to remove /avail commands).\n2) n8n Telegram credential for the new bot — attach on ALL Telegram nodes here (trigger, both deletes, both sends). Currently holding the reminder bot credential as placeholder.\n3) Paste the group chat ID on both Send nodes.\nFlow: /avail only (other messages ignored) → parse date/time → read 4 tabs → 24h overlap check → delete previous answer + delete the /avail command → send fresh → save message id under lastAvailMessageId.\nUsage: /avail Sep 20 9am (also 20 Sep 9am, 9am Sep 20, 20/9 9am, today/tomorrow + time). Time defaults to 8:00 AM. Past dates roll forward.",
-            "height" : 300,
-            "width" : 420
+            "content" : "## Availability Checker — setup\n1) Second bot via @BotFather (@rentalavailability_bot), in the team group AS ADMIN with message-delete permission.\n2) n8n Telegram credential (RentalAvailabilityBot) on ALL Telegram nodes here.\n3) Group chat ID on both Send nodes.\nFlow: /avail only (other messages ignored) → parse month/time → read 4 tabs → per-day 24h overlap per device → delete previous answer + delete the /avail command → send fresh month view → save message id under lastAvailMessageId.\nUsage: /avail (current month), /avail October, /avail Sep 20 9am (month view at 9am). Time defaults to 8:00 AM. Past months roll to next year. Blocked days excluded; unparseable active rows mark the device unverified.",
+            "height" : 316,
+            "width" : 580
          },
          "position" : [
-            100,
-            300
+            32,
+            -96
          ],
          "type" : "n8n-nodes-base.stickyNote",
          "typeVersion" : 1
@@ -746,7 +857,7 @@
          "name" : "Is Avail Command?",
          "parameters" : {
             "conditions" : {
-               "combinator" : "and",
+               "combinator" : "or",
                "conditions" : [
                   {
                      "leftValue" : "={{ $json.message?.text ?? '' }}",
@@ -755,17 +866,27 @@
                         "type" : "string"
                      },
                      "rightValue" : "/avail"
+                  },
+                  {
+                     "leftValue" : "={{ $json.message?.text ?? '' }}",
+                     "operator" : {
+                        "operation" : "startsWith",
+                        "type" : "string"
+                     },
+                     "rightValue" : "/help"
                   }
                ],
                "options" : {
                   "caseSensitive" : false,
                   "leftValue" : "",
-                  "typeValidation" : "strict"
+                  "typeValidation" : "strict",
+                  "version" : 1
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            350,
+            224,
             400
          ],
          "type" : "n8n-nodes-base.if",
@@ -782,21 +903,27 @@
          "id" : "70abcf5c-0e05-4f86-94d1-f4c1581f7049",
          "name" : "Read Answer State",
          "parameters" : {
+            "combineFilters" : "AND",
             "documentId" : {
                "__rl" : true,
                "mode" : "id",
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
-            "operation" : "read",
+            "filtersUI" : {
+               "values" : [
+                  {
+                     "lookupColumn" : "Key",
+                     "lookupValue" : "lastAvailMessageId"
+                  }
+               ]
+            },
             "options" : {
                "dataLocationOnSheet" : {
                   "values" : {
                      "rangeDefinition" : "detectAutomatically"
                   }
-               },
-               "returnAllMatches" : "returnAllMatches"
+               }
             },
-            "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -804,8 +931,8 @@
             }
          },
          "position" : [
-            700,
-            620
+            704,
+            624
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
@@ -829,13 +956,15 @@
                "options" : {
                   "caseSensitive" : true,
                   "leftValue" : "",
-                  "typeValidation" : "strict"
+                  "typeValidation" : "strict",
+                  "version" : 1
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            1820,
-            360
+            1824,
+            368
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -851,14 +980,13 @@
          "name" : "Delete Previous Answer",
          "onError" : "continueRegularOutput",
          "parameters" : {
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Read Answer State').first().json.Value ?? '') }}",
-            "operation" : "deleteMessage",
-            "resource" : "message"
+            "operation" : "deleteMessage"
          },
          "position" : [
-            1820,
-            220
+            1824,
+            224
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -875,14 +1003,13 @@
          "name" : "Delete Command",
          "onError" : "continueRegularOutput",
          "parameters" : {
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Availability Requests').first().json.message.message_id ?? '') }}",
-            "operation" : "deleteMessage",
-            "resource" : "message"
+            "operation" : "deleteMessage"
          },
          "position" : [
-            1960,
-            220
+            1968,
+            224
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -934,7 +1061,7 @@
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
             "operation" : "appendOrUpdate",
-            "resource" : "sheet",
+            "options" : {},
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -942,8 +1069,8 @@
             }
          },
          "position" : [
-            2250,
-            360
+            2256,
+            368
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
@@ -959,23 +1086,448 @@
          "name" : "Delete Usage Command",
          "onError" : "continueRegularOutput",
          "parameters" : {
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Availability Requests').first().json.message.message_id ?? '') }}",
-            "operation" : "deleteMessage",
-            "resource" : "message"
+            "operation" : "deleteMessage"
          },
          "position" : [
-            1720,
-            680
+            1728,
+            688
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
          "webhookId" : "ef3a3103-0c70-4db2-b4a7-b0b6b890ab1e"
+      },
+      {
+         "id" : "e93bf6a2-427b-4fdc-9acb-a54fba5d8f31",
+         "name" : "Run Settings",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "av-debug-flag",
+                     "name" : "isDebug",
+                     "type" : "boolean",
+                     "value" : false
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            416,
+            288
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "a1f05b4d-eb85-4258-8c73-cce886410c8e",
+         "name" : "Debug Send?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $('Run Settings').first().json.isDebug }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            1824,
+            208
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "aae7102f-9218-41e7-bf2f-1bdfd7ce7481",
+         "name" : "Dev Availability Send",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "5854600701",
+            "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Build Availability Message').item.json.telegramMessage }}"
+         },
+         "position" : [
+            2000,
+            80
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "e879abb8-7b4d-480a-a76d-15a5bed56459"
+      },
+      {
+         "id" : "e67e6a7b-bb3b-4add-9fdd-35a70dc0ebfe",
+         "name" : "Debug Usage?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $('Run Settings').first().json.isDebug }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            1824,
+            640
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "dac224e2-3985-4735-806c-baa91cbdd91f",
+         "name" : "Dev Usage Send",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false
+            },
+            "chatId" : "5854600701",
+            "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Parse Request').item.json.error }}"
+         },
+         "position" : [
+            1984,
+            768
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "63b8a913-4644-4307-8cac-c848b266442b"
+      },
+      {
+         "id" : "202cc94b-aad6-4154-bf03-dd31d3a43707",
+         "name" : "Has Prior Usage Answer?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ String($('Read Answer State (Usage)').first().json.Value ?? '') }}",
+                     "operator" : {
+                        "operation" : "notEquals",
+                        "type" : "string"
+                     },
+                     "rightValue" : ""
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            1560,
+            640
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "62f45935-28af-43e9-a40c-18ace2c6d8c2",
+         "name" : "Delete Prior Usage Answer",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "chatId" : "-1003771124764",
+            "messageId" : "={{ String($('Read Answer State (Usage)').first().json.Value ?? '') }}",
+            "operation" : "deleteMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            1560,
+            760
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "457f5aba-2fee-4ff3-9a29-62164505308e"
+      },
+      {
+         "alwaysOutputData" : true,
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "f40104fd-a0ea-4a64-8bd9-74b1fce0a109",
+         "name" : "Read Answer State (Usage)",
+         "parameters" : {
+            "combineFilters" : "AND",
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "filtersUI" : {
+               "values" : [
+                  {
+                     "lookupColumn" : "Key",
+                     "lookupValue" : "lastAvailMessageId"
+                  }
+               ]
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            1450,
+            700
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "alwaysOutputData" : true,
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "9f9feb69-f9c1-4dda-8e4a-b459c5f78f99",
+         "name" : "Read Handbook State",
+         "parameters" : {
+            "combineFilters" : "AND",
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "filtersUI" : {
+               "values" : [
+                  {
+                     "lookupColumn" : "Key",
+                     "lookupValue" : "lastHandbookMessageId"
+                  }
+               ]
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            420,
+            560
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "8b0580a7-43af-4526-b5a3-e689a0fa6f1a",
+         "name" : "Has Handbook?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ String($('Read Handbook State').first().json.Value ?? '') }}",
+                     "operator" : {
+                        "operation" : "notEquals",
+                        "type" : "string"
+                     },
+                     "rightValue" : ""
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            640,
+            560
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "6b1fa958-b81b-4bb8-82e1-4780be77044e",
+         "name" : "Send Handbook",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "-1003771124764",
+            "operation" : "sendMessage",
+            "resource" : "message",
+            "text" : "📖 <b>Availability Bot Handbook</b>\n\nAsk me about free rental dates. I check every unit for a full 24-hour window.\n\n<b>Commands</b>\n/avail - this month at 8:00 AM\n/avail October - that month at 8:00 AM\n/avail Sep 20 9am - September view starting 9:00 AM\n/avail 20 Sep 9am - same, day first\n/avail 9am Sep 20 - same, time first\n/avail 20/9 2pm - same, numeric date\n/avail today 9am - from today on\n/help - show examples\n\n<i>Blocked days are left out. Only my latest answer stays in chat.</i>"
+         },
+         "position" : [
+            860,
+            560
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "3911ab6c-b2ca-4f82-9856-5f2d4841f98b"
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "f02b002f-0aba-4e46-9686-5d91c2e42555",
+         "name" : "Pin Handbook",
+         "parameters" : {
+            "chatId" : "-1003771124764",
+            "messageId" : "={{ String($json.result.message_id ?? '') }}",
+            "operation" : "pinChatMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            1080,
+            480
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "0b1c0907-582a-458d-b934-557604cbca72"
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "26ca4a66-44c7-4b38-978b-40f92dd24233",
+         "name" : "Save Handbook State",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "matchingColumns" : [
+                  "Key"
+               ],
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Key",
+                     "id" : "Key",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Value",
+                     "id" : "Value",
+                     "required" : false,
+                     "type" : "string"
+                  }
+               ],
+               "value" : {
+                  "Key" : "lastHandbookMessageId",
+                  "Value" : "={{ $json.result.message_id }}"
+               }
+            },
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "appendOrUpdate",
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            1080,
+            640
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
       }
    ],
-   "pinData" : null,
+   "pinData" : {},
    "settings" : {
       "availableInMCP" : true,
+      "binaryMode" : "separate",
       "executionOrder" : "v1"
    },
    "shared" : [
@@ -1002,11 +1554,11 @@
    "staticData" : null,
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T01:59:23.426Z",
-   "versionCounter" : 37,
-   "versionId" : "5f5fc457-95bd-49e4-87a2-023cce6c260d",
+   "updatedAt" : "2026-09-06T03:29:53.540Z",
+   "versionCounter" : 112,
+   "versionId" : "a8d2f124-cd29-475d-a550-1a1db0df843f",
    "versionMetadata" : {
-      "description" : "Updated nodes: Send Usage Hint",
-      "name" : "Point usage hint at team group"
+      "description" : "Updated nodes: Check Availability",
+      "name" : "Restore full logic with return wording"
    }
 }

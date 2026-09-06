@@ -1,13 +1,13 @@
 {
    "active" : true,
-   "activeVersionId" : "bc846006-91ad-4383-b731-175da699e78c",
+   "activeVersionId" : "913065ed-77c0-4a8d-9034-817fbb09c6da",
    "connections" : {
       "Build No-Booking Message" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Debug Send? (Empty)",
+                  "node" : "Has Prior Note?",
                   "type" : "main"
                }
             ]
@@ -18,7 +18,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Debug Send?",
+                  "node" : "Has Prior Reminder?",
                   "type" : "main"
                }
             ]
@@ -76,7 +76,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Has Prior Reminder?",
+                  "node" : "Send Telegram Reminder",
                   "type" : "main"
                }
             ]
@@ -94,7 +94,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Has Prior Note?",
+                  "node" : "Send Telegram No-Booking Note",
                   "type" : "main"
                }
             ]
@@ -105,7 +105,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Send Telegram No-Booking Note",
+                  "node" : "Debug Send? (Empty)",
                   "type" : "main"
                }
             ]
@@ -116,7 +116,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Send Telegram Reminder",
+                  "node" : "Debug Send?",
                   "type" : "main"
                }
             ]
@@ -145,7 +145,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Send Telegram No-Booking Note",
+                  "node" : "Debug Send? (Empty)",
                   "type" : "main"
                }
             ]
@@ -163,7 +163,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Send Telegram Reminder",
+                  "node" : "Debug Send?",
                   "type" : "main"
                }
             ]
@@ -351,26 +351,6 @@
    "name" : "Next-Day Booking Reminder",
    "nodeGroups" : [],
    "nodes" : [
-      {
-         "id" : "ff0f8dc8-947b-4aa3-9bca-2886ed57483d",
-         "name" : "Twice-Daily Reminder Trigger",
-         "parameters" : {
-            "rule" : {
-               "interval" : [
-                  {},
-                  {
-                     "triggerAtHour" : 12
-                  }
-               ]
-            }
-         },
-         "position" : [
-            128,
-            400
-         ],
-         "type" : "n8n-nodes-base.scheduleTrigger",
-         "typeVersion" : 1.4
-      },
       {
          "id" : "0097904e-890a-4706-bca4-378ffbf8f897",
          "name" : "Calculate Tomorrow",
@@ -663,7 +643,7 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "ffbdbefc-7197-4ff4-bee1-69826e7f5c15",
@@ -673,7 +653,7 @@
                "appendAttribution" : false,
                "parse_mode" : "HTML"
             },
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "inlineKeyboard" : {
                "rows" : [
                   {
@@ -719,7 +699,7 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "1fde3017-e4eb-4950-94e6-c631e52a97fc",
@@ -729,7 +709,7 @@
                "appendAttribution" : false,
                "parse_mode" : "HTML"
             },
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "inlineKeyboard" : {
                "rows" : [
                   {
@@ -909,7 +889,7 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "f4806ece-8640-4e2b-bd14-07f6f31e7912",
@@ -982,7 +962,7 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "3ec19a9f-81c3-4034-9735-86754a441ab3",
@@ -1031,10 +1011,19 @@
          "id" : "1b145656-1741-47c6-87b6-9231dadb475b",
          "name" : "Read Bot State",
          "parameters" : {
+            "combineFilters" : "AND",
             "documentId" : {
                "__rl" : true,
                "mode" : "id",
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "filtersUI" : {
+               "values" : [
+                  {
+                     "lookupColumn" : "Key",
+                     "lookupValue" : "lastMessageId"
+                  }
+               ]
             },
             "operation" : "read",
             "options" : {
@@ -1093,14 +1082,14 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "922303df-396c-4d84-bf31-c742f7931959",
          "name" : "Delete Previous Reminder",
          "onError" : "continueRegularOutput",
          "parameters" : {
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
             "operation" : "deleteMessage",
             "resource" : "message"
@@ -1207,14 +1196,14 @@
          "credentials" : {
             "telegramApi" : {
                "id" : "vATakQ0Ac5I47aij",
-               "name" : "Telegram account"
+               "name" : "BookingScheduleBot"
             }
          },
          "id" : "6d2bd172-e05a-427a-a53f-bebb1e3ec498",
          "name" : "Delete Previous Note",
          "onError" : "continueRegularOutput",
          "parameters" : {
-            "chatId" : "-5579280398",
+            "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
             "operation" : "deleteMessage",
             "resource" : "message"
@@ -1286,6 +1275,34 @@
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
+      },
+      {
+         "id" : "fb1a0841-247e-49c1-b683-a729ed24dc98",
+         "name" : "Twice-Daily Reminder Trigger",
+         "parameters" : {
+            "rule" : {
+               "interval" : [
+                  {
+                     "daysInterval" : 1,
+                     "field" : "days",
+                     "triggerAtHour" : 0,
+                     "triggerAtMinute" : 0
+                  },
+                  {
+                     "daysInterval" : 1,
+                     "field" : "days",
+                     "triggerAtHour" : 12,
+                     "triggerAtMinute" : 0
+                  }
+               ]
+            }
+         },
+         "position" : [
+            128,
+            400
+         ],
+         "type" : "n8n-nodes-base.scheduleTrigger",
+         "typeVersion" : 1.4
       }
    ],
    "pinData" : {},
@@ -1330,11 +1347,11 @@
    },
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T01:30:06.950Z",
-   "versionCounter" : 211,
-   "versionId" : "bc846006-91ad-4383-b731-175da699e78c",
+   "updatedAt" : "2026-09-06T03:20:14.093Z",
+   "versionCounter" : 221,
+   "versionId" : "913065ed-77c0-4a8d-9034-817fbb09c6da",
    "versionMetadata" : {
-      "description" : "Updated nodes: Run Settings",
-      "name" : "Disable debug mode for production"
+      "description" : "Updated nodes: Twice-Daily Reminder Trigger\nConnections: 1 added, 1 removed",
+      "name" : "Restore trigger name"
    }
 }
