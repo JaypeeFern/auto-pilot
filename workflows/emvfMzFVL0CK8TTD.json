@@ -1,0 +1,1012 @@
+{
+   "active" : true,
+   "activeVersionId" : "5f5fc457-95bd-49e4-87a2-023cce6c260d",
+   "connections" : {
+      "Availability Requests" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Is Avail Command?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Build Availability Message" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Prior Answer?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Check Availability" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build Availability Message",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Combine Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Check Availability",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Delete Command" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Availability",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Delete Previous Answer" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Command",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Delete Usage Command" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Usage Hint",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Has Prior Answer?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Previous Answer",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Command",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Is Avail Command?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Parse Request",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Parse Request" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Request Understood?",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Answer State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Answer State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Iphone 13 Rows",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Canon Rows",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Insta360 Rows",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read DJI Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Canon Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Canon Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read DJI Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag DJI Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Insta360 Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Insta360 Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Iphone 13 Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Iphone Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Request Understood?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Answer State",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Usage Command",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Availability" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Save Answer State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Usage Hint" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Save Answer State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Canon Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 1,
+                  "node" : "Combine Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag DJI Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 3,
+                  "node" : "Combine Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Insta360 Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 2,
+                  "node" : "Combine Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Iphone Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Combine Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-06T01:37:56.445Z",
+   "description" : "Answers /avail date time questions with per-unit 24-hour availability.",
+   "id" : "emvfMzFVL0CK8TTD",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "Availability Checker",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "e1894200-2ea5-4c5e-978d-c8cac29ebd32",
+         "name" : "Availability Requests",
+         "parameters" : {
+            "additionalFields" : {
+               "chatIds" : "-5579280398"
+            },
+            "updates" : [
+               "message"
+            ]
+         },
+         "position" : [
+            240,
+            400
+         ],
+         "type" : "n8n-nodes-base.telegramTrigger",
+         "typeVersion" : 1.5,
+         "webhookId" : "0819987f-70f1-4d8d-8d5d-7d5fba8fa7f6"
+      },
+      {
+         "id" : "d50f5cf2-b8a6-43d1-95ce-eaadace15670",
+         "name" : "Parse Request",
+         "parameters" : {
+            "jsCode" : "const raw = String((($input.first().json.message || {}).text) || ''); const t = raw.replace(/^\\/avail(@[A-Za-z0-9_]+)?\\b/i, '').trim(); function mIdx(n) { n = String(n || '').toLowerCase(); if (/^\\d+$/.test(n)) { const v = Number(n); if (v >= 1 && v <= 12) return v - 1; return -1; } const k = n.slice(0, 3); const all = 'janfebmaraprmayjunjulaugsepoctnovdec'; const i = all.indexOf(k); if (i < 0 || i % 3 !== 0) return -1; return i / 3; } function pTime(s) { s = String(s || '').trim().toLowerCase().replace(/\\./g, ''); if (s === '') return 480; const m = s.match(/^(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?$/); if (!m) return null; let h = Number(m[1]); const mi = m[2] ? Number(m[2]) : 0; const ap = m[3]; if (ap) { if (h < 1 || h > 12) return null; if (ap === 'pm' && h < 12) h += 12; if (ap === 'am' && h === 12) h = 0; } else { if (h > 23) return null; } if (mi > 59) return null; return h * 60 + mi; } function manilaToday() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); } function fmtDay(y, mo, d) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(Date.UTC(y, mo, d) - 8 * 3600000)); } function fmtTime(mins) { let h = Math.floor(mins / 60); const mi = mins % 60; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + (mi < 10 ? '0' + mi : mi) + ' ' + ap; } let day = -1, mo = -1, rest = '', m = null; const low = t.toLowerCase(); if ((m = low.match(/^(today|tomorrow)\\b\\s*(.*)$/))) { const td = manilaToday().split('-'); const y = Number(td[0]); mo = Number(td[1]) - 1; day = Number(td[2]) + (m[1] === 'tomorrow' ? 1 : 0); rest = m[2]; const tmp = new Date(Date.UTC(y, mo, day)); var yy = tmp.getUTCFullYear(); var mmo = tmp.getUTCMonth(); var ddo = tmp.getUTCDate(); const mins = pTime(rest); if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail Sep 20 9am' } }]; const startMs = Date.UTC(yy, mmo, ddo) + mins * 60000 - 8 * 3600000; return [{ json: { ok: true, startMs: startMs, endMs: startMs + 24 * 3600000, dayLabel: fmtDay(yy, mmo, ddo), timeLabel: fmtTime(mins) } }]; } else if ((m = low.match(/^(\\d{1,2})(st|nd|rd|th)?\\s+([a-z]+)\\b\\s*(.*)$/))) { day = Number(m[1]); mo = mIdx(m[3]); rest = m[4]; } else if ((m = low.match(/^([a-z]+)\\s+(\\d{1,2})(st|nd|rd|th)?\\b\\s*(.*)$/))) { mo = mIdx(m[1]); day = Number(m[2]); rest = m[4]; } else if ((m = low.match(/^(\\d{1,2})[\\/\\-](\\d{1,2})\\s*(.*)$/))) { day = Number(m[1]); mo = Number(m[2]) - 1; if (mo < 0 || mo > 11) mo = -1; rest = m[3]; } else { return [{ json: { ok: false, error: 'Could not understand the date. Try /avail Sep 20 9am' } }]; } if (day < 1 || day > 31 || mo < 0) return [{ json: { ok: false, error: 'Could not understand the date. Try /avail Sep 20 9am' } }]; const mins = pTime(rest); if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail Sep 20 9am' } }]; const td0 = manilaToday().split('-'); let y0 = Number(td0[0]); const todayKey = Number(td0[0]) * 10000 + Number(td0[1]) * 100 + Number(td0[2]); let roll = 0; while ((y0 * 10000 + (mo + 1) * 100 + day) < todayKey && roll < 12) { mo += 1; if (mo > 11) { mo = 0; y0 += 1; } roll += 1; } const dd = new Date(Date.UTC(y0, mo, day)); const y = dd.getUTCFullYear(); const mm = dd.getUTCMonth(); const dd2 = dd.getUTCDate(); const startMs = Date.UTC(y, mm, dd2) + mins * 60000 - 8 * 3600000; return [{ json: { ok: true, startMs: startMs, endMs: startMs + 24 * 3600000, dayLabel: fmtDay(y, mm, dd2), timeLabel: fmtTime(mins) } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            460,
+            400
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "9d1faf1a-2a1f-454f-81d2-ee3afb208c42",
+         "name" : "Request Understood?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.ok }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            680,
+            400
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "450398b3-67a3-4674-9b2c-b54e6fc38f3c",
+         "name" : "Read Iphone 13 Rows",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Iphone 13"
+            }
+         },
+         "position" : [
+            900,
+            160
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "b2b5a158-4333-435c-b0e7-eebbb4d58ddc",
+         "name" : "Tag Iphone Rows",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "av-a",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Iphone 13"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "mode" : "manual"
+         },
+         "position" : [
+            1100,
+            160
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "ad8814cf-af86-4579-9c9c-799072ae9df6",
+         "name" : "Combine Rows",
+         "parameters" : {
+            "mode" : "append",
+            "numberInputs" : 4
+         },
+         "position" : [
+            1300,
+            460
+         ],
+         "type" : "n8n-nodes-base.merge",
+         "typeVersion" : 3.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "b194afa6-0197-43c6-a700-de6c02b381d7",
+         "name" : "Send Usage Hint",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false
+            },
+            "chatId" : "-5579280398",
+            "operation" : "sendMessage",
+            "resource" : "message",
+            "text" : "={{ $('Parse Request').item.json.error }}"
+         },
+         "position" : [
+            1900,
+            560
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "53a032b3-ab43-400d-894b-42a4665b7e2f"
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "725eaa4e-ec79-4ad5-82ab-773fd3ebb7a0",
+         "name" : "Read Canon Rows",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Canon EOS R50"
+            }
+         },
+         "position" : [
+            900,
+            360
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "785ee698-e54c-4c26-a1c5-e62367613a88",
+         "name" : "Tag Canon Rows",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "av-b",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Canon EOS R50"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "mode" : "manual"
+         },
+         "position" : [
+            1100,
+            360
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "d8968226-9fdf-4880-b3f5-7198106caf56",
+         "name" : "Read Insta360 Rows",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Insta360 X5"
+            }
+         },
+         "position" : [
+            900,
+            560
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "950fe2b6-8dbe-42b1-8d63-360bbc4fa215",
+         "name" : "Tag Insta360 Rows",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "av-c",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Insta360 X5"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "mode" : "manual"
+         },
+         "position" : [
+            1100,
+            560
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "8b4148a0-0066-4e33-8d50-2b9ec89cfbff",
+         "name" : "Read DJI Rows",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "DJI Osmo Pocket 3"
+            }
+         },
+         "position" : [
+            900,
+            760
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "9b1a1492-f16e-437a-8f3d-8cfd4243b610",
+         "name" : "Tag DJI Rows",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "av-d",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "DJI Osmo Pocket 3"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "mode" : "manual"
+         },
+         "position" : [
+            1100,
+            760
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "06332599-b7ff-4b6a-adfa-e8fb31044414",
+         "name" : "Check Availability",
+         "parameters" : {
+            "jsCode" : "const req = $('Parse Request').first().json; const s = req.startMs; const e = req.endMs; const DEVICES = ['Iphone 13', 'Canon EOS R50', 'Insta360 X5', 'DJI Osmo Pocket 3']; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const str = String(v).trim(); const m = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(str); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const str = String(t).trim().toUpperCase(); const m = str.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function stamp(iso, m) { const p = iso.split('-'); return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; } function shortD(ms) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(new Date(ms)); } function shortT(ms) { const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms)).split(':'); let h = Number(parts[0]); const mi = parts[1]; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + mi + ' ' + ap; } const rows = []; for (const it of $input.all()) { const j = it.json || {}; if (!j.device || DEVICES.indexOf(j.device) < 0) continue; rows.push(j); } const out = []; for (const dev of DEVICES) { let state = 'free'; let by = ''; let until = ''; for (const j of rows) { if (j.device !== dev) continue; const st = String(j.Status || '').trim().toLowerCase(); if (st !== 'booked' && st !== 'released') continue; const sd = normDate(j['Start Date']); const ed = normDate(j['End Date']); const m = mins(j.Time); if (sd === '' || ed === '' || m >= 99999) { if (state === 'free') state = 'unknown'; continue; } const rs = stamp(sd, m); const re = stamp(ed, m); if (s < re && rs < e) { state = 'taken'; by = String(j['Renter Name'] || '').trim(); until = shortD(re) + ', ' + shortT(re); break; } } out.push({ device: dev, state: state, by: by, until: until }); } return [{ json: { startMs: s, endMs: e, dayLabel: req.dayLabel, timeLabel: req.timeLabel, results: out } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1500,
+            460
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "2c265733-f88b-455a-a276-d6d6254ea3b9",
+         "name" : "Build Availability Message",
+         "parameters" : {
+            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } const lines = []; lines.push('📅 <b>Availability - ' + esc(d.dayLabel) + ', ' + esc(d.timeLabel) + '</b>'); lines.push('<i>24-hour window</i>'); lines.push(''); let free = 0; for (const r of d.results) { const icon = EMOJI[r.device] ? EMOJI[r.device] + ' ' : ''; if (r.state === 'free') { free += 1; lines.push(icon + '<b>' + esc(r.device) + '</b> - FREE ✅'); } else if (r.state === 'taken') { let extra = r.until !== '' ? ' (back ' + r.until + ')' : ''; lines.push(icon + '<b>' + esc(r.device) + '</b> - taken' + esc(extra)); } else { lines.push(icon + '<b>' + esc(r.device) + '</b> - unknown ⚠️'); } } if (free === 0) lines.push('No units free for this window.'); return [{ json: { telegramMessage: lines.join('\\n') } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1700,
+            360
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "2997275f-5a42-43bb-9672-b5d4c2cb1eee",
+         "name" : "Send Availability",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "-5579280398",
+            "operation" : "sendMessage",
+            "resource" : "message",
+            "text" : "={{ $('Build Availability Message').item.json.telegramMessage }}"
+         },
+         "position" : [
+            2100,
+            360
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "8ea91b7f-6139-4dd9-b657-ceb1bef61cfd"
+      },
+      {
+         "id" : "25f80682-da4f-4803-b35c-eeeb6b661de4",
+         "name" : "Sticky Note a499fe0e",
+         "parameters" : {
+            "color" : 6,
+            "content" : "## Availability Checker — setup\n1) Create a second bot via @BotFather, add it to the team group AS ADMIN with message-delete permission (needed to remove /avail commands).\n2) n8n Telegram credential for the new bot — attach on ALL Telegram nodes here (trigger, both deletes, both sends). Currently holding the reminder bot credential as placeholder.\n3) Paste the group chat ID on both Send nodes.\nFlow: /avail only (other messages ignored) → parse date/time → read 4 tabs → 24h overlap check → delete previous answer + delete the /avail command → send fresh → save message id under lastAvailMessageId.\nUsage: /avail Sep 20 9am (also 20 Sep 9am, 9am Sep 20, 20/9 9am, today/tomorrow + time). Time defaults to 8:00 AM. Past dates roll forward.",
+            "height" : 300,
+            "width" : 420
+         },
+         "position" : [
+            100,
+            300
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      },
+      {
+         "id" : "9747f153-0272-4c33-a515-be35164a5aa2",
+         "name" : "Is Avail Command?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.message?.text ?? '' }}",
+                     "operator" : {
+                        "operation" : "startsWith",
+                        "type" : "string"
+                     },
+                     "rightValue" : "/avail"
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : false,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            350,
+            400
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "alwaysOutputData" : true,
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "70abcf5c-0e05-4f86-94d1-f4c1581f7049",
+         "name" : "Read Answer State",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            700,
+            620
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "bedc3d60-ab48-447a-abe3-e482c72218dc",
+         "name" : "Has Prior Answer?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ String($('Read Answer State').first().json.Value ?? '') }}",
+                     "operator" : {
+                        "operation" : "notEquals",
+                        "type" : "string"
+                     },
+                     "rightValue" : ""
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            1820,
+            360
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "afbece47-bd07-4339-87ab-49e53c6b9677",
+         "name" : "Delete Previous Answer",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "chatId" : "-5579280398",
+            "messageId" : "={{ String($('Read Answer State').first().json.Value ?? '') }}",
+            "operation" : "deleteMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            1820,
+            220
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "9f6b75a1-86a2-471e-a58c-610d0fbdb0c6"
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "9f635219-ccac-4118-927c-06017c7e52b9",
+         "name" : "Delete Command",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "chatId" : "-5579280398",
+            "messageId" : "={{ String($('Availability Requests').first().json.message.message_id ?? '') }}",
+            "operation" : "deleteMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            1960,
+            220
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "11a0fe23-cdda-494c-9127-33b2f63d851f"
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "8c4d5402-47f6-4d10-9f3d-30b1e57de93b",
+         "name" : "Save Answer State",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "matchingColumns" : [
+                  "Key"
+               ],
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Key",
+                     "id" : "Key",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Value",
+                     "id" : "Value",
+                     "required" : false,
+                     "type" : "string"
+                  }
+               ],
+               "value" : {
+                  "Key" : "lastAvailMessageId",
+                  "Value" : "={{ $json.result.message_id }}"
+               }
+            },
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "appendOrUpdate",
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            2250,
+            360
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "d9974642-f22f-4389-b5e4-5f178ec36ec2",
+         "name" : "Delete Usage Command",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "chatId" : "-5579280398",
+            "messageId" : "={{ String($('Availability Requests').first().json.message.message_id ?? '') }}",
+            "operation" : "deleteMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            1720,
+            680
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "ef3a3103-0c70-4db2-b4a7-b0b6b890ab1e"
+      }
+   ],
+   "pinData" : null,
+   "settings" : {
+      "availableInMCP" : true,
+      "executionOrder" : "v1"
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-06T01:37:56.467Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-06T01:37:56.467Z",
+         "workflowId" : "emvfMzFVL0CK8TTD"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 1,
+   "updatedAt" : "2026-09-06T01:59:23.426Z",
+   "versionCounter" : 37,
+   "versionId" : "5f5fc457-95bd-49e4-87a2-023cce6c260d",
+   "versionMetadata" : {
+      "description" : "Updated nodes: Send Usage Hint",
+      "name" : "Point usage hint at team group"
+   }
+}
