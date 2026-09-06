@@ -1,13 +1,13 @@
 {
    "active" : true,
-   "activeVersionId" : "9afd2feb-16c5-4172-902a-6e8d1a967a46",
+   "activeVersionId" : "bc846006-91ad-4383-b731-175da699e78c",
    "connections" : {
       "Build No-Booking Message" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Send Telegram No-Booking Note",
+                  "node" : "Debug Send? (Empty)",
                   "type" : "main"
                }
             ]
@@ -18,7 +18,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Send Telegram Reminder",
+                  "node" : "Debug Send?",
                   "type" : "main"
                }
             ]
@@ -29,22 +29,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Read Iphone 13 Bookings",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Canon EOS R50 Bookings",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Insta360 X5 Bookings",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read DJI Osmo Pocket 3 Bookings",
+                  "node" : "Read Bot State",
                   "type" : "main"
                }
             ]
@@ -79,6 +64,64 @@
             ]
          ]
       },
+      "Debug Send?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram Reminder (Dev)",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Prior Reminder?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Debug Send? (Empty)" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram No-Booking (Dev)",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Prior Note?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Delete Previous Note" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram No-Booking Note",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Delete Previous Reminder" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram Reminder",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "Filter Tomorrow's Bookings" : {
          "main" : [
             [
@@ -90,12 +133,74 @@
             ]
          ]
       },
+      "Has Prior Note?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Previous Note",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram No-Booking Note",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Has Prior Reminder?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Delete Previous Reminder",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Telegram Reminder",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "On-Demand Entry" : {
          "main" : [
             [
                {
                   "index" : 0,
                   "node" : "Run Settings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Bot State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Iphone 13 Bookings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Canon EOS R50 Bookings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Insta360 X5 Bookings",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read DJI Osmo Pocket 3 Bookings",
                   "type" : "main"
                }
             ]
@@ -151,6 +256,28 @@
                {
                   "index" : 0,
                   "node" : "Calculate Tomorrow",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Telegram No-Booking Note" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Save Note State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Telegram Reminder" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Save Reminder State",
                   "type" : "main"
                }
             ]
@@ -238,7 +365,7 @@
             }
          },
          "position" : [
-            240,
+            128,
             400
          ],
          "type" : "n8n-nodes-base.scheduleTrigger",
@@ -248,7 +375,8 @@
          "id" : "0097904e-890a-4706-bca4-378ffbf8f897",
          "name" : "Calculate Tomorrow",
          "parameters" : {
-            "jsCode" : "const TIMEZONE = 'Asia/Manila'; const now = new Date(); const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now); const p = todayDate.split('-'); const t = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]))); t.setUTCDate(t.getUTCDate() + 1); const targetDate = t.toISOString().slice(0, 10); const displayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(t); const todayDisplayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(now); const clock = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false }).format(now); const cp = clock.split(':'); const nowMinutes = Number(cp[0]) * 60 + Number(cp[1]); return [{ json: { targetDate: targetDate, displayDate: displayDate, todayDate: todayDate, todayDisplayDate: todayDisplayDate, timezone: TIMEZONE, nowMinutes: nowMinutes } }];"
+            "jsCode" : "const TIMEZONE = 'Asia/Manila'; const now = new Date(); const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now); const p = todayDate.split('-'); const t = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]))); t.setUTCDate(t.getUTCDate() + 1); const targetDate = t.toISOString().slice(0, 10); const displayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(t); const todayDisplayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(now); const clock = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false }).format(now); const cp = clock.split(':'); const nowMinutes = Number(cp[0]) * 60 + Number(cp[1]); const nextRunShort = nowMinutes < 480 ? 'Today, 8:00 AM' : (nowMinutes < 1200 ? 'Today, 8:00 PM' : 'Tomorrow, 8:00 AM'); return [{ json: { targetDate: targetDate, displayDate: displayDate, todayDate: todayDate, todayDisplayDate: todayDisplayDate, timezone: TIMEZONE, nowMinutes: nowMinutes, nextRunShort: nextRunShort } }];",
+            "mode" : "runOnceForAllItems"
          },
          "position" : [
             464,
@@ -469,7 +597,7 @@
          "id" : "caed1fc9-d1a9-49b3-ba36-c24a09e90b80",
          "name" : "Filter Tomorrow's Bookings",
          "parameters" : {
-            "jsCode" : "const START_DATE_FIELD = 'Start Date'; const STATUS_FIELD = 'Status'; const RENTER_FIELD = 'Renter Name'; const PICKUP_TIME_FIELD = 'Time'; const RETURN_FIELD = 'End Date'; const DEVICE_FIELD = 'device'; const ADDRESS_FIELD = 'Address'; const NOTES_FIELD = 'Notes'; const REMAINING_FIELD = 'Remaining'; const DOWN_PAYMENT_FIELD = 'Down Payment'; const DIVE_CASE_FIELD = 'Dive Case'; const ACTIVE_STATUSES = ['booked']; const DIVE_NO = ['no', 'n', 'none', 'n/a', 'na', 'nil', 'null', '-', '—', '0', 'false', 'x']; const ref = $('Calculate Tomorrow').first().json; const target = ref.targetDate; const today = ref.todayDate; const nowM = ref.nowMinutes; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const s = String(v).trim(); const m = s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(s); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function shortDate(iso) { if (iso === '') return ''; const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d.getTime())) return iso; return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(d); } function cleanTime(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return ''; const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*([AaPp][Mm])?$/); if (m) return m[1] + ':' + m[2] + (m[4] ? ' ' + m[4].toUpperCase() : ''); return s; } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const s = String(t).trim().toUpperCase(); const m = s.match(/(\\d{1,2})(:(\\d{2}))?\\s*(AM|PM)?/); if (!m) return 99999; let h = Number(m[1]); const mi = m[3] ? Number(m[3]) : 0; const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function daysBetween(a, b) { if (a === '' || b === '') return null; const da = new Date(a + 'T00:00:00Z'); const db = new Date(b + 'T00:00:00Z'); if (isNaN(da.getTime()) || isNaN(db.getTime())) return null; const n = Math.round((db - da) / 86400000); return n < 1 ? 1 : n; } function isActive(st) { const slow = st.trim().toLowerCase(); for (const k of ACTIVE_STATUSES) { if (slow === k) return true; } return false; } function diveYes(v) { const s = v === null || v === undefined ? '' : String(v).trim().toLowerCase(); if (s === '') return 'No'; for (const k of DIVE_NO) { if (s === k) return 'No'; } return 'Yes'; } const out = []; for (const item of $input.all()) { const j = item.json; const sd = normDate(j[START_DATE_FIELD]); const ed = normDate(j[RETURN_FIELD]); const st = j[STATUS_FIELD] !== undefined && j[STATUS_FIELD] !== null ? String(j[STATUS_FIELD]) : ''; if (!isActive(st)) continue; const rawTime = j[PICKUP_TIME_FIELD] !== undefined && j[PICKUP_TIME_FIELD] !== null ? String(j[PICKUP_TIME_FIELD]).trim() : ''; const pt = rawTime; const tDisp = cleanTime(rawTime); const section = sd === today ? 'today' : (sd === target ? 'tomorrow' : ''); const pickupAt = sd !== '' && tDisp !== '' ? shortDate(sd) + ', ' + tDisp : (sd !== '' ? shortDate(sd) : tDisp); const returnAt = ed !== '' && tDisp !== '' ? shortDate(ed) + ', ' + tDisp : (ed !== '' ? shortDate(ed) : ''); const base = { device: j[DEVICE_FIELD] || '', renter: j[RENTER_FIELD] || '', bookingDate: sd, pickupTime: pt, pickupAt: pickupAt, returnInfo: j[RETURN_FIELD] || '', returnAt: returnAt, status: st, address: j[ADDRESS_FIELD] || '', notes: j[NOTES_FIELD] || '', remaining: j[REMAINING_FIELD] || '', downPayment: j[DOWN_PAYMENT_FIELD] || '', diveCase: diveYes(j[DIVE_CASE_FIELD]), durationDays: daysBetween(sd, ed) }; if (section === 'today' && mins(pt) >= nowM) { base.section = 'today'; out.push({ json: base }); } else if (section === 'tomorrow') { base.section = 'tomorrow'; out.push({ json: base }); } else if (section === '' && ed === today && sd !== today) { base.section = 'return'; out.push({ json: base }); } } out.sort((a, b) => { const order = { today: 0, tomorrow: 1, return: 2 }; const o = order[a.json.section] - order[b.json.section]; if (o !== 0) return o; if (a.json.section !== 'return') { const d = mins(a.json.pickupTime) - mins(b.json.pickupTime); if (d !== 0) return d; } const dv = String(a.json.device).localeCompare(String(b.json.device)); if (dv !== 0) return dv; return String(a.json.renter).localeCompare(String(b.json.renter)); }); const rows = out.map(o => o.json); return [{ json: { targetDate: target, displayDate: ref.displayDate, todayDate: today, todayDisplayDate: ref.todayDisplayDate, todayShort: shortDate(today), displayShort: shortDate(target), timezone: ref.timezone, count: rows.length, bookings: rows } }];",
+            "jsCode" : "const START_DATE_FIELD = 'Start Date'; const STATUS_FIELD = 'Status'; const RENTER_FIELD = 'Renter Name'; const PICKUP_TIME_FIELD = 'Time'; const RETURN_FIELD = 'End Date'; const DEVICE_FIELD = 'device'; const ADDRESS_FIELD = 'Address'; const NOTES_FIELD = 'Notes'; const REMAINING_FIELD = 'Balance'; const DOWN_PAYMENT_FIELD = 'Down Payment'; const DIVE_CASE_FIELD = 'Dive Case'; const ACTIVE_STATUSES = ['booked', 'released']; const DIVE_NO = ['no', 'n', 'none', 'n/a', 'na', 'nil', 'null', '-', '—', '0', 'false', 'x']; const TODAY_GRACE_MIN = 30; const DUE_SOON_HOURS = 12; const ref = $('Calculate Tomorrow').first().json; const target = ref.targetDate; const today = ref.todayDate; const nowM = ref.nowMinutes; const nowMs = Date.now(); function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const s = String(v).trim(); const m = s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(s); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function shortDate(iso) { if (iso === '') return ''; const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d.getTime())) return iso; return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(d); } function cleanTime(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return ''; const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*([AaPp][Mm])?$/); if (m) return m[1] + ':' + m[2] + (m[4] ? ' ' + m[4].toUpperCase() : ''); return s; } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const s = String(t).trim().toUpperCase(); const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function dueInfo(ed, pt) { const m = mins(pt); if (ed === '' || m >= 99999) return { text: '', hours: null }; const p = ed.split('-'); if (p.length !== 3) return { text: '', hours: null }; const retMs = Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; const h = (retMs - nowMs) / 3600000; if (h > 0 && h <= DUE_SOON_HOURS) return { text: 'Due back in ~' + Math.max(1, Math.round(h)) + 'h', hours: h }; if (h <= 0) return { text: 'Return time passed', hours: h }; return { text: '', hours: null }; } function daysBetween(a, b) { if (a === '' || b === '') return null; const da = new Date(a + 'T00:00:00Z'); const db = new Date(b + 'T00:00:00Z'); if (isNaN(da.getTime()) || isNaN(db.getTime())) return null; const n = Math.round((db - da) / 86400000); return n < 1 ? 1 : n; } function isActive(st) { const slow = st.trim().toLowerCase(); for (const k of ACTIVE_STATUSES) { if (slow === k) return true; } return false; } function diveYes(v) { const s = v === null || v === undefined ? '' : String(v).trim().toLowerCase(); if (s === '') return 'No'; for (const k of DIVE_NO) { if (s === k) return 'No'; } return 'Yes'; } const out = []; for (const item of $input.all()) { const j = item.json; const sd = normDate(j[START_DATE_FIELD]); const ed = normDate(j[RETURN_FIELD]); const st = j[STATUS_FIELD] !== undefined && j[STATUS_FIELD] !== null ? String(j[STATUS_FIELD]) : ''; if (!isActive(st)) continue; const isRel = st.trim().toLowerCase() === 'released'; const rawTime = j[PICKUP_TIME_FIELD] !== undefined && j[PICKUP_TIME_FIELD] !== null ? String(j[PICKUP_TIME_FIELD]).trim() : ''; const pt = rawTime; const tDisp = cleanTime(rawTime); const dayKind = sd === today ? 'today' : (sd === target ? 'tomorrow' : ''); const pickupAt = sd !== '' && tDisp !== '' ? shortDate(sd) + ', ' + tDisp : (sd !== '' ? shortDate(sd) : tDisp); const returnAt = ed !== '' && tDisp !== '' ? shortDate(ed) + ', ' + tDisp : (ed !== '' ? shortDate(ed) : ''); const di = dueInfo(ed, pt); const base = { device: j[DEVICE_FIELD] || '', renter: j[RENTER_FIELD] || '', bookingDate: sd, pickupTime: pt, pickupAt: pickupAt, returnInfo: j[RETURN_FIELD] || '', returnAt: returnAt, status: st, address: j[ADDRESS_FIELD] || '', notes: j[NOTES_FIELD] || '', remaining: j[REMAINING_FIELD] || '', downPayment: j[DOWN_PAYMENT_FIELD] || '', diveCase: diveYes(j[DIVE_CASE_FIELD]), durationDays: daysBetween(sd, ed), dueSoon: di.text, hoursLeft: di.hours }; if (!isRel) { if (dayKind === 'today' && mins(pt) + TODAY_GRACE_MIN >= nowM) { base.section = 'today'; out.push({ json: base }); } else if (dayKind === 'tomorrow') { base.section = 'tomorrow'; out.push({ json: base }); } else if (dayKind === '' && ed === today && sd !== today) { base.section = 'return'; out.push({ json: base }); } } else { if (ed === today) { base.section = 'return'; out.push({ json: base }); } else if (ed === target) { base.section = 'dueback'; out.push({ json: base }); } } } out.sort((a, b) => { const order = { today: 0, tomorrow: 1, return: 2, dueback: 3 }; const o = order[a.json.section] - order[b.json.section]; if (o !== 0) return o; if (a.json.section === 'today' || a.json.section === 'tomorrow') { const d = mins(a.json.pickupTime) - mins(b.json.pickupTime); if (d !== 0) return d; } const dv = String(a.json.device).localeCompare(String(b.json.device)); if (dv !== 0) return dv; return String(a.json.renter).localeCompare(String(b.json.renter)); }); const rows = out.map(o => o.json); return [{ json: { targetDate: target, displayDate: ref.displayDate, todayDate: today, todayDisplayDate: ref.todayDisplayDate, todayShort: shortDate(today), displayShort: shortDate(target), timezone: ref.timezone, nextRunShort: ref.nextRunShort, count: rows.length, bookings: rows } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
@@ -508,8 +636,7 @@
                   "typeValidation" : "strict",
                   "version" : 2
                }
-            },
-            "options" : {}
+            }
          },
          "position" : [
             1520,
@@ -522,7 +649,7 @@
          "id" : "de3b4b96-7288-4dbc-98f6-8f915b93078b",
          "name" : "Build Reminder Message",
          "parameters" : {
-            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; const SEP = '━━━━━━━━━━━━━━━━━━'; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } function val(v, emptyText) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return emptyText === undefined ? '—' : emptyText; return esc(s); } function dpVal(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return '₱0'; const n = parseFloat(s.replace(/[^0-9.\\-]/g, '')); if (isNaN(n)) return esc(s); return '₱' + n.toLocaleString('en-US'); } function durVal(n) { if (n === null || n === undefined) return '—'; return n + (n === 1 ? ' day' : ' days'); } function isInsta(b) { return String(b.device || '').trim().toLowerCase() === 'insta360 x5'; } function head(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); return icon + '<b>' + esc(name) + '</b>'; } function block(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('🕐 <b>Pickup:</b> ' + val(b.pickupAt)); L.push('↩️ <b>Return:</b> ' + val(b.returnAt)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } function returnBlock(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('📤 <b>Out since:</b> ' + val(b.bookingDate)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } const lines = []; lines.push('📅 <b>UPCOMING BOOKINGS</b>'); const td = d.bookings.filter(b => b.section === 'today'); const tm = d.bookings.filter(b => b.section !== 'today' && b.section !== 'return'); const rt = d.bookings.filter(b => b.section === 'return'); if (td.length > 0) { lines.push(''); lines.push('<b>Today, ' + esc(d.todayShort || d.todayDisplayDate) + ' — ' + td.length + (td.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of td) lines.push(block(b)); } if (tm.length > 0) { lines.push(''); lines.push('<b>Tomorrow, ' + esc(d.displayShort || d.displayDate) + ' — ' + tm.length + (tm.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of tm) lines.push(block(b)); } if (rt.length > 0) { lines.push(''); lines.push('<b>Returns due, ' + esc(d.todayShort || d.todayDisplayDate) + ' — ' + rt.length + (rt.length === 1 ? ' unit</b>' : ' units</b>')); lines.push(''); for (const b of rt) lines.push(returnBlock(b)); } return [{ json: { telegramMessage: lines.join('\\n').trim(), count: d.count, displayDate: d.displayDate } }];",
+            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; const SEP = '━━━━━━━━━━━━━━━━━━'; const DUE_SOON_HOURS = 12; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } function val(v, emptyText) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return emptyText === undefined ? '—' : emptyText; return esc(s); } function dpVal(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return '₱0'; const n = parseFloat(s.replace(/[^0-9.\\-]/g, '')); if (isNaN(n)) return esc(s); return '₱' + n.toLocaleString('en-US'); } function durVal(n) { if (n === null || n === undefined) return '—'; return n + (n === 1 ? ' day' : ' days'); } function isInsta(b) { return String(b.device || '').trim().toLowerCase() === 'insta360 x5'; } function head(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); return icon + '<b>' + esc(name) + '</b>'; } function dueLine(b, L) { const s = b.dueSoon === null || b.dueSoon === undefined ? '' : String(b.dueSoon).trim(); if (s !== '') L.push('⏳ <b>' + esc(s) + '</b>'); } function devName(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); const who = String(b.renter || '').trim() === '' ? '' : ' - ' + b.renter; return icon + esc(name) + esc(who); } function countdown(b) { const h = b.hoursLeft; if (h === null || h === undefined || isNaN(h)) return '—'; if (h <= 0) return 'return time passed'; return 'back in ~' + Math.max(1, Math.round(h)) + 'h'; } function isDue(b) { const h = b.hoursLeft; return h !== null && h !== undefined && !isNaN(h) && h <= DUE_SOON_HOURS; } function block(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('🕐 <b>Pickup:</b> ' + val(b.pickupAt)); L.push('↩️ <b>Return:</b> ' + val(b.returnAt)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); dueLine(b, L); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } const lines = []; lines.push('📅 <b>UPCOMING BOOKINGS</b>'); const td = d.bookings.filter(b => b.section === 'today'); const tm = d.bookings.filter(b => b.section !== 'today' && b.section !== 'return' && b.section !== 'dueback'); const due = d.bookings.filter(b => (b.section === 'return' || b.section === 'dueback') && isDue(b)).sort((a, b) => a.hoursLeft - b.hoursLeft); if (td.length + tm.length === 0) { lines.push('No upcoming bookings today or tomorrow (' + esc(d.todayDisplayDate) + ' - ' + esc(d.displayDate) + ').'); } else { if (td.length > 0) { lines.push(''); lines.push('<b>Today, ' + esc(d.todayShort || d.todayDisplayDate) + ' - ' + td.length + (td.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of td) lines.push(block(b)); } if (tm.length > 0) { lines.push(''); lines.push('<b>Tomorrow, ' + esc(d.displayShort || d.displayDate) + ' - ' + tm.length + (tm.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of tm) lines.push(block(b)); } } lines.push(''); lines.push('↩️ <b>DUE FOR RETURN - ' + due.length + (due.length === 1 ? ' unit</b>' : ' units</b>')); if (due.length === 0) { lines.push('No units due right now.'); } else { for (const b of due) { lines.push(devName(b) + ' - ' + countdown(b)); } } lines.push(''); lines.push('⏭ <b>Next check:</b> ' + esc(d.nextRunShort || '')); return [{ json: { telegramMessage: lines.join('\\n').trim(), count: d.count, displayDate: d.displayDate } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
@@ -578,7 +705,8 @@
          "id" : "314a3251-9814-4270-b632-e682b302b95c",
          "name" : "Build No-Booking Message",
          "parameters" : {
-            "jsCode" : "const d = $input.first().json; return [{ json: { telegramMessage: 'No upcoming bookings today or tomorrow (' + d.todayDisplayDate + ' \\u2013 ' + d.displayDate + ').', count: 0, displayDate: d.displayDate } }];"
+            "jsCode" : "const d = $input.first().json; const nxt = d.nextRunShort ? '\\n\\n⏭ <b>Next check:</b> ' + d.nextRunShort : ''; return [{ json: { telegramMessage: 'No upcoming bookings today or tomorrow (' + d.todayDisplayDate + ' - ' + d.displayDate + ').' + nxt, count: 0, displayDate: d.displayDate } }];",
+            "mode" : "runOnceForAllItems"
          },
          "position" : [
             1728,
@@ -634,13 +762,13 @@
          "name" : "README Live Config",
          "parameters" : {
             "color" : 4,
-            "content" : "## Next-Day Booking Reminder — live config\nSchedule: 08:00 + 20:00 Asia/Manila daily (workflow timezone set; instance default UTC).\nSheets: 4 branches (Iphone 13, Canon EOS R50, Insta360 X5, DJI Osmo Pocket 3), spreadsheet ID set, OAuth credential attached to all reads.\nColumns: Start Date / End Date / Time (= pickup) / Status / Renter Name / Address / Notes / Remaining / Down Payment. Insta360-only: Dive Case → Yes/No.\nFilter: status allowlist = Booked only. Window = today (pickup still ahead) + tomorrow, plus returns due today.\nMessage: single Telegram send from Build Reminder Message — fan out future channels (Discord/Messenger) from that node.\nTelegram: bot credential attached; chat ID pasted on both Send nodes.\nDo not add :latest, do not embed secrets (credentials only).",
+            "content" : "## Next-Day Booking Reminder — live config\nSchedule: 08:00 + 20:00 Asia/Manila daily (workflow timezone set; instance default UTC).\nSheets: 4 device branches + Read Bot State (_State tab: Key | Value), spreadsheet ID set, OAuth credential attached to all reads.\nColumns: Start Date / End Date / Time (= pickup AND return time, 24h convention) / Status / Renter Name / Address / Notes / Remaining / Down Payment. Insta360-only: Dive Case → Yes/No.\nSTATUS MODEL: Booked = secured, upcoming (pickup sections). Released = unit is OUT (return tracking). Only Returned/Available/Pending/etc. stop reminding.\nMESSAGE: two sections. 1) Upcoming pickups (full blocks; explicit none-line when empty). 2) Due for return (compact one-line countdowns, soonest first). Per-block countdown lines on pickups.\nONE MESSAGE: each group send deletes the previous group message first (message id tracked in _State under lastMessageId; missing-message delete failures are tolerated). Dev DM sends never touch group state.\nMessage: single Telegram send from Build Reminder Message — fan out future channels (Discord/Messenger) from that node.\nTelegram: bot credential attached; group chat on group Sends, personal DM on Dev Sends.\nDEBUG: Run Settings.isDebug = true routes both Sends to your DM with a DEV-TEST prefix. Default false (group). Remember to set false + publish when done testing.\nOn-demand: On-Demand Entry trigger (sub-workflow calls) + Booking Reminder On-Demand workflow (group button + /check).\nDo not add :latest, do not embed secrets (credentials only).",
             "height" : 364,
             "width" : 484
          },
          "position" : [
-            32,
-            -32
+            -608,
+            -112
          ],
          "type" : "n8n-nodes-base.stickyNote",
          "typeVersion" : 1
@@ -717,7 +845,7 @@
             "inputSource" : "passthrough"
          },
          "position" : [
-            460,
+            464,
             560
          ],
          "type" : "n8n-nodes-base.executeWorkflowTrigger",
@@ -737,11 +865,10 @@
                   }
                ]
             },
-            "includeOtherFields" : false,
-            "mode" : "manual"
+            "options" : {}
          },
          "position" : [
-            352,
+            288,
             400
          ],
          "type" : "n8n-nodes-base.set",
@@ -765,13 +892,15 @@
                "options" : {
                   "caseSensitive" : true,
                   "leftValue" : "",
-                  "typeValidation" : "strict"
+                  "typeValidation" : "strict",
+                  "version" : 1
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            0,
-            0
+            1824,
+            192
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -791,13 +920,28 @@
                "parse_mode" : "HTML"
             },
             "chatId" : "5854600701",
-            "operation" : "sendMessage",
-            "resource" : "message",
+            "inlineKeyboard" : {
+               "rows" : [
+                  {
+                     "row" : {
+                        "buttons" : [
+                           {
+                              "additionalFields" : {
+                                 "callback_data" : "refresh"
+                              },
+                              "text" : "🔄 Check Bookings Now"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            },
+            "replyMarkup" : "inlineKeyboard",
             "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Build Reminder Message').item.json.telegramMessage }}"
          },
          "position" : [
-            0,
-            0
+            2000,
+            80
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -806,13 +950,342 @@
       {
          "id" : "8ca31854-9eed-4fe1-bd10-9126aae45208",
          "name" : "Debug Send? (Empty)",
-         "parameters" : {},
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $('Run Settings').first().json.isDebug }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
          "position" : [
-            0,
-            0
+            1824,
+            624
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "3ec19a9f-81c3-4034-9735-86754a441ab3",
+         "name" : "Send Telegram No-Booking (Dev)",
+         "parameters" : {
+            "additionalFields" : {
+               "appendAttribution" : false,
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "5854600701",
+            "inlineKeyboard" : {
+               "rows" : [
+                  {
+                     "row" : {
+                        "buttons" : [
+                           {
+                              "additionalFields" : {
+                                 "callback_data" : "refresh"
+                              },
+                              "text" : "🔄 Check Bookings Now"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            },
+            "replyMarkup" : "inlineKeyboard",
+            "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Build No-Booking Message').item.json.telegramMessage }}"
+         },
+         "position" : [
+            2000,
+            720
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "cd57ec6d-b099-4aac-89a3-1e43f9bd0c58"
+      },
+      {
+         "alwaysOutputData" : true,
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "1b145656-1741-47c6-87b6-9231dadb475b",
+         "name" : "Read Bot State",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "returnAllMatches" : "returnAllMatches"
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            680,
+            1000
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "16cab7b1-49d2-4c96-b80c-8c7dbc429126",
+         "name" : "Has Prior Reminder?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
+                     "operator" : {
+                        "operation" : "notEquals",
+                        "type" : "string"
+                     },
+                     "rightValue" : ""
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            2010,
+            200
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "922303df-396c-4d84-bf31-c742f7931959",
+         "name" : "Delete Previous Reminder",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "chatId" : "-5579280398",
+            "messageId" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
+            "operation" : "deleteMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            2010,
+            100
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "452f8fe8-aa57-4ec1-819c-fddf001bbcbd"
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "e6d877c4-58c3-4f39-bd29-dfd2f1e372b9",
+         "name" : "Save Reminder State",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "matchingColumns" : [
+                  "Key"
+               ],
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Key",
+                     "id" : "Key",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Value",
+                     "id" : "Value",
+                     "required" : false,
+                     "type" : "string"
+                  }
+               ],
+               "value" : {
+                  "Key" : "lastMessageId",
+                  "Value" : "={{ $json.result.message_id }}"
+               }
+            },
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "appendOrUpdate",
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            2100,
+            304
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "82ade651-3cfc-4164-ae3e-1a69e3d3fe50",
+         "name" : "Has Prior Note?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
+                     "operator" : {
+                        "operation" : "notEquals",
+                        "type" : "string"
+                     },
+                     "rightValue" : ""
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict"
+               }
+            }
+         },
+         "position" : [
+            2010,
+            600
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "vATakQ0Ac5I47aij",
+               "name" : "Telegram account"
+            }
+         },
+         "id" : "6d2bd172-e05a-427a-a53f-bebb1e3ec498",
+         "name" : "Delete Previous Note",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "chatId" : "-5579280398",
+            "messageId" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
+            "operation" : "deleteMessage",
+            "resource" : "message"
+         },
+         "position" : [
+            2010,
+            500
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "f994268f-0f01-4c34-877a-1d9c2c808992"
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "1578d7b2-054d-4727-8620-099221e34d4a",
+         "name" : "Save Note State",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "matchingColumns" : [
+                  "Key"
+               ],
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Key",
+                     "id" : "Key",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Value",
+                     "id" : "Value",
+                     "required" : false,
+                     "type" : "string"
+                  }
+               ],
+               "value" : {
+                  "Key" : "lastMessageId",
+                  "Value" : "={{ $json.result.message_id }}"
+               }
+            },
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "appendOrUpdate",
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            2100,
+            512
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
       }
    ],
    "pinData" : {},
@@ -857,11 +1330,11 @@
    },
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-05T22:26:06.480Z",
-   "versionCounter" : 107,
-   "versionId" : "4b6f58dd-4ed1-4842-a1ab-38fd78ad702b",
+   "updatedAt" : "2026-09-06T01:30:06.950Z",
+   "versionCounter" : 211,
+   "versionId" : "bc846006-91ad-4383-b731-175da699e78c",
    "versionMetadata" : {
-      "description" : "Added nodes: Debug Send? (Empty)",
-      "name" : "Add debug gate for no-booking path"
+      "description" : "Updated nodes: Run Settings",
+      "name" : "Disable debug mode for production"
    }
 }

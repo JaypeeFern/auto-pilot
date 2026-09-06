@@ -1,6 +1,6 @@
 {
    "active" : true,
-   "activeVersionId" : "e27f0ee1-3b14-461c-96fb-fced1e727371",
+   "activeVersionId" : "8d981b18-a1fc-4809-a367-3e9238fbd9a8",
    "connections" : {
       "Answer Button Tap" : {
          "main" : [
@@ -76,7 +76,7 @@
          "name" : "Telegram Updates",
          "parameters" : {
             "additionalFields" : {
-               "chatIds" : "-5579280398"
+               "chatIds" : "-5579280398,5854600701"
             },
             "updates" : [
                "message",
@@ -252,11 +252,11 @@
    "staticData" : null,
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-05T22:21:06.138Z",
-   "versionCounter" : 4,
-   "versionId" : "e27f0ee1-3b14-461c-96fb-fced1e727371",
+   "updatedAt" : "2026-09-06T01:28:30.791Z",
+   "versionCounter" : 5,
+   "versionId" : "8d981b18-a1fc-4809-a367-3e9238fbd9a8",
    "versionMetadata" : {
-      "description" : "Updated nodes: Answer Button Tap",
-      "name" : "Explicit refresh toast text"
+      "description" : "Updated nodes: Telegram Updates",
+      "name" : "Listen for taps in group and DM"
    }
 }
