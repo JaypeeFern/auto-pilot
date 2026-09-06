@@ -77,8 +77,22 @@ When guidance conflicts, use the following precedence:
 1. User instructions
 2. This `AGENTS.md` (locked decisions + hard rules)
 3. `docs/` (`ARCHITECTURE.md`, `DEPLOYMENT.md`, `BACKUP.md`, `RESTORE.md`,
-   `MCP.md`), `.env.example`, `README.md`
+   `MCP.md`), `docs/workflows/<workflow>/WORKFLOW.md`, `.env.example`,
+   `README.md`
 4. Framework / upstream conventions (Compose spec, n8n documented env vars)
+
+## Workflow documentation
+
+Each live workflow gets its own human-readable page at
+`docs/workflows/<workflow-name>/WORKFLOW.md` (lowercase hyphenated workflow name,
+e.g. `docs/workflows/next-day-booking-reminder/WORKFLOW.md`).
+
+- Write for clarity, not cleverness: what the workflow does, why it
+  exists, its structure, and how to look after it.
+- Keep the page in sync when the workflow changes (schedule, sheets,
+  columns, statuses, message shape, credentials by name).
+- Never put secrets, tokens, chat IDs, or spreadsheet IDs in these
+  pages — credential and destination *names* only.
 
 ## Prefer sub-agent driven development
 
