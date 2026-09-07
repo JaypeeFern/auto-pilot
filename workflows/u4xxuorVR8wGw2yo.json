@@ -1,6 +1,6 @@
 {
    "active" : true,
-   "activeVersionId" : "4e406c75-abc9-40d1-8b49-17dc42bc0ccd",
+   "activeVersionId" : "102392be-6c86-4e08-958e-3427266d52b9",
    "connections" : {
       "Answer Button Tap" : {
          "main" : [
@@ -174,7 +174,7 @@
          "name" : "Answer Button Tap",
          "parameters" : {
             "additionalFields" : {
-               "text" : "Checking all 4 device sheets — fresh reminder incoming…"
+               "text" : "Checking for new bookings…"
             },
             "queryId" : "={{ $json.callback_query.id }}",
             "resource" : "callback"
@@ -252,11 +252,11 @@
    "staticData" : null,
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T02:08:56.468Z",
-   "versionCounter" : 7,
-   "versionId" : "4e406c75-abc9-40d1-8b49-17dc42bc0ccd",
+   "updatedAt" : "2026-09-06T15:33:26.100Z",
+   "versionCounter" : 8,
+   "versionId" : "102392be-6c86-4e08-958e-3427266d52b9",
    "versionMetadata" : {
-      "description" : "Updated nodes: Telegram Updates",
-      "name" : "Listen on supergroup and DM"
+      "description" : "Updated nodes: Answer Button Tap",
+      "name" : "Honest refresh acknowledgment"
    }
 }

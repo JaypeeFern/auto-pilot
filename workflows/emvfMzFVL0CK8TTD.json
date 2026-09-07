@@ -1,6 +1,6 @@
 {
    "active" : true,
-   "activeVersionId" : "a8d2f124-cd29-475d-a550-1a1db0df843f",
+   "activeVersionId" : "3879de7f-c69c-4a09-9e57-fa5ccb179fad",
    "connections" : {
       "Availability Requests" : {
          "main" : [
@@ -30,17 +30,6 @@
                {
                   "index" : 0,
                   "node" : "Build Availability Message",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Combine Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Check Availability",
                   "type" : "main"
                }
             ]
@@ -126,6 +115,17 @@
             ]
          ]
       },
+      "Fetch Core Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Check Availability",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "Has Handbook?" : {
          "main" : [
             null,
@@ -206,22 +206,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Read Iphone 13 Rows",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Canon Rows",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Insta360 Rows",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read DJI Rows",
+                  "node" : "Fetch Core Bookings",
                   "type" : "main"
                }
             ]
@@ -238,56 +223,12 @@
             ]
          ]
       },
-      "Read Canon Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag Canon Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Read DJI Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag DJI Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
       "Read Handbook State" : {
          "main" : [
             [
                {
                   "index" : 0,
                   "node" : "Has Handbook?",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Read Insta360 Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag Insta360 Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Read Iphone 13 Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag Iphone Rows",
                   "type" : "main"
                }
             ]
@@ -359,50 +300,6 @@
                }
             ]
          ]
-      },
-      "Tag Canon Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 1,
-                  "node" : "Combine Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Tag DJI Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 3,
-                  "node" : "Combine Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Tag Insta360 Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 2,
-                  "node" : "Combine Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Tag Iphone Rows" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Combine Rows",
-                  "type" : "main"
-               }
-            ]
-         ]
       }
    },
    "createdAt" : "2026-09-06T01:37:56.445Z",
@@ -445,7 +342,7 @@
          "id" : "d50f5cf2-b8a6-43d1-95ce-eaadace15670",
          "name" : "Parse Request",
          "parameters" : {
-            "jsCode" : "const raw = String((($input.first().json.message || {}).text) || ''); const t0 = raw.replace(/^\\/avail(@[A-Za-z0-9_]+)?\\b/i, '').trim(); function mIdx(n) { n = String(n || '').toLowerCase(); if (/^\\d+$/.test(n)) { const v = Number(n); if (v >= 1 && v <= 12) return v - 1; return -1; } const k = n.slice(0, 3); const all = 'janfebmaraprmayjunjulaugsepoctnovdec'; const i = all.indexOf(k); if (i < 0 || i % 3 !== 0) return -1; return i / 3; } function pTime(s) { s = String(s || '').trim().toLowerCase().replace(/\\./g, ''); if (s === '') return 480; const m = s.match(/^(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?$/); if (!m) return null; let h = Number(m[1]); const mi = m[2] ? Number(m[2]) : 0; const ap = m[3]; if (ap) { if (h < 1 || h > 12) return null; if (ap === 'pm' && h < 12) h += 12; if (ap === 'am' && h === 12) h = 0; } else { if (h > 23) return null; } if (mi > 59) return null; return h * 60 + mi; } function manilaParts() { const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-'); return { y: Number(p[0]), mo: Number(p[1]) - 1, d: Number(p[2]) }; } function fmtTime(mins) { let h = Math.floor(mins / 60); const mi = mins % 60; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + (mi < 10 ? '0' + mi : mi) + ' ' + ap; } function monthLabel(y, mo) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'long', year: 'numeric' }).format(new Date(Date.UTC(y, mo, 1))); } const now = manilaParts(); let t = t0.toLowerCase(); let timeFirst = null; const mt = t.match(/^(\\d{1,2}:\\d{2}|\\d{1,2}\\s*(?:am|pm))\\s+(.+)$/); if (mt) { const pv = pTime(mt[1]); if (pv !== null) { timeFirst = pv; t = mt[2]; } } let mo = -1, rest = '', m = null; const low = t; if (low === '') { mo = now.mo; rest = ''; var yy0 = now.y; } else if ((m = low.match(/^(today|tomorrow)\\b\\s*(.*)$/))) { mo = now.mo; rest = m[2]; var yy0 = now.y; } else if ((m = low.match(/^([a-z]+)\\s+(\\d{1,2})(st|nd|rd|th)?\\b\\s*(.*)$/)) && mIdx(m[1]) >= 0) { mo = mIdx(m[1]); rest = m[4]; var yy0 = now.y; if (mo < now.mo) yy0 += 1; } else if ((m = low.match(/^([a-z]+)\\s*(.*)$/)) && mIdx(m[1]) >= 0 && !/\\d/.test(m[1])) { mo = mIdx(m[1]); rest = m[2]; var yy0 = now.y; if (mo < now.mo) yy0 += 1; } else if ((m = low.match(/^(\\d{1,2})(st|nd|rd|th)?\\s+([a-z]+)\\b\\s*(.*)$/))) { mo = mIdx(m[3]); rest = m[4]; var yy0 = now.y; if (mo >= 0 && mo < now.mo) yy0 += 1; } else if ((m = low.match(/^(\\d{1,2})[\\/\\-](\\d{1,2})\\s*(.*)$/))) { mo = Number(m[2]) - 1; if (mo < 0 || mo > 11) mo = -1; rest = m[3]; var yy0 = now.y; if (mo >= 0 && mo < now.mo) yy0 += 1; } else { return [{ json: { ok: false, error: 'Could not understand that. Try /avail October 9am' } }]; } if (mo < 0) return [{ json: { ok: false, error: 'Could not understand the month. Try /avail October 9am' } }]; let mins; if (timeFirst !== null) { mins = timeFirst; } else { mins = pTime(rest); } if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail October 9am' } }]; return [{ json: { ok: true, year: yy0, month: mo, timeMins: mins, monthLabel: monthLabel(yy0, mo), timeLabel: fmtTime(mins) } }];",
+            "jsCode" : "const raw = String((($input.first().json.message || {}).text) || ''); const t0 = raw.replace(/^\\/avail(@[A-Za-z0-9_]+)?\\b/i, '').trim(); function mIdx(n) { n = String(n || '').toLowerCase(); if (/^\\d+$/.test(n)) { const v = Number(n); if (v >= 1 && v <= 12) return v - 1; return -1; } const k = n.slice(0, 3); const all = 'janfebmaraprmayjunjulaugsepoctnovdec'; const i = all.indexOf(k); if (i < 0 || i % 3 !== 0) return -1; return i / 3; } function pTime(s) { s = String(s || '').trim().toLowerCase().replace(/\\./g, ''); if (s === '') return 0; const m = s.match(/^(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)?$/); if (!m) return null; let h = Number(m[1]); const mi = m[2] ? Number(m[2]) : 0; const ap = m[3]; if (ap) { if (h < 1 || h > 12) return null; if (ap === 'pm' && h < 12) h += 12; if (ap === 'am' && h === 12) h = 0; } else { if (h > 23) return null; } if (mi > 59) return null; return h * 60 + mi; } function manilaParts() { const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-'); return { y: Number(p[0]), mo: Number(p[1]) - 1, d: Number(p[2]) }; } function fmtTime(mins) { let h = Math.floor(mins / 60); const mi = mins % 60; const ap = h >= 12 ? 'PM' : 'AM'; if (h === 0) h = 12; if (h > 12) h -= 12; return h + ':' + (mi < 10 ? '0' + mi : mi) + ' ' + ap; } function monthLabel(y, mo) { return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'long', year: 'numeric' }).format(new Date(Date.UTC(y, mo, 1))); } const now = manilaParts(); let t = t0.toLowerCase(); let timeFirst = null; const mt = t.match(/^(\\d{1,2}:\\d{2}|\\d{1,2}\\s*(?:am|pm))\\s+(.+)$/); if (mt) { const pv = pTime(mt[1]); if (pv !== null) { timeFirst = pv; t = mt[2]; } } let mo = -1, rest = '', m = null; const low = t; if (low === '') { mo = now.mo; rest = ''; var yy0 = now.y; } else if ((m = low.match(/^(today|tomorrow)\\b\\s*(.*)$/))) { mo = now.mo; rest = m[2]; var yy0 = now.y; } else if ((m = low.match(/^([a-z]+)\\s+(\\d{1,2})(st|nd|rd|th)?\\b\\s*(.*)$/)) && mIdx(m[1]) >= 0) { mo = mIdx(m[1]); rest = m[4]; var yy0 = now.y; if (mo < now.mo) yy0 += 1; } else if ((m = low.match(/^([a-z]+)\\s*(.*)$/)) && mIdx(m[1]) >= 0 && !/\\d/.test(m[1])) { mo = mIdx(m[1]); rest = m[2]; var yy0 = now.y; if (mo < now.mo) yy0 += 1; } else if ((m = low.match(/^(\\d{1,2})(st|nd|rd|th)?\\s+([a-z]+)\\b\\s*(.*)$/))) { mo = mIdx(m[3]); rest = m[4]; var yy0 = now.y; if (mo >= 0 && mo < now.mo) yy0 += 1; } else if ((m = low.match(/^(\\d{1,2})[\\/\\-](\\d{1,2})\\s*(.*)$/))) { mo = Number(m[2]) - 1; if (mo < 0 || mo > 11) mo = -1; rest = m[3]; var yy0 = now.y; if (mo >= 0 && mo < now.mo) yy0 += 1; } else { return [{ json: { ok: false, error: 'Could not understand that. Try /avail October 9am' } }]; } if (mo < 0) return [{ json: { ok: false, error: 'Could not understand the month. Try /avail October 9am' } }]; let mins; if (timeFirst !== null) { mins = timeFirst; } else { mins = pTime(rest); } if (mins === null) return [{ json: { ok: false, error: 'Could not understand the time. Try /avail October 9am' } }]; return [{ json: { ok: true, year: yy0, month: mo, timeMins: mins, monthLabel: monthLabel(yy0, mo), timeLabel: fmtTime(mins) } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
@@ -488,84 +385,6 @@
       },
       {
          "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "450398b3-67a3-4674-9b2c-b54e6fc38f3c",
-         "name" : "Read Iphone 13 Rows",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "Iphone 13"
-            }
-         },
-         "position" : [
-            912,
-            160
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "b2b5a158-4333-435c-b0e7-eebbb4d58ddc",
-         "name" : "Tag Iphone Rows",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "av-a",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "Iphone 13"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            1104,
-            160
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
-         "id" : "ad8814cf-af86-4579-9c9c-799072ae9df6",
-         "name" : "Combine Rows",
-         "parameters" : {
-            "numberInputs" : 4
-         },
-         "position" : [
-            1312,
-            464
-         ],
-         "type" : "n8n-nodes-base.merge",
-         "typeVersion" : 3.2
-      },
-      {
-         "credentials" : {
             "telegramApi" : {
                "id" : "j63wb73oNdn0XZYA",
                "name" : "RentalAvailabilityBot"
@@ -589,205 +408,10 @@
          "webhookId" : "53a032b3-ab43-400d-894b-42a4665b7e2f"
       },
       {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "725eaa4e-ec79-4ad5-82ab-773fd3ebb7a0",
-         "name" : "Read Canon Rows",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "Canon EOS R50"
-            }
-         },
-         "position" : [
-            912,
-            368
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "785ee698-e54c-4c26-a1c5-e62367613a88",
-         "name" : "Tag Canon Rows",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "av-b",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "Canon EOS R50"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            1104,
-            368
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "d8968226-9fdf-4880-b3f5-7198106caf56",
-         "name" : "Read Insta360 Rows",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "Insta360 X5"
-            }
-         },
-         "position" : [
-            912,
-            560
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "950fe2b6-8dbe-42b1-8d63-360bbc4fa215",
-         "name" : "Tag Insta360 Rows",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "av-c",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "Insta360 X5"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            1104,
-            560
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "8b4148a0-0066-4e33-8d50-2b9ec89cfbff",
-         "name" : "Read DJI Rows",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "DJI Osmo Pocket 3"
-            }
-         },
-         "position" : [
-            912,
-            768
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "9b1a1492-f16e-437a-8f3d-8cfd4243b610",
-         "name" : "Tag DJI Rows",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "av-d",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "DJI Osmo Pocket 3"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            1104,
-            768
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
          "id" : "06332599-b7ff-4b6a-adfa-e8fb31044414",
          "name" : "Check Availability",
          "parameters" : {
-            "jsCode" : "const req = $('Parse Request').first().json; const Y = req.year; const MO = req.month; const T = req.timeMins; const DEVICES = ['Iphone 13', 'Canon EOS R50', 'Insta360 X5', 'DJI Osmo Pocket 3']; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const str = String(v).trim(); const m = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(str); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const str = String(t).trim().toUpperCase(); const m = str.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function stamp(iso, m) { const p = iso.split('-'); return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; } function shortDT(ms) { const d = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(new Date(ms)); const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(ms)); return d + ', ' + t; } const rows = []; for (const it of $input.all()) { const j = it.json || {}; if (!j.device || DEVICES.indexOf(j.device) < 0) continue; rows.push(j); } const tp = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-'); const tKey = Number(tp[0]) * 10000 + Number(tp[1]) * 100 + Number(tp[2]); const lastDay = new Date(Date.UTC(Y, MO + 1, 0)).getUTCDate(); const out = []; for (const dev of DEVICES) { const mine = rows.filter(j => j.device === dev); let unknown = false; const act = []; for (const j of mine) { const st = String(j.Status || '').trim().toLowerCase(); if (st !== 'booked' && st !== 'released') continue; const sd = normDate(j['Start Date']); const ed = normDate(j['End Date']); const m = mins(j.Time); if (sd === '' || ed === '' || m >= 99999) { unknown = true; continue; } act.push({ s: stamp(sd, m), e: stamp(ed, m) }); } const freeDays = []; const blocked = []; if (!unknown) { for (let d = 1; d <= lastDay; d += 1) { if (Y * 10000 + (MO + 1) * 100 + d < tKey) continue; const s = Date.UTC(Y, MO, d) + T * 60000 - 8 * 3600000; const e = s + 24 * 3600000; const reasons = []; for (const a of act) { if (s < a.e && a.s < e) { if (a.e > s && a.s <= s) reasons.push('return ' + shortDT(a.e)); else reasons.push('next pickup ' + shortDT(a.s)); if (reasons.length >= 2) break; } } if (reasons.length === 0) { freeDays.push(d); } else { blocked.push({ d: d, why: reasons.join('; ') }); } } } const ranges = []; let rs = -1, prev = -2; for (const d of freeDays) { if (d !== prev + 1) { if (rs >= 0) ranges.push([rs, prev]); rs = d; } prev = d; } if (rs >= 0) ranges.push([rs, prev]); out.push({ device: dev, unknown: unknown, ranges: ranges, blocked: blocked }); } return [{ json: { year: Y, month: MO, timeMins: T, monthLabel: req.monthLabel, timeLabel: req.timeLabel, results: out } }];",
+            "jsCode" : "const req = $('Parse Request').first().json; const Y = req.year; const MO = req.month; const T = req.timeMins; const DEVICES = ['Iphone 13', 'Canon EOS R50', 'Insta360 X5', 'DJI Osmo Pocket 3']; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const str = String(v).trim(); const m = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(str); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const str = String(t).trim().toUpperCase(); const m = str.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function stamp(iso, m) { const p = iso.split('-'); return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; } function shortDT(ms) { const d = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(new Date(ms)); const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(ms)); return d + ', ' + t; } const rows = []; for (const it of $input.all()) { const c = it.json || {}; const j = { device: c.device || '', Status: c.statusRaw || '', 'Start Date': c.startDate || '', 'End Date': c.endDate || '', Time: c.timeRaw || '' }; if (!j.device || DEVICES.indexOf(j.device) < 0) continue; rows.push(j); } const tp = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-'); const tKey = Number(tp[0]) * 10000 + Number(tp[1]) * 100 + Number(tp[2]); const lastDay = new Date(Date.UTC(Y, MO + 1, 0)).getUTCDate(); const out = []; for (const dev of DEVICES) { const mine = rows.filter(j => j.device === dev); let unknown = false; const act = []; for (const j of mine) { const st = String(j.Status || '').trim().toLowerCase(); if (st !== 'booked' && st !== 'released') continue; const sd = normDate(j['Start Date']); const ed = normDate(j['End Date']); const m = mins(j.Time); if (sd === '' || ed === '' || m >= 99999) { unknown = true; continue; } act.push({ s: stamp(sd, m), e: stamp(ed, m) }); } const freeDays = []; const blocked = []; if (!unknown) { for (let d = 1; d <= lastDay; d += 1) { if (Y * 10000 + (MO + 1) * 100 + d < tKey) continue; const s = Date.UTC(Y, MO, d) + T * 60000 - 8 * 3600000; const e = s + 24 * 3600000; const reasons = []; for (const a of act) { if (s < a.e && a.s < e) { if (a.e > s && a.s <= s) reasons.push('return ' + shortDT(a.e)); else reasons.push('next pickup ' + shortDT(a.s)); if (reasons.length >= 2) break; } } if (reasons.length === 0) { freeDays.push(d); } else { blocked.push({ d: d, why: reasons.join('; ') }); } } } const ranges = []; let rs = -1, prev = -2; for (const d of freeDays) { if (d !== prev + 1) { if (rs >= 0) ranges.push([rs, prev]); rs = d; } prev = d; } if (rs >= 0) ranges.push([rs, prev]); out.push({ device: dev, unknown: unknown, ranges: ranges, blocked: blocked }); } return [{ json: { year: Y, month: MO, timeMins: T, monthLabel: req.monthLabel, timeLabel: req.timeLabel, results: out } }];",
             "mode" : "runOnceForAllItems"
          },
          "position" : [
@@ -841,7 +465,7 @@
          "name" : "Sticky Note a499fe0e",
          "parameters" : {
             "color" : 6,
-            "content" : "## Availability Checker — setup\n1) Second bot via @BotFather (@rentalavailability_bot), in the team group AS ADMIN with message-delete permission.\n2) n8n Telegram credential (RentalAvailabilityBot) on ALL Telegram nodes here.\n3) Group chat ID on both Send nodes.\nFlow: /avail only (other messages ignored) → parse month/time → read 4 tabs → per-day 24h overlap per device → delete previous answer + delete the /avail command → send fresh month view → save message id under lastAvailMessageId.\nUsage: /avail (current month), /avail October, /avail Sep 20 9am (month view at 9am). Time defaults to 8:00 AM. Past months roll to next year. Blocked days excluded; unparseable active rows mark the device unverified.",
+            "content" : "## Availability Checker — setup\n1) Second bot via @BotFather (@rentalavailability_bot), in the team group AS ADMIN with message-delete permission.\n2) n8n Telegram credential (RentalAvailabilityBot) on ALL Telegram nodes here.\n3) Group chat ID on both Send nodes.\nFlow: /avail only (other messages ignored) → parse month/time → Fetch Core Bookings (Bookings Core sub-workflow: 4 tabs + normalize) → per-day 24h overlap per device → delete previous answer + delete the /avail command → send fresh month view → save message id under lastAvailMessageId.\nUsage: /avail (current month), /avail October, /avail Sep 20 9am (month view at 9am). Time defaults to 12:00 AM. Past months roll to next year. Blocked days excluded; unparseable active rows mark the device unverified.",
             "height" : 316,
             "width" : 580
          },
@@ -1430,7 +1054,7 @@
             "chatId" : "-1003771124764",
             "operation" : "sendMessage",
             "resource" : "message",
-            "text" : "📖 <b>Availability Bot Handbook</b>\n\nAsk me about free rental dates. I check every unit for a full 24-hour window.\n\n<b>Commands</b>\n/avail - this month at 8:00 AM\n/avail October - that month at 8:00 AM\n/avail Sep 20 9am - September view starting 9:00 AM\n/avail 20 Sep 9am - same, day first\n/avail 9am Sep 20 - same, time first\n/avail 20/9 2pm - same, numeric date\n/avail today 9am - from today on\n/help - show examples\n\n<i>Blocked days are left out. Only my latest answer stays in chat.</i>"
+            "text" : "📖 <b>Availability Bot Handbook</b>\n\nAsk me about free rental dates. I check every unit for a full 24-hour window.\n\n<b>Commands</b>\n/avail - this month at 12:00 AM\n/avail October - that month at 12:00 AM\n/avail Sep 20 9am - September view starting 9:00 AM\n/avail 20 Sep 9am - same, day first\n/avail 9am Sep 20 - same, time first\n/avail 20/9 2pm - same, numeric date\n/avail today 9am - from today on\n/help - show examples\n\n<i>Blocked days are left out. Only my latest answer stays in chat.</i>"
          },
          "position" : [
             860,
@@ -1522,6 +1146,24 @@
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
+      },
+      {
+         "id" : "f048a1d3-b192-48a7-8f89-7a96248a7dfa",
+         "name" : "Fetch Core Bookings",
+         "parameters" : {
+            "mode" : "once",
+            "workflowId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "JTMUO5UfcZjIH36L"
+            }
+         },
+         "position" : [
+            1050,
+            464
+         ],
+         "type" : "n8n-nodes-base.executeWorkflow",
+         "typeVersion" : 1.3
       }
    ],
    "pinData" : {},
@@ -1554,11 +1196,11 @@
    "staticData" : null,
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T03:29:53.540Z",
-   "versionCounter" : 112,
-   "versionId" : "a8d2f124-cd29-475d-a550-1a1db0df843f",
+   "updatedAt" : "2026-09-06T12:33:40.699Z",
+   "versionCounter" : 114,
+   "versionId" : "3879de7f-c69c-4a09-9e57-fa5ccb179fad",
    "versionMetadata" : {
-      "description" : "Updated nodes: Check Availability",
-      "name" : "Restore full logic with return wording"
+      "description" : "Added nodes: Fetch Core Bookings\nRemoved nodes: Read Iphone 13 Rows, Tag Iphone Rows, Combine Rows, Read Canon Rows, Tag Canon Rows and 4 more\nUpdated nodes: Check Availability, Sticky Note a499fe0e\nConnections: 2 added, 13 removed",
+      "name" : "Read bookings via Bookings Core sub-workflow"
    }
 }

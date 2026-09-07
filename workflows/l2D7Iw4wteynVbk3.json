@@ -1,13 +1,13 @@
 {
    "active" : true,
-   "activeVersionId" : "913065ed-77c0-4a8d-9034-817fbb09c6da",
+   "activeVersionId" : "9f4e0304-7ff0-469a-9c61-553ba45968c7",
    "connections" : {
       "Build No-Booking Message" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Has Prior Note?",
+                  "node" : "Gate Note Data",
                   "type" : "main"
                }
             ]
@@ -18,7 +18,7 @@
             [
                {
                   "index" : 0,
-                  "node" : "Has Prior Reminder?",
+                  "node" : "Gate Reminder Data",
                   "type" : "main"
                }
             ]
@@ -53,12 +53,12 @@
             ]
          ]
       },
-      "Combine Device Bookings" : {
+      "Compute Stable Hash" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Filter Tomorrow's Bookings",
+                  "node" : "Check Has Bookings",
                   "type" : "main"
                }
             ]
@@ -122,12 +122,45 @@
             ]
          ]
       },
-      "Filter Tomorrow's Bookings" : {
+      "Fetch Core Bookings" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Check Has Bookings",
+                  "node" : "Filter Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Filter Bookings" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Compute Stable Hash",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Gate Note Data" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Note?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Gate Reminder Data" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Send Reminder?",
                   "type" : "main"
                }
             ]
@@ -169,6 +202,17 @@
             ]
          ]
       },
+      "Hourly Reminder Trigger" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Run Settings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
       "On-Demand Entry" : {
          "main" : [
             [
@@ -185,66 +229,18 @@
             [
                {
                   "index" : 0,
-                  "node" : "Read Iphone 13 Bookings",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Canon EOS R50 Bookings",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read Insta360 X5 Bookings",
-                  "type" : "main"
-               },
-               {
-                  "index" : 0,
-                  "node" : "Read DJI Osmo Pocket 3 Bookings",
+                  "node" : "Read Reminder Hash",
                   "type" : "main"
                }
             ]
          ]
       },
-      "Read Canon EOS R50 Bookings" : {
+      "Read Reminder Hash" : {
          "main" : [
             [
                {
                   "index" : 0,
-                  "node" : "Tag Canon EOS R50",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Read DJI Osmo Pocket 3 Bookings" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag DJI Osmo Pocket 3",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Read Insta360 X5 Bookings" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag Insta360 X5",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Read Iphone 13 Bookings" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Tag Iphone 13",
+                  "node" : "Fetch Core Bookings",
                   "type" : "main"
                }
             ]
@@ -256,6 +252,50 @@
                {
                   "index" : 0,
                   "node" : "Calculate Tomorrow",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Save Note State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Save Reminder Hash",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Save Reminder State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Save Reminder Hash",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Note?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Prior Note?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Send Reminder?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Prior Reminder?",
                   "type" : "main"
                }
             ]
@@ -282,61 +322,6 @@
                }
             ]
          ]
-      },
-      "Tag Canon EOS R50" : {
-         "main" : [
-            [
-               {
-                  "index" : 1,
-                  "node" : "Combine Device Bookings",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Tag DJI Osmo Pocket 3" : {
-         "main" : [
-            [
-               {
-                  "index" : 3,
-                  "node" : "Combine Device Bookings",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Tag Insta360 X5" : {
-         "main" : [
-            [
-               {
-                  "index" : 2,
-                  "node" : "Combine Device Bookings",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Tag Iphone 13" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Combine Device Bookings",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Twice-Daily Reminder Trigger" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
-                  "node" : "Run Settings",
-                  "type" : "main"
-               }
-            ]
-         ]
       }
    },
    "createdAt" : "2026-09-05T20:11:46.403Z",
@@ -355,234 +340,24 @@
          "id" : "0097904e-890a-4706-bca4-378ffbf8f897",
          "name" : "Calculate Tomorrow",
          "parameters" : {
-            "jsCode" : "const TIMEZONE = 'Asia/Manila'; const now = new Date(); const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now); const p = todayDate.split('-'); const t = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]))); t.setUTCDate(t.getUTCDate() + 1); const targetDate = t.toISOString().slice(0, 10); const displayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(t); const todayDisplayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(now); const clock = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false }).format(now); const cp = clock.split(':'); const nowMinutes = Number(cp[0]) * 60 + Number(cp[1]); const nextRunShort = nowMinutes < 480 ? 'Today, 8:00 AM' : (nowMinutes < 1200 ? 'Today, 8:00 PM' : 'Tomorrow, 8:00 AM'); return [{ json: { targetDate: targetDate, displayDate: displayDate, todayDate: todayDate, todayDisplayDate: todayDisplayDate, timezone: TIMEZONE, nowMinutes: nowMinutes, nextRunShort: nextRunShort } }];",
-            "mode" : "runOnceForAllItems"
+            "jsCode" : "const TIMEZONE = 'Asia/Manila'; const now = new Date(); const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now); const p = todayDate.split('-'); const t = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]))); t.setUTCDate(t.getUTCDate() + 1); const targetDate = t.toISOString().slice(0, 10); const displayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(t); const todayDisplayDate = new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, month: 'long', day: 'numeric', year: 'numeric' }).format(now); const clock = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false }).format(now); const cp = clock.split(':'); const nowMinutes = Number(cp[0]) * 60 + Number(cp[1]); const nextRunShort = nowMinutes < 480 ? 'Today, 8:00 AM' : (nowMinutes < 1200 ? 'Today, 8:00 PM' : 'Tomorrow, 8:00 AM'); return [{ json: { targetDate: targetDate, displayDate: displayDate, todayDate: todayDate, todayDisplayDate: todayDisplayDate, timezone: TIMEZONE, nowMinutes: nowMinutes, nextRunShort: nextRunShort } }];"
          },
          "position" : [
-            464,
-            400
+            576,
+            368
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
       },
       {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "c78c4404-6a17-43a5-9b71-4605fb8f3d86",
-         "name" : "Read Iphone 13 Bookings",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "Iphone 13"
-            }
-         },
-         "position" : [
-            688,
-            208
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "0b829d55-56a6-4774-98aa-0488815c130e",
-         "name" : "Tag Iphone 13",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "device-tag-a",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "Iphone 13"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            912,
-            208
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
-         "id" : "9e0a27f3-0891-41bd-94ae-ee823de639eb",
-         "name" : "Combine Device Bookings",
-         "parameters" : {
-            "numberInputs" : 4
-         },
-         "position" : [
-            1120,
-            400
-         ],
-         "type" : "n8n-nodes-base.merge",
-         "typeVersion" : 3.2
-      },
-      {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "3c30d9b7-8744-4bf4-add9-7d851d02201f",
-         "name" : "Read Canon EOS R50 Bookings",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "Canon EOS R50"
-            }
-         },
-         "position" : [
-            688,
-            400
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "3fb01bde-293d-477e-915f-0e086fc10c1f",
-         "name" : "Tag Canon EOS R50",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "device-tag-b",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "Canon EOS R50"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            912,
-            400
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "bad8c0d4-803c-44cd-b7b9-df64a50cda47",
-         "name" : "Read Insta360 X5 Bookings",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "Insta360 X5"
-            }
-         },
-         "position" : [
-            688,
-            608
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "91b870ba-6830-45db-8d13-4d6a4d8d6b86",
-         "name" : "Tag Insta360 X5",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "device-tag-c",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "Insta360 X5"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            912,
-            608
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
          "id" : "caed1fc9-d1a9-49b3-ba36-c24a09e90b80",
-         "name" : "Filter Tomorrow's Bookings",
+         "name" : "Filter Bookings",
          "parameters" : {
-            "jsCode" : "const START_DATE_FIELD = 'Start Date'; const STATUS_FIELD = 'Status'; const RENTER_FIELD = 'Renter Name'; const PICKUP_TIME_FIELD = 'Time'; const RETURN_FIELD = 'End Date'; const DEVICE_FIELD = 'device'; const ADDRESS_FIELD = 'Address'; const NOTES_FIELD = 'Notes'; const REMAINING_FIELD = 'Balance'; const DOWN_PAYMENT_FIELD = 'Down Payment'; const DIVE_CASE_FIELD = 'Dive Case'; const ACTIVE_STATUSES = ['booked', 'released']; const DIVE_NO = ['no', 'n', 'none', 'n/a', 'na', 'nil', 'null', '-', '—', '0', 'false', 'x']; const TODAY_GRACE_MIN = 30; const DUE_SOON_HOURS = 12; const ref = $('Calculate Tomorrow').first().json; const target = ref.targetDate; const today = ref.todayDate; const nowM = ref.nowMinutes; const nowMs = Date.now(); function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const s = String(v).trim(); const m = s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(s); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function shortDate(iso) { if (iso === '') return ''; const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d.getTime())) return iso; return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(d); } function cleanTime(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return ''; const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*([AaPp][Mm])?$/); if (m) return m[1] + ':' + m[2] + (m[4] ? ' ' + m[4].toUpperCase() : ''); return s; } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const s = String(t).trim().toUpperCase(); const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function dueInfo(ed, pt) { const m = mins(pt); if (ed === '' || m >= 99999) return { text: '', hours: null }; const p = ed.split('-'); if (p.length !== 3) return { text: '', hours: null }; const retMs = Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; const h = (retMs - nowMs) / 3600000; if (h > 0 && h <= DUE_SOON_HOURS) return { text: 'Due back in ~' + Math.max(1, Math.round(h)) + 'h', hours: h }; if (h <= 0) return { text: 'Return time passed', hours: h }; return { text: '', hours: null }; } function daysBetween(a, b) { if (a === '' || b === '') return null; const da = new Date(a + 'T00:00:00Z'); const db = new Date(b + 'T00:00:00Z'); if (isNaN(da.getTime()) || isNaN(db.getTime())) return null; const n = Math.round((db - da) / 86400000); return n < 1 ? 1 : n; } function isActive(st) { const slow = st.trim().toLowerCase(); for (const k of ACTIVE_STATUSES) { if (slow === k) return true; } return false; } function diveYes(v) { const s = v === null || v === undefined ? '' : String(v).trim().toLowerCase(); if (s === '') return 'No'; for (const k of DIVE_NO) { if (s === k) return 'No'; } return 'Yes'; } const out = []; for (const item of $input.all()) { const j = item.json; const sd = normDate(j[START_DATE_FIELD]); const ed = normDate(j[RETURN_FIELD]); const st = j[STATUS_FIELD] !== undefined && j[STATUS_FIELD] !== null ? String(j[STATUS_FIELD]) : ''; if (!isActive(st)) continue; const isRel = st.trim().toLowerCase() === 'released'; const rawTime = j[PICKUP_TIME_FIELD] !== undefined && j[PICKUP_TIME_FIELD] !== null ? String(j[PICKUP_TIME_FIELD]).trim() : ''; const pt = rawTime; const tDisp = cleanTime(rawTime); const dayKind = sd === today ? 'today' : (sd === target ? 'tomorrow' : ''); const pickupAt = sd !== '' && tDisp !== '' ? shortDate(sd) + ', ' + tDisp : (sd !== '' ? shortDate(sd) : tDisp); const returnAt = ed !== '' && tDisp !== '' ? shortDate(ed) + ', ' + tDisp : (ed !== '' ? shortDate(ed) : ''); const di = dueInfo(ed, pt); const base = { device: j[DEVICE_FIELD] || '', renter: j[RENTER_FIELD] || '', bookingDate: sd, pickupTime: pt, pickupAt: pickupAt, returnInfo: j[RETURN_FIELD] || '', returnAt: returnAt, status: st, address: j[ADDRESS_FIELD] || '', notes: j[NOTES_FIELD] || '', remaining: j[REMAINING_FIELD] || '', downPayment: j[DOWN_PAYMENT_FIELD] || '', diveCase: diveYes(j[DIVE_CASE_FIELD]), durationDays: daysBetween(sd, ed), dueSoon: di.text, hoursLeft: di.hours }; if (!isRel) { if (dayKind === 'today' && mins(pt) + TODAY_GRACE_MIN >= nowM) { base.section = 'today'; out.push({ json: base }); } else if (dayKind === 'tomorrow') { base.section = 'tomorrow'; out.push({ json: base }); } else if (dayKind === '' && ed === today && sd !== today) { base.section = 'return'; out.push({ json: base }); } } else { if (ed === today) { base.section = 'return'; out.push({ json: base }); } else if (ed === target) { base.section = 'dueback'; out.push({ json: base }); } } } out.sort((a, b) => { const order = { today: 0, tomorrow: 1, return: 2, dueback: 3 }; const o = order[a.json.section] - order[b.json.section]; if (o !== 0) return o; if (a.json.section === 'today' || a.json.section === 'tomorrow') { const d = mins(a.json.pickupTime) - mins(b.json.pickupTime); if (d !== 0) return d; } const dv = String(a.json.device).localeCompare(String(b.json.device)); if (dv !== 0) return dv; return String(a.json.renter).localeCompare(String(b.json.renter)); }); const rows = out.map(o => o.json); return [{ json: { targetDate: target, displayDate: ref.displayDate, todayDate: today, todayDisplayDate: ref.todayDisplayDate, todayShort: shortDate(today), displayShort: shortDate(target), timezone: ref.timezone, nextRunShort: ref.nextRunShort, count: rows.length, bookings: rows } }];",
-            "mode" : "runOnceForAllItems"
+            "jsCode" : "const START_DATE_FIELD = 'Start Date'; const STATUS_FIELD = 'Status'; const RENTER_FIELD = 'Renter Name'; const PICKUP_TIME_FIELD = 'Time'; const RETURN_FIELD = 'End Date'; const DEVICE_FIELD = 'device'; const ADDRESS_FIELD = 'Address'; const NOTES_FIELD = 'Notes'; const REMAINING_FIELD = 'Balance'; const DOWN_PAYMENT_FIELD = 'Down Payment'; const DIVE_CASE_FIELD = 'Dive Case'; const ACTIVE_STATUSES = ['booked', 'released']; const DIVE_NO = ['no', 'n', 'none', 'n/a', 'na', 'nil', 'null', '-', '—', '0', 'false', 'x']; const TODAY_GRACE_MIN = 30; const DUE_SOON_HOURS = 12; const ref = $('Calculate Tomorrow').first().json; const target = ref.targetDate; const today = ref.todayDate; const nowM = ref.nowMinutes; const nowMs = Date.now(); function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const s = String(v).trim(); const m = s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(s); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function shortDate(iso) { if (iso === '') return ''; const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d.getTime())) return iso; return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' }).format(d); } function cleanTime(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return ''; const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*([AaPp][Mm])?$/); if (m) return m[1] + ':' + m[2] + (m[4] ? ' ' + m[4].toUpperCase() : ''); return s; } function mins(t) { if (t === null || t === undefined || t === '') return 99999; const s = String(t).trim().toUpperCase(); const m = s.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return 99999; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; return h * 60 + mi; } function dueInfo(ed, pt) { const m = mins(pt); if (ed === '' || m >= 99999) return { text: '', hours: null }; const p = ed.split('-'); if (p.length !== 3) return { text: '', hours: null }; const retMs = Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; const h = (retMs - nowMs) / 3600000; if (h > 0 && h <= DUE_SOON_HOURS) return { text: 'Due back in ~' + Math.max(1, Math.round(h)) + 'h', hours: h }; if (h <= 0) return { text: 'Return time passed', hours: h }; return { text: '', hours: null }; } function daysBetween(a, b) { if (a === '' || b === '') return null; const da = new Date(a + 'T00:00:00Z'); const db = new Date(b + 'T00:00:00Z'); if (isNaN(da.getTime()) || isNaN(db.getTime())) return null; const n = Math.round((db - da) / 86400000); return n < 1 ? 1 : n; } function isActive(st) { const slow = st.trim().toLowerCase(); for (const k of ACTIVE_STATUSES) { if (slow === k) return true; } return false; } function diveYes(v) { const s = v === null || v === undefined ? '' : String(v).trim().toLowerCase(); if (s === '') return 'No'; for (const k of DIVE_NO) { if (s === k) return 'No'; } return 'Yes'; } const legacy = []; for (const it of $input.all()) { const c = it.json || {}; legacy.push({ device: c.device || '', 'Start Date': c.startDate || '', 'End Date': c.endDate || '', 'Time': c.timeRaw || '', 'Status': c.statusRaw || '', 'Renter Name': c.renterName || '', 'Address': c.address || '', 'Notes': c.notes || '', 'Balance': c.balance || '', 'Down Payment': c.downPayment || '', 'Dive Case': c.diveCase || '' }); } const out = []; for (const item of legacy) { const j = item; const sd = normDate(j[START_DATE_FIELD]); const ed = normDate(j[RETURN_FIELD]); const st = j[STATUS_FIELD] !== undefined && j[STATUS_FIELD] !== null ? String(j[STATUS_FIELD]) : ''; if (!isActive(st)) continue; const isRel = st.trim().toLowerCase() === 'released'; const rawTime = j[PICKUP_TIME_FIELD] !== undefined && j[PICKUP_TIME_FIELD] !== null ? String(j[PICKUP_TIME_FIELD]).trim() : ''; const pt = rawTime; const tDisp = cleanTime(rawTime); const dayKind = sd === today ? 'today' : (sd === target ? 'tomorrow' : ''); const pickupAt = sd !== '' && tDisp !== '' ? shortDate(sd) + ', ' + tDisp : (sd !== '' ? shortDate(sd) : tDisp); const returnAt = ed !== '' && tDisp !== '' ? shortDate(ed) + ', ' + tDisp : (ed !== '' ? shortDate(ed) : ''); const di = dueInfo(ed, pt); const base = { device: j[DEVICE_FIELD] || '', renter: j[RENTER_FIELD] || '', bookingDate: sd, pickupTime: pt, pickupAt: pickupAt, returnInfo: j[RETURN_FIELD] || '', returnAt: returnAt, status: st, address: j[ADDRESS_FIELD] || '', notes: j[NOTES_FIELD] || '', remaining: j[REMAINING_FIELD] || '', downPayment: j[DOWN_PAYMENT_FIELD] || '', diveCase: diveYes(j[DIVE_CASE_FIELD]), durationDays: daysBetween(sd, ed), dueSoon: di.text, hoursLeft: di.hours }; if (!isRel) { if (dayKind === 'today' && mins(pt) + TODAY_GRACE_MIN >= nowM) { base.section = 'today'; out.push({ json: base }); } else if (dayKind === 'tomorrow') { base.section = 'tomorrow'; out.push({ json: base }); } else if (dayKind === '' && ed === today && sd !== today) { base.section = 'return'; out.push({ json: base }); } } else { if (ed === today) { base.section = 'return'; out.push({ json: base }); } else if (ed === target) { base.section = 'dueback'; out.push({ json: base }); } } } out.sort((a, b) => { const order = { today: 0, tomorrow: 1, return: 2, dueback: 3 }; const o = order[a.json.section] - order[b.json.section]; if (o !== 0) return o; if (a.json.section === 'today' || a.json.section === 'tomorrow') { const d = mins(a.json.pickupTime) - mins(b.json.pickupTime); if (d !== 0) return d; } const dv = String(a.json.device).localeCompare(String(b.json.device)); if (dv !== 0) return dv; return String(a.json.renter).localeCompare(String(b.json.renter)); }); const rows = out.map(o => o.json); return [{ json: { targetDate: target, displayDate: ref.displayDate, todayDate: today, todayDisplayDate: ref.todayDisplayDate, todayShort: shortDate(today), displayShort: shortDate(target), timezone: ref.timezone, nextRunShort: ref.nextRunShort, count: rows.length, bookings: rows } }];"
          },
          "position" : [
-            1328,
-            400
+            1248,
+            368
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
@@ -616,11 +391,12 @@
                   "typeValidation" : "strict",
                   "version" : 2
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            1520,
-            400
+            1472,
+            368
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -629,12 +405,11 @@
          "id" : "de3b4b96-7288-4dbc-98f6-8f915b93078b",
          "name" : "Build Reminder Message",
          "parameters" : {
-            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; const SEP = '━━━━━━━━━━━━━━━━━━'; const DUE_SOON_HOURS = 12; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } function val(v, emptyText) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return emptyText === undefined ? '—' : emptyText; return esc(s); } function dpVal(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return '₱0'; const n = parseFloat(s.replace(/[^0-9.\\-]/g, '')); if (isNaN(n)) return esc(s); return '₱' + n.toLocaleString('en-US'); } function durVal(n) { if (n === null || n === undefined) return '—'; return n + (n === 1 ? ' day' : ' days'); } function isInsta(b) { return String(b.device || '').trim().toLowerCase() === 'insta360 x5'; } function head(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); return icon + '<b>' + esc(name) + '</b>'; } function dueLine(b, L) { const s = b.dueSoon === null || b.dueSoon === undefined ? '' : String(b.dueSoon).trim(); if (s !== '') L.push('⏳ <b>' + esc(s) + '</b>'); } function devName(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); const who = String(b.renter || '').trim() === '' ? '' : ' - ' + b.renter; return icon + esc(name) + esc(who); } function countdown(b) { const h = b.hoursLeft; if (h === null || h === undefined || isNaN(h)) return '—'; if (h <= 0) return 'return time passed'; return 'back in ~' + Math.max(1, Math.round(h)) + 'h'; } function isDue(b) { const h = b.hoursLeft; return h !== null && h !== undefined && !isNaN(h) && h <= DUE_SOON_HOURS; } function block(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('🕐 <b>Pickup:</b> ' + val(b.pickupAt)); L.push('↩️ <b>Return:</b> ' + val(b.returnAt)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); dueLine(b, L); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } const lines = []; lines.push('📅 <b>UPCOMING BOOKINGS</b>'); const td = d.bookings.filter(b => b.section === 'today'); const tm = d.bookings.filter(b => b.section !== 'today' && b.section !== 'return' && b.section !== 'dueback'); const due = d.bookings.filter(b => (b.section === 'return' || b.section === 'dueback') && isDue(b)).sort((a, b) => a.hoursLeft - b.hoursLeft); if (td.length + tm.length === 0) { lines.push('No upcoming bookings today or tomorrow (' + esc(d.todayDisplayDate) + ' - ' + esc(d.displayDate) + ').'); } else { if (td.length > 0) { lines.push(''); lines.push('<b>Today, ' + esc(d.todayShort || d.todayDisplayDate) + ' - ' + td.length + (td.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of td) lines.push(block(b)); } if (tm.length > 0) { lines.push(''); lines.push('<b>Tomorrow, ' + esc(d.displayShort || d.displayDate) + ' - ' + tm.length + (tm.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of tm) lines.push(block(b)); } } lines.push(''); lines.push('↩️ <b>DUE FOR RETURN - ' + due.length + (due.length === 1 ? ' unit</b>' : ' units</b>')); if (due.length === 0) { lines.push('No units due right now.'); } else { for (const b of due) { lines.push(devName(b) + ' - ' + countdown(b)); } } lines.push(''); lines.push('⏭ <b>Next check:</b> ' + esc(d.nextRunShort || '')); return [{ json: { telegramMessage: lines.join('\\n').trim(), count: d.count, displayDate: d.displayDate } }];",
-            "mode" : "runOnceForAllItems"
+            "jsCode" : "const d = $input.first().json; const EMOJI = { 'Iphone 13': '📱', 'Canon EOS R50': '📷', 'Insta360 X5': '🎥', 'DJI Osmo Pocket 3': '🚁' }; const SEP = '━━━━━━━━━━━━━━━━━━'; const DUE_SOON_HOURS = 12; function esc(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); } function val(v, emptyText) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return emptyText === undefined ? '—' : emptyText; return esc(s); } function dpVal(v) { const s = v === null || v === undefined ? '' : String(v).trim(); if (s === '') return '₱0'; const n = parseFloat(s.replace(/[^0-9.\\-]/g, '')); if (isNaN(n)) return esc(s); return '₱' + n.toLocaleString('en-US'); } function durVal(n) { if (n === null || n === undefined) return '—'; return n + (n === 1 ? ' day' : ' days'); } function isInsta(b) { return String(b.device || '').trim().toLowerCase() === 'insta360 x5'; } function head(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); return icon + '<b>' + esc(name) + '</b>'; } function dueLine(b, L) { const s = b.dueSoon === null || b.dueSoon === undefined ? '' : String(b.dueSoon).trim(); if (s !== '') L.push('⏳ <b>' + esc(s) + '</b>'); } function devName(b) { const icon = EMOJI[String(b.device)] ? EMOJI[String(b.device)] + ' ' : ''; const name = String(b.device || '').trim() === '' ? 'Booking' : String(b.device).trim(); const who = String(b.renter || '').trim() === '' ? '' : ' - ' + b.renter; return icon + esc(name) + esc(who); } function countdown(b) { const h = b.hoursLeft; if (h === null || h === undefined || isNaN(h)) return '—'; if (h <= 0) return 'return time passed'; return 'back in ~' + Math.max(1, Math.round(h)) + 'h'; } function isDue(b) { const h = b.hoursLeft; return h !== null && h !== undefined && !isNaN(h) && h <= DUE_SOON_HOURS; } function block(b) { const L = []; L.push(SEP); L.push(''); L.push(head(b)); L.push(''); L.push('👤 <b>Renter:</b> ' + val(b.renter)); L.push('🕐 <b>Pickup:</b> ' + val(b.pickupAt)); L.push('↩️ <b>Return:</b> ' + val(b.returnAt)); L.push('⏱️ <b>Duration:</b> ' + durVal(b.durationDays)); dueLine(b, L); if (isInsta(b)) L.push('🤿 <b>Dive Case:</b> ' + val(b.diveCase)); L.push('📍 <b>Address:</b> ' + val(b.address, 'N/A')); L.push('🏷️ <b>Status:</b> ' + val(b.status)); L.push('📝 <b>Notes:</b> ' + val(b.notes, 'N/A')); L.push('💵 <b>Down Payment:</b> ' + dpVal(b.downPayment)); L.push('💳 <b>Balance:</b> ' + dpVal(b.remaining)); return L.join('\\n'); } const lines = []; lines.push('📅 <b>UPCOMING BOOKINGS</b>'); const td = d.bookings.filter(b => b.section === 'today'); const tm = d.bookings.filter(b => b.section !== 'today' && b.section !== 'return' && b.section !== 'dueback'); const due = d.bookings.filter(b => (b.section === 'return' || b.section === 'dueback') && isDue(b)).sort((a, b) => a.hoursLeft - b.hoursLeft); if (td.length + tm.length === 0) { lines.push('No upcoming bookings today or tomorrow (' + esc(d.todayDisplayDate) + ' - ' + esc(d.displayDate) + ').'); } else { if (td.length > 0) { lines.push(''); lines.push('<b>Today, ' + esc(d.todayShort || d.todayDisplayDate) + ' - ' + td.length + (td.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of td) lines.push(block(b)); } if (tm.length > 0) { lines.push(''); lines.push('<b>Tomorrow, ' + esc(d.displayShort || d.displayDate) + ' - ' + tm.length + (tm.length === 1 ? ' booking</b>' : ' bookings</b>')); lines.push(''); for (const b of tm) lines.push(block(b)); } } lines.push(''); lines.push('↩️ <b>DUE FOR RETURN - ' + due.length + (due.length === 1 ? ' unit</b>' : ' units</b>')); if (due.length === 0) { lines.push('No units due right now.'); } else { for (const b of due) { lines.push(devName(b) + ' - ' + countdown(b)); } } lines.push(''); lines.push('⏭ <b>Next check:</b> ' + esc(d.nextRunShort || '')); return [{ json: { telegramMessage: lines.join('\\n').trim(), count: d.count, displayDate: d.displayDate } }];"
          },
          "position" : [
-            1728,
-            304
+            1696,
+            176
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
@@ -674,8 +449,8 @@
             "text" : "={{ $('Build Reminder Message').item.json.telegramMessage }}"
          },
          "position" : [
-            1920,
-            304
+            2592,
+            272
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -685,12 +460,11 @@
          "id" : "314a3251-9814-4270-b632-e682b302b95c",
          "name" : "Build No-Booking Message",
          "parameters" : {
-            "jsCode" : "const d = $input.first().json; const nxt = d.nextRunShort ? '\\n\\n⏭ <b>Next check:</b> ' + d.nextRunShort : ''; return [{ json: { telegramMessage: 'No upcoming bookings today or tomorrow (' + d.todayDisplayDate + ' - ' + d.displayDate + ').' + nxt, count: 0, displayDate: d.displayDate } }];",
-            "mode" : "runOnceForAllItems"
+            "jsCode" : "const d = $input.first().json; const nxt = d.nextRunShort ? '\\n\\n⏭ <b>Next check:</b> ' + d.nextRunShort : ''; return [{ json: { telegramMessage: 'No upcoming bookings today or tomorrow (' + d.todayDisplayDate + ' - ' + d.displayDate + ').' + nxt, count: 0, displayDate: d.displayDate } }];"
          },
          "position" : [
-            1728,
-            512
+            1696,
+            560
          ],
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
@@ -730,8 +504,8 @@
             "text" : "={{ $('Build No-Booking Message').item.json.telegramMessage }}"
          },
          "position" : [
-            1920,
-            512
+            2592,
+            464
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -742,7 +516,7 @@
          "name" : "README Live Config",
          "parameters" : {
             "color" : 4,
-            "content" : "## Next-Day Booking Reminder — live config\nSchedule: 08:00 + 20:00 Asia/Manila daily (workflow timezone set; instance default UTC).\nSheets: 4 device branches + Read Bot State (_State tab: Key | Value), spreadsheet ID set, OAuth credential attached to all reads.\nColumns: Start Date / End Date / Time (= pickup AND return time, 24h convention) / Status / Renter Name / Address / Notes / Remaining / Down Payment. Insta360-only: Dive Case → Yes/No.\nSTATUS MODEL: Booked = secured, upcoming (pickup sections). Released = unit is OUT (return tracking). Only Returned/Available/Pending/etc. stop reminding.\nMESSAGE: two sections. 1) Upcoming pickups (full blocks; explicit none-line when empty). 2) Due for return (compact one-line countdowns, soonest first). Per-block countdown lines on pickups.\nONE MESSAGE: each group send deletes the previous group message first (message id tracked in _State under lastMessageId; missing-message delete failures are tolerated). Dev DM sends never touch group state.\nMessage: single Telegram send from Build Reminder Message — fan out future channels (Discord/Messenger) from that node.\nTelegram: bot credential attached; group chat on group Sends, personal DM on Dev Sends.\nDEBUG: Run Settings.isDebug = true routes both Sends to your DM with a DEV-TEST prefix. Default false (group). Remember to set false + publish when done testing.\nOn-demand: On-Demand Entry trigger (sub-workflow calls) + Booking Reminder On-Demand workflow (group button + /check).\nDo not add :latest, do not embed secrets (credentials only).",
+            "content" : "## Next-Day Booking Reminder — live config\nSchedule: hourly (workflow timezone set; instance default UTC). Change gate: Send Reminder? / Send Note? compare Compute Stable Hash against lastReminderHash in _State — unchanged runs stop silently, no delete/send.\nSheets: Bookings Core sub-workflow (reads 4 device tabs + normalizes rows) + Read Bot State (_State tab: Key | Value) + Read Reminder Hash. OAuth credential lives on the Core reads.\nColumns: Start Date / End Date / Time (= pickup AND return time, 24h convention) / Status / Renter Name / Address / Notes / Remaining / Down Payment. Insta360-only: Dive Case → Yes/No.\nHEADER VARIANCE: balance column is Balance in iPhone/Canon tabs but Remaining in DJI/Insta360 tabs — Core prefers Balance, falls back to Remaining. Do not assume one header everywhere.\nSTATUS MODEL: Booked = secured, upcoming (pickup sections). Released = unit is OUT (return tracking). Only Returned/Available/Pending/etc. stop reminding.\nDRAFT CONVENTION: Status is the commit signal — fill it in last. Blank-status rows are invisible to every output.\nMESSAGE: two sections. 1) Upcoming pickups (full blocks; explicit none-line when empty). 2) Due for return (compact one-line countdowns, soonest first). Per-block countdown lines on pickups.\nONE MESSAGE: each group send deletes the previous group message first (message id tracked in _State under lastMessageId; missing-message delete failures are tolerated). Dev DM sends never touch group state.\nMessage: single Telegram send from Build Reminder Message — fan out future channels (Discord/Messenger) from that node.\nTelegram: bot credential attached; group chat on group Sends, personal DM on Dev Sends.\nDEBUG: Run Settings.isDebug = true routes both Sends to your DM with a DEV-TEST prefix. Default false (group). Remember to set false + publish when done testing.\nOn-demand: On-Demand Entry trigger (sub-workflow calls) + Booking Reminder On-Demand workflow (group button + /check).\nDo not add :latest, do not embed secrets (credentials only).",
             "height" : 364,
             "width" : 484
          },
@@ -754,79 +528,14 @@
          "typeVersion" : 1
       },
       {
-         "credentials" : {
-            "googleSheetsOAuth2Api" : {
-               "id" : "d0C0P76hw5iOdLYR",
-               "name" : "Google Sheets account"
-            }
-         },
-         "id" : "06c76c8e-c956-4e9f-a0d2-a183ec43fb47",
-         "name" : "Read DJI Osmo Pocket 3 Bookings",
-         "parameters" : {
-            "documentId" : {
-               "__rl" : true,
-               "mode" : "id",
-               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
-            },
-            "options" : {
-               "dataLocationOnSheet" : {
-                  "values" : {
-                     "rangeDefinition" : "detectAutomatically"
-                  }
-               },
-               "outputFormatting" : {
-                  "values" : {
-                     "date" : "FORMATTED_STRING",
-                     "general" : "UNFORMATTED_VALUE"
-                  }
-               }
-            },
-            "sheetName" : {
-               "__rl" : true,
-               "mode" : "name",
-               "value" : "DJI Osmo Pocket 3"
-            }
-         },
-         "position" : [
-            688,
-            800
-         ],
-         "type" : "n8n-nodes-base.googleSheets",
-         "typeVersion" : 4.7
-      },
-      {
-         "id" : "9c6427c3-3d44-4800-b308-3f2b50f56436",
-         "name" : "Tag DJI Osmo Pocket 3",
-         "parameters" : {
-            "assignments" : {
-               "assignments" : [
-                  {
-                     "id" : "device-tag-d",
-                     "name" : "device",
-                     "type" : "string",
-                     "value" : "DJI Osmo Pocket 3"
-                  }
-               ]
-            },
-            "includeOtherFields" : true,
-            "options" : {}
-         },
-         "position" : [
-            912,
-            800
-         ],
-         "type" : "n8n-nodes-base.set",
-         "typeVersion" : 3.5
-      },
-      {
          "id" : "5840cf89-2f8c-46e2-bcc9-d3c0e4c989e7",
          "name" : "On-Demand Entry",
          "parameters" : {
             "inputSource" : "passthrough"
          },
          "position" : [
-            464,
-            560
+            128,
+            464
          ],
          "type" : "n8n-nodes-base.executeWorkflowTrigger",
          "typeVersion" : 1.2
@@ -848,8 +557,8 @@
             "options" : {}
          },
          "position" : [
-            288,
-            400
+            352,
+            368
          ],
          "type" : "n8n-nodes-base.set",
          "typeVersion" : 3.5
@@ -879,8 +588,8 @@
             "options" : {}
          },
          "position" : [
-            1824,
-            192
+            2368,
+            176
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -920,7 +629,7 @@
             "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Build Reminder Message').item.json.telegramMessage }}"
          },
          "position" : [
-            2000,
+            2592,
             80
          ],
          "type" : "n8n-nodes-base.telegram",
@@ -952,8 +661,8 @@
             "options" : {}
          },
          "position" : [
-            1824,
-            624
+            2368,
+            560
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -993,8 +702,8 @@
             "text" : "={{ '🧪 DEV-TEST\\n\\n' + $('Build No-Booking Message').item.json.telegramMessage }}"
          },
          "position" : [
-            2000,
-            720
+            2592,
+            656
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -1011,7 +720,6 @@
          "id" : "1b145656-1741-47c6-87b6-9231dadb475b",
          "name" : "Read Bot State",
          "parameters" : {
-            "combineFilters" : "AND",
             "documentId" : {
                "__rl" : true,
                "mode" : "id",
@@ -1025,16 +733,13 @@
                   }
                ]
             },
-            "operation" : "read",
             "options" : {
                "dataLocationOnSheet" : {
                   "values" : {
                      "rangeDefinition" : "detectAutomatically"
                   }
-               },
-               "returnAllMatches" : "returnAllMatches"
+               }
             },
-            "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -1042,8 +747,8 @@
             }
          },
          "position" : [
-            680,
-            1000
+            800,
+            368
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
@@ -1067,13 +772,15 @@
                "options" : {
                   "caseSensitive" : true,
                   "leftValue" : "",
-                  "typeValidation" : "strict"
+                  "typeValidation" : "strict",
+                  "version" : 1
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            2010,
-            200
+            1920,
+            176
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -1091,12 +798,11 @@
          "parameters" : {
             "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
-            "operation" : "deleteMessage",
-            "resource" : "message"
+            "operation" : "deleteMessage"
          },
          "position" : [
-            2010,
-            100
+            2144,
+            112
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -1148,7 +854,7 @@
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
             "operation" : "appendOrUpdate",
-            "resource" : "sheet",
+            "options" : {},
             "sheetName" : {
                "__rl" : true,
                "mode" : "name",
@@ -1156,8 +862,8 @@
             }
          },
          "position" : [
-            2100,
-            304
+            2816,
+            272
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
@@ -1181,13 +887,15 @@
                "options" : {
                   "caseSensitive" : true,
                   "leftValue" : "",
-                  "typeValidation" : "strict"
+                  "typeValidation" : "strict",
+                  "version" : 1
                }
-            }
+            },
+            "options" : {}
          },
          "position" : [
-            2010,
-            600
+            1920,
+            560
          ],
          "type" : "n8n-nodes-base.if",
          "typeVersion" : 2.2
@@ -1205,12 +913,11 @@
          "parameters" : {
             "chatId" : "-1003771124764",
             "messageId" : "={{ String($('Read Bot State').first().json.Value ?? '') }}",
-            "operation" : "deleteMessage",
-            "resource" : "message"
+            "operation" : "deleteMessage"
          },
          "position" : [
-            2010,
-            500
+            2144,
+            448
          ],
          "type" : "n8n-nodes-base.telegram",
          "typeVersion" : 1.2,
@@ -1262,6 +969,101 @@
                "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
             },
             "operation" : "appendOrUpdate",
+            "options" : {},
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            2816,
+            464
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "fb1a0841-247e-49c1-b683-a729ed24dc98",
+         "name" : "Hourly Reminder Trigger",
+         "parameters" : {
+            "rule" : {
+               "interval" : [
+                  {
+                     "field" : "hours",
+                     "hoursInterval" : 1
+                  }
+               ]
+            }
+         },
+         "position" : [
+            128,
+            272
+         ],
+         "type" : "n8n-nodes-base.scheduleTrigger",
+         "typeVersion" : 1.4
+      },
+      {
+         "id" : "b5a05939-c65e-4c36-8381-b6f6fc363b39",
+         "name" : "Fetch Core Bookings",
+         "parameters" : {
+            "options" : {},
+            "workflowId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "JTMUO5UfcZjIH36L"
+            }
+         },
+         "position" : [
+            1024,
+            368
+         ],
+         "type" : "n8n-nodes-base.executeWorkflow",
+         "typeVersion" : 1.3
+      },
+      {
+         "id" : "0e528591-249a-49a6-9d6a-a06321dd0c8c",
+         "name" : "Compute Stable Hash",
+         "parameters" : {
+            "jsCode" : "const d = $input.first().json; const rows = d.bookings || []; const stableSrc = rows.map(b => [b.device, b.renter, b.bookingDate, b.pickupTime, b.returnInfo, b.status, b.section, b.address, b.notes, b.remaining, b.downPayment, b.diveCase, b.durationDays].join('|')).join('~') + '~' + d.targetDate + '~' + d.todayDate + '~' + d.nextRunShort; let hh = 5381; for (let i = 0; i < stableSrc.length; i += 1) { hh = ((hh << 5) + hh + stableSrc.charCodeAt(i)) | 0; } d.stableHash = 'h' + (hh >>> 0).toString(36); return [{ json: d }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1424,
+            400
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "alwaysOutputData" : true,
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "e027b7b1-3761-4f64-a6b1-dde0cd6bb707",
+         "name" : "Read Reminder Hash",
+         "parameters" : {
+            "combineFilters" : "AND",
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "filtersUI" : {
+               "values" : [
+                  {
+                     "lookupColumn" : "Key",
+                     "lookupValue" : "lastReminderHash"
+                  }
+               ]
+            },
+            "operation" : "read",
+            "options" : {
+               "returnAllMatches" : "returnAllMatches"
+            },
             "resource" : "sheet",
             "sheetName" : {
                "__rl" : true,
@@ -1270,39 +1072,161 @@
             }
          },
          "position" : [
-            2100,
-            512
+            680,
+            850
          ],
          "type" : "n8n-nodes-base.googleSheets",
          "typeVersion" : 4.7
       },
       {
-         "id" : "fb1a0841-247e-49c1-b683-a729ed24dc98",
-         "name" : "Twice-Daily Reminder Trigger",
+         "id" : "675b2913-75e8-47da-8c6d-93155192d3c6",
+         "name" : "Gate Reminder Data",
          "parameters" : {
-            "rule" : {
-               "interval" : [
+            "jsCode" : "const cur = $('Compute Stable Hash').first().json.stableHash; const prev = $('Read Reminder Hash').first().json.Value; const s = String(cur || ''); return [{ json: { changed: s !== String(prev || ''), stableHash: s } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1860,
+            260
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "9365f3c6-e4dc-42a5-8c03-9de6e2379bf1",
+         "name" : "Send Reminder?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
                   {
-                     "daysInterval" : 1,
-                     "field" : "days",
-                     "triggerAtHour" : 0,
-                     "triggerAtMinute" : 0
+                     "leftValue" : "={{ $json.changed }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            1960,
+            260
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "id" : "b659e114-e765-4eb2-acba-645fcf0edeeb",
+         "name" : "Gate Note Data",
+         "parameters" : {
+            "jsCode" : "const cur = $('Compute Stable Hash').first().json.stableHash; const prev = $('Read Reminder Hash').first().json.Value; const s = String(cur || ''); return [{ json: { changed: s !== String(prev || ''), stableHash: s } }];",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            1860,
+            570
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "d0d8680d-f7ac-44cd-a3c8-bb637967eeb2",
+         "name" : "Send Note?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.changed }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            1960,
+            570
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.2
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "b8e586f4-e80b-45e8-8713-248e80e3da6e",
+         "name" : "Save Reminder Hash",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "matchingColumns" : [
+                  "Key"
+               ],
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Key",
+                     "id" : "Key",
+                     "required" : false,
+                     "type" : "string"
                   },
                   {
-                     "daysInterval" : 1,
-                     "field" : "days",
-                     "triggerAtHour" : 12,
-                     "triggerAtMinute" : 0
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "Value",
+                     "id" : "Value",
+                     "required" : false,
+                     "type" : "string"
                   }
-               ]
+               ],
+               "value" : {
+                  "Key" : "lastReminderHash",
+                  "Value" : "={{ $('Compute Stable Hash').first().json.stableHash }}"
+               }
+            },
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "appendOrUpdate",
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
             }
          },
          "position" : [
-            128,
+            2280,
             400
          ],
-         "type" : "n8n-nodes-base.scheduleTrigger",
-         "typeVersion" : 1.4
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
       }
    ],
    "pinData" : {},
@@ -1334,6 +1258,14 @@
    ],
    "sourceWorkflowId" : null,
    "staticData" : {
+      "node:Hourly Reminder Trigger" : {
+         "recurrenceRuleSignatures" : [
+            null
+         ],
+         "recurrenceRules" : [
+            null
+         ]
+      },
       "node:Twice-Daily Reminder Trigger" : {
          "recurrenceRuleSignatures" : [
             null,
@@ -1347,11 +1279,11 @@
    },
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T03:20:14.093Z",
-   "versionCounter" : 221,
-   "versionId" : "913065ed-77c0-4a8d-9034-817fbb09c6da",
+   "updatedAt" : "2026-09-06T17:09:27.175Z",
+   "versionCounter" : 250,
+   "versionId" : "9f4e0304-7ff0-469a-9c61-553ba45968c7",
    "versionMetadata" : {
-      "description" : "Updated nodes: Twice-Daily Reminder Trigger\nConnections: 1 added, 1 removed",
-      "name" : "Restore trigger name"
+      "description" : "Updated nodes: README Live Config",
+      "name" : "Sticky notes Balance/Remaining variance"
    }
 }

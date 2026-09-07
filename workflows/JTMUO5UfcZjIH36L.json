@@ -1,0 +1,488 @@
+{
+   "active" : true,
+   "activeVersionId" : "de139e88-d99c-486d-b4fb-dbd036507e9b",
+   "connections" : {
+      "Combine Device Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Normalize Bookings",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Core Input" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Iphone 13",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Canon",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read Insta360",
+                  "type" : "main"
+               },
+               {
+                  "index" : 0,
+                  "node" : "Read DJI",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Canon" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Canon",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read DJI" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag DJI",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Insta360" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Insta360",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Iphone 13" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Tag Iphone",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Canon" : {
+         "main" : [
+            [
+               {
+                  "index" : 1,
+                  "node" : "Combine Device Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag DJI" : {
+         "main" : [
+            [
+               {
+                  "index" : 3,
+                  "node" : "Combine Device Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Insta360" : {
+         "main" : [
+            [
+               {
+                  "index" : 2,
+                  "node" : "Combine Device Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Tag Iphone" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Combine Device Rows",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-06T11:48:34.209Z",
+   "description" : "Shared sheet read plus booking normalization for the rental workflows. Callable only via Execute Sub-workflow; draft, not yet used by callers.",
+   "id" : "JTMUO5UfcZjIH36L",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "Bookings Core",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "id" : "f2fa91f6-12f3-4214-97df-ca1d3934358e",
+         "name" : "Core Input",
+         "parameters" : {
+            "inputSource" : "passthrough"
+         },
+         "position" : [
+            0,
+            288
+         ],
+         "type" : "n8n-nodes-base.executeWorkflowTrigger",
+         "typeVersion" : 1.2
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "34904e80-bfd4-4824-a441-5036c596a505",
+         "name" : "Read Iphone 13",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Iphone 13"
+            }
+         },
+         "position" : [
+            224,
+            0
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "fe84559b-6ea4-438a-9352-aef9561a751b",
+         "name" : "Tag Iphone",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "core-dev-a",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Iphone 13"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            448,
+            0
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "8a141042-aafb-45c9-90b5-e3a4729eb121",
+         "name" : "Combine Device Rows",
+         "parameters" : {
+            "mode" : "append",
+            "numberInputs" : 4
+         },
+         "position" : [
+            672,
+            256
+         ],
+         "type" : "n8n-nodes-base.merge",
+         "typeVersion" : 3.2
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "46429fb1-0062-4979-bae8-20e11a362b1c",
+         "name" : "Read Canon",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Canon EOS R50"
+            }
+         },
+         "position" : [
+            224,
+            192
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "41e19264-36e4-4a0c-ae95-8a30979ec681",
+         "name" : "Tag Canon",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "core-dev-b",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Canon EOS R50"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            448,
+            192
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "69616862-e3b4-4c7e-a382-8cdc1d166726",
+         "name" : "Read Insta360",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "Insta360 X5"
+            }
+         },
+         "position" : [
+            224,
+            384
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "2cc37577-bb58-4e8d-81f2-8ab7b97c1ab6",
+         "name" : "Tag Insta360",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "core-dev-c",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "Insta360 X5"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            448,
+            384
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "1d836a38-b11d-4ff0-9fa6-55a32712b6de",
+         "name" : "Read DJI",
+         "parameters" : {
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "operation" : "read",
+            "options" : {
+               "dataLocationOnSheet" : {
+                  "values" : {
+                     "rangeDefinition" : "detectAutomatically"
+                  }
+               },
+               "outputFormatting" : {
+                  "values" : {
+                     "date" : "FORMATTED_STRING",
+                     "general" : "UNFORMATTED_VALUE"
+                  }
+               }
+            },
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "DJI Osmo Pocket 3"
+            }
+         },
+         "position" : [
+            224,
+            576
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "id" : "fbbd7f59-b863-4824-97bd-9c7811033012",
+         "name" : "Tag DJI",
+         "parameters" : {
+            "assignments" : {
+               "assignments" : [
+                  {
+                     "id" : "core-dev-d",
+                     "name" : "device",
+                     "type" : "string",
+                     "value" : "DJI Osmo Pocket 3"
+                  }
+               ]
+            },
+            "includeOtherFields" : true,
+            "options" : {}
+         },
+         "position" : [
+            448,
+            576
+         ],
+         "type" : "n8n-nodes-base.set",
+         "typeVersion" : 3.5
+      },
+      {
+         "id" : "8a7f378d-440e-4cae-8415-16b2b924f5ce",
+         "name" : "Normalize Bookings",
+         "parameters" : {
+            "jsCode" : "const TZ = 'Asia/Manila'; const DEVICES = ['Iphone 13', 'Canon EOS R50', 'Insta360 X5', 'DJI Osmo Pocket 3']; const ACTIVE = ['booked', 'released']; function normDate(v) { if (v === null || v === undefined || v === '') return ''; if (typeof v === 'number') { const b = new Date(Date.UTC(1899, 11, 30)); b.setUTCDate(b.getUTCDate() + Math.floor(v)); return b.toISOString().slice(0, 10); } const str = String(v).trim(); const m = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})/); if (m) return m[0]; const d = new Date(str); if (isNaN(d.getTime())) return ''; return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); } function timeMins(t) { if (t === null || t === undefined || t === '') return -1; const str = String(t).trim().toUpperCase(); const m = str.match(/^(\\d{1,2}):(\\d{2})(:\\d{2})?\\s*(AM|PM)?$/); if (!m) return -1; let h = Number(m[1]); const mi = Number(m[2]); const ap = m[4]; if (ap) { if (h < 1 || h > 12) return -1; if (ap === 'PM' && h < 12) h += 12; if (ap === 'AM' && h === 12) h = 0; } else { if (h > 23) return -1; } if (mi > 59) return -1; return h * 60 + mi; } function stamp(iso, m) { const p = iso.split('-'); return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])) + m * 60000 - 8 * 3600000; } function pickBal(j) { const a = j['Balance']; if (a !== null && a !== undefined && String(a).trim() !== '') return String(a); const b = j['Remaining']; if (b === null || b === undefined) return ''; return String(b); } const out = []; for (const it of $input.all()) { const j = it.json || {}; if (!j.device || DEVICES.indexOf(j.device) < 0) continue; const status = String(j.Status || '').trim().toLowerCase(); const sd = normDate(j['Start Date']); const ed = normDate(j['End Date']); const tm = timeMins(j.Time); const problems = []; if (sd === '') problems.push('bad Start Date'); if (ed === '') problems.push('bad End Date'); if (tm < 0) problems.push('bad Time'); out.push({ json: { device: j.device, statusRaw: String(j.Status || ''), status: status, isActive: ACTIVE.indexOf(status) >= 0, startDate: sd, endDate: ed, timeRaw: String(j.Time || ''), timeMins: tm, startStamp: problems.length === 0 ? stamp(sd, tm) : null, endStamp: problems.length === 0 ? stamp(ed, tm) : null, valid: problems.length === 0, invalidReason: problems.join('; '), renterName: String(j['Renter Name'] || ''), address: String(j.Address || ''), notes: String(j.Notes || ''), balance: pickBal(j), downPayment: String(j['Down Payment'] || ''), diveCase: String(j['Dive Case'] || '') } }); } return out;",
+            "mode" : "runOnceForAllItems"
+         },
+         "position" : [
+            896,
+            288
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      }
+   ],
+   "pinData" : null,
+   "settings" : {
+      "availableInMCP" : true,
+      "executionOrder" : "v1"
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-06T11:48:34.215Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-06T11:48:34.215Z",
+         "workflowId" : "JTMUO5UfcZjIH36L"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 0,
+   "updatedAt" : "2026-09-06T17:06:09.913Z",
+   "versionCounter" : 3,
+   "versionId" : "de139e88-d99c-486d-b4fb-dbd036507e9b",
+   "versionMetadata" : {
+      "description" : "Updated nodes: Normalize Bookings",
+      "name" : "Balance falls back to Remaining header"
+   }
+}

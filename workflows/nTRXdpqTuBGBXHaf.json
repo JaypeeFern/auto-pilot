@@ -1,0 +1,154 @@
+{
+   "active" : false,
+   "activeVersionId" : null,
+   "connections" : {
+      "Read Handbook Id" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Edit Handbook",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Start" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Handbook Id",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-06T10:52:47.788Z",
+   "description" : "One-off edit of the pinned availability handbook message to reflect the midnight default. Archive after use.",
+   "id" : "nTRXdpqTuBGBXHaf",
+   "isArchived" : true,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "TEMP Update Handbook Wording",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "id" : "3a6a6347-6e5f-453c-aa5a-e95ec15a9a2a",
+         "name" : "Start",
+         "parameters" : {},
+         "position" : [
+            0,
+            0
+         ],
+         "type" : "n8n-nodes-base.manualTrigger",
+         "typeVersion" : 1
+      },
+      {
+         "credentials" : {
+            "googleSheetsOAuth2Api" : {
+               "id" : "d0C0P76hw5iOdLYR",
+               "name" : "Google Sheets account"
+            }
+         },
+         "id" : "b7d2e4a2-f3e8-4d91-9e18-c569f5dff2db",
+         "name" : "Read Handbook Id",
+         "parameters" : {
+            "combineFilters" : "AND",
+            "documentId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "1nDEfiyLRArM1xGjrC7npCbLUmmAS7GpnOSkEezT5hRo"
+            },
+            "filtersUI" : {
+               "values" : [
+                  {
+                     "lookupColumn" : "Key",
+                     "lookupValue" : "lastHandbookMessageId"
+                  }
+               ]
+            },
+            "operation" : "read",
+            "options" : {},
+            "resource" : "sheet",
+            "sheetName" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "_State"
+            }
+         },
+         "position" : [
+            224,
+            0
+         ],
+         "type" : "n8n-nodes-base.googleSheets",
+         "typeVersion" : 4.7
+      },
+      {
+         "credentials" : {
+            "telegramApi" : {
+               "id" : "j63wb73oNdn0XZYA",
+               "name" : "RentalAvailabilityBot"
+            }
+         },
+         "id" : "40e8b3ce-1d9b-4c7c-8a2d-02a67854e2be",
+         "name" : "Edit Handbook",
+         "parameters" : {
+            "additionalFields" : {
+               "parse_mode" : "HTML"
+            },
+            "chatId" : "-1003771124764",
+            "messageId" : "={{ $('Read Handbook Id').first().json.Value }}",
+            "operation" : "editMessageText",
+            "resource" : "message",
+            "text" : "📖 <b>Availability Bot Handbook</b>\n\nAsk me about free rental dates. I check every unit for a full 24-hour window.\n\n<b>Commands</b>\n/avail - this month at 12:00 AM\n/avail October - that month at 12:00 AM\n/avail Sep 20 9am - September view starting 9:00 AM\n/avail 20 Sep 9am - same, day first\n/avail 9am Sep 20 - same, time first\n/avail 20/9 2pm - same, numeric date\n/avail today 9am - from today on\n/help - show examples\n\n<i>Blocked days are left out. Only my latest answer stays in chat.</i>"
+         },
+         "position" : [
+            448,
+            0
+         ],
+         "type" : "n8n-nodes-base.telegram",
+         "typeVersion" : 1.2,
+         "webhookId" : "0775fe23-b8fd-4833-878a-6a828edc6bd4"
+      }
+   ],
+   "pinData" : null,
+   "settings" : {
+      "availableInMCP" : true,
+      "executionOrder" : "v1"
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-06T10:52:47.815Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-06T10:52:47.815Z",
+         "workflowId" : "nTRXdpqTuBGBXHaf"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 0,
+   "updatedAt" : "2026-09-06T10:56:11.000Z",
+   "versionCounter" : 2,
+   "versionId" : "db310699-d223-455a-b158-acaf1da768f7",
+   "versionMetadata" : {
+      "description" : null,
+      "name" : null
+   }
+}
