@@ -324,42 +324,12 @@ async function waitForNamedProfiles(page, timeoutMs) {
 // outside that surface, zero-size (hidden/unrendered) anchors, and non-profile
 // hrefs are skipped. Relative hrefs are absolutized against the page URL so
 // downstream validation always sees absolute http(s) URLs.
-//
-// On a live run the anchor count in scope grew every scroll (999, 1031,
-// 1063, 1095, 1127, ...) instead of staying roughly constant, meaning every
-// scroll re-read and re-filtered the entire, ever-growing set of
-// already-seen anchors just to find a handful of new ones — O(n^2) work
-// over a run, and the reason "encountered" in /progress ballooned to
-// ~80,000 on a ~930-follower page. To cut that down, already-captured
-// profile URLs are cached (in the page's own JS heap, so it survives across
-// scroll cycles within the run) and skipped on later scrolls — but ONLY
-// once a NON-EMPTY name has been captured for that URL. A first-generation
-// version of this cache instead marked the physical DOM anchor element
-// (not the URL) the moment it was read at all, including with a still-blank
-// name — independent review caught two real problems with that: (1) it
-// assumed Facebook reuses the same DOM node per follower rather than
-// recycling nodes across different followers, which the growing-anchor-count
-// observation doesn't actually prove (a windowed virtualization with a large
-// overscan buffer, or one that only recycles on scroll-up, would produce the
-// same growth pattern and this collector only ever scrolls forward); and
-// (2) an anchor read before its name text had painted got frozen blank
-// forever, silently dropping that follower from the roulette pool with
-// nothing but a quietly-higher missingNames count to show for it — n8n's
-// dedupe ("Validate Dedupe and Build Rows") tolerates a blank *sighting* of
-// a URL only because it expects a later, better sighting of the same URL to
-// eventually arrive; freezing after one blank read removes that safety net.
-// Keying by URL instead of DOM node sidesteps the recycling question
-// entirely (correct either way), and requiring a non-empty name before
-// caching means a still-loading anchor is simply retried next scroll, same
-// as before this optimization existed.
 async function extractVisibleProfiles(page) {
   return page.$$eval('a[href]', function (anchors) {
     const scope =
       document.querySelector('[role="dialog"]') ||
       document.querySelector('[role="main"]') ||
       document.body;
-    if (!window.__fgNamedCapture) window.__fgNamedCapture = Object.create(null);
-    const namedCapture = window.__fgNamedCapture;
     const out = [];
     const links = scope.querySelectorAll('a[href]');
     for (const a of links) {
@@ -373,20 +343,11 @@ async function extractVisibleProfiles(page) {
       } catch (err) {
         continue;
       }
-      // The URL cache is authoritative because Facebook may recycle an
-      // anchor node for a different follower. The DOM marker is only a
-      // same-node fast path after that URL has already been captured.
-      if (a.dataset.fgSeen === '1' && namedCapture[abs]) continue;
-      if (namedCapture[abs]) continue;
       let text = (a.innerText || '').trim();
       if (!text) text = (a.getAttribute('aria-label') || '').trim();
       if (!text) {
         const img = a.querySelector('img[alt]');
         if (img) text = (img.getAttribute('alt') || '').trim();
-      }
-      if (text) {
-        namedCapture[abs] = true;
-        a.dataset.fgSeen = '1';
       }
       out.push({ displayName: text, profileUrl: abs });
     }
