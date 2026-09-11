@@ -38,15 +38,20 @@ const STATUS_CACHE_MS = Number(process.env.COLLECTOR_STATUS_CACHE_MS || '8640000
 // bundled Chromium instead).
 const CHROME_PATH = process.env.CHROME_PATH || undefined;
 // Must not exceed the Xvfb virtual display resolution (entrypoint.sh SCREEN,
-// default 1920x1080x24 — keep that default in sync with these two if either
+// default 1366x900x24 — keep that default in sync with these two if either
 // changes) — a headed Chromium window cannot render larger than the X11
 // display behind it. Facebook's follower list is virtualized (only mounts
 // DOM nodes near/in the viewport), so a larger viewport surfaces more rows
-// per scroll and cuts down on redundant re-scanning between scroll cycles.
-// clampInt (defined below; hoisted) guards against non-numeric/zero/negative
-// overrides producing invalid Chromium launch args.
-const VIEWPORT_WIDTH = clampInt(process.env.COLLECTOR_VIEWPORT_WIDTH, 1920, 320, 3840);
-const VIEWPORT_HEIGHT = clampInt(process.env.COLLECTOR_VIEWPORT_HEIGHT, 1080, 240, 2160);
+// per scroll and cuts down on redundant re-scanning between scroll cycles —
+// but 1920x1080 OOM-crashed Chromium inside the browser container's 640m
+// mem_limit mid-collection (Chrome "Aw, Snap!" error code 9, observed in
+// production), so the default is back to the known-safe 1366x900 until
+// either mem_limit is raised or a smaller bump is verified against actual
+// container memory headroom. clampInt (defined below; hoisted) guards
+// against non-numeric/zero/negative overrides producing invalid Chromium
+// launch args.
+const VIEWPORT_WIDTH = clampInt(process.env.COLLECTOR_VIEWPORT_WIDTH, 1366, 320, 3840);
+const VIEWPORT_HEIGHT = clampInt(process.env.COLLECTOR_VIEWPORT_HEIGHT, 900, 240, 2160);
 
 // Network posture: loopback is the safe default for local runs. Inside the
 // browser container the API must bind the container network so n8n can reach
