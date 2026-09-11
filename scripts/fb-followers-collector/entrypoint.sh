@@ -8,7 +8,9 @@ set -eu
 
 : "${VNC_PASSWORD:?VNC_PASSWORD must be set (Coolify env secret, see .env.example)}"
 : "${PROFILE_DIR:=/profile}"
-: "${SCREEN:=1366x900x24}"
+# Keep in sync with server.js's COLLECTOR_VIEWPORT_WIDTH/HEIGHT defaults —
+# Chromium's page.setViewport() cannot exceed this X11 display size.
+: "${SCREEN:=1920x1080x24}"
 : "${VNC_PORT:=5900}"
 : "${NOVNC_PORT:=6080}"
 

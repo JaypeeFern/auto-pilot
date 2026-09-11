@@ -37,6 +37,16 @@ const STATUS_CACHE_MS = Number(process.env.COLLECTOR_STATUS_CACHE_MS || '8640000
 // Chromium installed in the browser image (local runs omit it and use the
 // bundled Chromium instead).
 const CHROME_PATH = process.env.CHROME_PATH || undefined;
+// Must not exceed the Xvfb virtual display resolution (entrypoint.sh SCREEN,
+// default 1920x1080x24 — keep that default in sync with these two if either
+// changes) — a headed Chromium window cannot render larger than the X11
+// display behind it. Facebook's follower list is virtualized (only mounts
+// DOM nodes near/in the viewport), so a larger viewport surfaces more rows
+// per scroll and cuts down on redundant re-scanning between scroll cycles.
+// clampInt (defined below; hoisted) guards against non-numeric/zero/negative
+// overrides producing invalid Chromium launch args.
+const VIEWPORT_WIDTH = clampInt(process.env.COLLECTOR_VIEWPORT_WIDTH, 1920, 320, 3840);
+const VIEWPORT_HEIGHT = clampInt(process.env.COLLECTOR_VIEWPORT_HEIGHT, 1080, 240, 2160);
 
 // Network posture: loopback is the safe default for local runs. Inside the
 // browser container the API must bind the container network so n8n can reach
@@ -89,7 +99,7 @@ async function getBrowser() {
     headless: HEADLESS ? 'new' : false,
     userDataDir: PROFILE_DIR,
     ...(CHROME_PATH ? { executablePath: CHROME_PATH } : {}),
-    args: ['--no-sandbox', '--disable-dev-shm-usage', '--window-size=1366,900'],
+    args: ['--no-sandbox', '--disable-dev-shm-usage', '--window-size=' + VIEWPORT_WIDTH + ',' + VIEWPORT_HEIGHT],
   });
   return browser;
 }
@@ -369,7 +379,7 @@ async function runCollection(opts) {
 
   const b = await getBrowser();
   const page = await b.newPage();
-  await page.setViewport({ width: 1366, height: 900 });
+  await page.setViewport({ width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT });
   try {
     // Single navigation for the whole run: go straight to the followers
     // page (never the bare homepage first) and check auth on that same
