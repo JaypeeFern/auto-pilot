@@ -96,13 +96,25 @@ async function getBrowser() {
 
 // Fail-safe auth probe: uncertain means NOT authenticated, so the workflow
 // stops at AUTH_REQUIRED instead of scraping a login wall.
-async function checkAuth(page) {
+//
+// navigateUrl controls where this navigates before checking: default is the
+// bare facebook.com homepage (used by /status, a general liveness/auth
+// probe with no other target page in mind). Pass null to skip navigation
+// entirely and check whatever page is already loaded — used by
+// runCollection, which already navigated to the followers page itself and
+// would otherwise cause a second, redundant open/navigate/close cycle to
+// the homepage before ever reaching the actual target (visibly showing as
+// Facebook opening, closing, and reopening for every single run).
+async function checkAuth(page, navigateUrl) {
   let reachable = true;
-  await page.goto('https://www.facebook.com/', {
-    waitUntil: 'networkidle2',
-    timeout: NAV_TIMEOUT_MS,
-  }).catch(function () { reachable = false; });
-  await sleep(2500);
+  const target = navigateUrl === null ? null : (navigateUrl || 'https://www.facebook.com/');
+  if (target) {
+    await page.goto(target, {
+      waitUntil: 'networkidle2',
+      timeout: NAV_TIMEOUT_MS,
+    }).catch(function () { reachable = false; });
+    await sleep(2500);
+  }
   const url = page.url();
   if (/login|checkpoint|two_step|captcha/i.test(url)) {
     return { authenticated: false, reachable: reachable, message: 'Facebook shows a login/checkpoint page.' };
@@ -168,9 +180,25 @@ function isProfileHref(href) {
     '/events/', '/marketplace', '/watch', '/gaming', '/help', '/policies',
     '/ads', '/business', '/sharer', '/dialog/', '/plugins/', '/connect/',
     '/privacy', '/about', '/settings', '/search', '/messages', '/friends',
-    '/photo.php', '/video.php', '/reel', '/stories', '/hashtag'];
+    '/photo.php', '/video.php', '/reel', '/stories', '/hashtag',
+    // Page-chrome links that render inside the same scope as the followers
+    // list on a Page's Followers tab (cover photo, professional dashboard) —
+    // not follower profiles, confirmed against a real collection run.
+    '/photo/', '/professional_dashboard'];
   for (const b of banned) {
-    if (low.includes(b)) return false;
+    // Match as a whole path segment, not a bare substring, and check every
+    // occurrence (not just the first) — otherwise a legitimate
+    // username/slug that happens to start with a banned token (e.g.
+    // "/aboutme123") could pass, or a later genuine occurrence of that same
+    // token elsewhere in the URL could be missed (independent review
+    // findings: "/aboutme123/about" must still be banned via its second,
+    // boundary-anchored "/about").
+    if (b.endsWith('/')) {
+      if (low.includes(b)) return false; // already segment-anchored
+      continue;
+    }
+    const escaped = b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (new RegExp(escaped + '(?:[/?#]|$)', 'i').test(low)) return false;
   }
   return true;
 }
@@ -256,14 +284,41 @@ async function runCollection(opts) {
   const emptyThreshold = clampInt(opts.emptyScrollThreshold, 10, 1, 50);
   const maxScrolls = clampInt(opts.maxScrollAttempts, 500, 1, 2000);
 
+  // The page/profile being collected always appears in its own followers
+  // list on Facebook's UI (a "N followers" self-link, and sometimes other
+  // self-referential chrome) — exclude it by identifier, not DOM position,
+  // so it can never masquerade as a follower. Covers numeric-id URLs
+  // (facebook.com/profile.php?id=...), plain slug URLs (facebook.com/<page>/
+  // followers/), and route-style URLs (facebook.com/people/<name>/<id>/,
+  // where the leading "people" segment is a generic route prefix, not part
+  // of the identity, and the trailing numeric segment is the real id —
+  // independent review finding: naively using the first path segment
+  // collapsed every /people/... profile to the same identity).
+  function identityOf(url) {
+    const s = String(url || '');
+    const idm = s.match(/[?&]id=(\d+)/i);
+    if (idm) return 'id:' + idm[1];
+    try {
+      const parts = new URL(s, 'https://www.facebook.com').pathname.split('/').filter(Boolean);
+      if (!parts.length) return '';
+      const last = parts[parts.length - 1];
+      if (/^\d+$/.test(last)) return 'id:' + last;
+      if (parts[0] === 'people' && parts.length > 1) return 'slug:' + parts[1].toLowerCase();
+      return 'slug:' + parts[0].toLowerCase();
+    } catch (err) {
+      return '';
+    }
+  }
+  const selfId = identityOf(followersUrl);
+
   const b = await getBrowser();
   const page = await b.newPage();
   await page.setViewport({ width: 1366, height: 900 });
   try {
-    const auth = await checkAuth(page);
-    if (!auth.authenticated) {
-      return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: ' + auth.message };
-    }
+    // Single navigation for the whole run: go straight to the followers
+    // page (never the bare homepage first) and check auth on that same
+    // already-loaded page. Avoids a second, redundant Facebook open/close
+    // cycle before ever reaching the actual target.
     let loaded = false;
     let loadError = '';
     for (let attempt = 1; attempt <= 2; attempt++) {
@@ -280,6 +335,11 @@ async function runCollection(opts) {
       return { ok: false, authenticated: true, error: 'Could not load followers page: ' + loadError };
     }
     await sleep(postScrollWaitMs);
+
+    const auth = await checkAuth(page, null);
+    if (!auth.authenticated) {
+      return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: ' + auth.message };
+    }
 
     const seen = new Set();
     const profiles = [];
@@ -299,6 +359,7 @@ async function runCollection(opts) {
         if (!isProfileHref(f.profileUrl)) continue;
         const key = normalizeUrl(f.profileUrl);
         if (!key) continue;
+        if (selfId && identityOf(f.profileUrl) === selfId) continue;
         totalEncountered++;
         // Every encounter is returned, including repeats: n8n dedupes by
         // profile URL and records duplicate status per row in Raw Followers.
