@@ -94,14 +94,6 @@ e.g. `docs/workflows/next-day-booking-reminder/WORKFLOW.md`).
 - Never put secrets, tokens, chat IDs, or spreadsheet IDs in these
   pages — credential and destination *names* only.
 
-## Agent Brain integration
-
-Use the installed Agent Brain capability for reusable orchestration, delegation,
-review, effort, lifecycle, and capability routing. AutoPilot-specific n8n safety,
-locked infrastructure decisions, validation, and the Codex reviewer requirement
-remain in this file. Do not copy the canonical Agent Brain or Herdr policy into
-this repository.
-
 ## Code conventions (Compose / shell / scripts)
 
 Distilled from the AlumniLink coding guidelines; adapted to what this repo
@@ -134,3 +126,14 @@ Laravel/React/Expo specifics do not apply here — the principles below do.
   `bash -n`; Compose changes must pass `docker compose config` (both already
   required under "Hard rules" — this is the same gate, restated for the
   implementer role).
+
+<!-- agent-brain:bootstrap:start -->
+## Agent Brain bootstrap
+Before planning or performing orchestration for any meaningful task, activate and follow the globally installed Agent Brain capability.
+- Claude Code authority: `C:\Users\Paul\.claude\skills\agent-brain\SKILL.md`
+- Codex and OpenCode authority: `C:\Users\Paul\.agents\skills\agent-brain\SKILL.md`
+- Lifecycle authority: `C:\Users\Paul\.agents\skills\agent-brain\agent-brain-orchestration-gate.ps1`
+Activation boundary: project harness -> Agent Brain capability -> Herdr capability when delegation is selected.
+Do not plan, delegate, or control Herdr until the capability is active. Use its supported Windows launch and Herdr prompt-delivery contract.
+Keep project-owned instructions and configuration here. Do not copy Agent Brain policy, skills, hooks, or global configuration into this project.
+<!-- agent-brain:bootstrap:end -->
