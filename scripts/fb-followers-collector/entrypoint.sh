@@ -23,6 +23,26 @@ XVFB_PID=$!
 
 export DISPLAY=:99
 
+# Wait until Xvfb is actually ready before starting anything that connects
+# to the display. Without this, x11vnc (and openbox) can start first, fail
+# with XOpenDisplay, and exit — leaving noVNC with no VNC server behind
+# it (observed in production logs). Fail loud if Xvfb never comes up.
+READY=0
+tries=0
+while [ "$tries" -lt 100 ]; do
+  if [ -S /tmp/.X11-unix/X99 ]; then
+    READY=1
+    break
+  fi
+  tries=$((tries + 1))
+  sleep 0.2
+done
+if [ "$READY" -ne 1 ]; then
+  echo "Xvfb :99 did not become ready in time; aborting." >&2
+  kill "$XVFB_PID" 2>/dev/null || true
+  exit 1
+fi
+
 # Lightweight window manager so the browser window is operable via VNC.
 openbox &
 
