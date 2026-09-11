@@ -27,6 +27,12 @@ const PORT = Number(process.env.COLLECTOR_PORT || '5679');
 const PROFILE_DIR = process.env.COLLECTOR_PROFILE_DIR || '/profile';
 const HEADLESS = String(process.env.COLLECTOR_HEADLESS || 'false') === 'true';
 const NAV_TIMEOUT_MS = Number(process.env.COLLECTOR_NAV_TIMEOUT_MS || '60000');
+// /status is also the Docker healthcheck target (compose: interval 60s), and
+// a live check navigates to facebook.com every call. Without caching that
+// means an automated hit to Facebook every 60s forever, even with no
+// giveaway running. Cache the auth result so the frequent healthcheck stays
+// cheap; only the first call in each 24h window actually opens the page.
+const STATUS_CACHE_MS = Number(process.env.COLLECTOR_STATUS_CACHE_MS || '86400000');
 // PUPPETEER_* envs are honored by puppeteer; CHROME_PATH selects the system
 // Chromium installed in the browser image (local runs omit it and use the
 // bundled Chromium instead).
@@ -53,6 +59,12 @@ if (BIND === '0.0.0.0' && !ALLOW_NON_LOOPBACK) {
 
 let browser = null;
 let collectBusy = false;
+let statusCache = null; // { at: number, body: object }
+// Bumped whenever /collect finishes, so a live /status check that was
+// already in flight (its checkAuth navigation is a long series of awaits)
+// can detect that a collection ran underneath it and skip writing a
+// now-possibly-stale result into the cache.
+let statusCacheEpoch = 0;
 
 function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
@@ -341,18 +353,36 @@ function readBody(req) {
 
 const server = http.createServer(async function (req, res) {
   try {
-    if (req.method === 'GET' && req.url === '/status') {
+    if (req.method === 'GET' && req.url.split('?')[0] === '/status') {
+      // ?fresh=1 forces a live Facebook check, bypassing the cache below —
+      // used by the real collector run so it never acts on a stale auth
+      // result. The Docker healthcheck (and any other caller) hits the
+      // plain path and gets the cache, so a repeated 60s healthcheck
+      // doesn't repeatedly hit facebook.com.
+      const forceFresh = /(^|[?&])fresh=1(&|$)/.test(req.url);
+      if (!forceFresh && statusCache && (Date.now() - statusCache.at) < STATUS_CACHE_MS) {
+        sendJson(res, 200, Object.assign({}, statusCache.body, { cached: true }));
+        return;
+      }
+      const epochAtStart = statusCacheEpoch;
       const b = await getBrowser();
       const page = await b.newPage();
       try {
         const auth = await checkAuth(page);
-        sendJson(res, 200, {
+        const body = {
           ok: true,
           authenticated: auth.authenticated,
           profileDir: PROFILE_DIR,
           facebookReachable: auth.reachable,
           message: auth.message,
-        });
+        };
+        // Only cache if no /collect ran while this check was in flight —
+        // otherwise this result may already be stale relative to the
+        // collection's own invalidation, and caching it would mask that.
+        if (statusCacheEpoch === epochAtStart) {
+          statusCache = { at: Date.now(), body: body };
+        }
+        sendJson(res, 200, Object.assign({}, body, { cached: false }));
       } finally {
         await page.close().catch(function () {});
       }
@@ -371,6 +401,13 @@ const server = http.createServer(async function (req, res) {
       } catch (err) {
         sendJson(res, 500, { ok: false, error: String((err && err.message) || err) });
       } finally {
+        // A collection run may have changed auth state (session expired or
+        // got challenged mid-run) — drop the cache so the next /status
+        // reflects reality instead of a stale pre-run result. Bumping the
+        // epoch also stops any /status check already in flight from
+        // re-populating the cache with a result that predates this run.
+        statusCache = null;
+        statusCacheEpoch++;
         collectBusy = false;
       }
       return;
