@@ -14,6 +14,17 @@ set -eu
 
 mkdir -p "$PROFILE_DIR" "$HOME/.vnc"
 
+# Chromium's SingletonLock/SingletonSocket/SingletonCookie in the profile
+# dir name the PID and hostname of whichever container instance last held
+# it. PROFILE_DIR is a persistent volume that survives container
+# recreation, so on every fresh boot these files necessarily reference a
+# process from a previous, now-gone container — Chromium refuses to start
+# against them ("profile appears to be in use by another process"),
+# hanging Puppeteer's launch until it times out and failing the
+# healthcheck (observed in production). This entrypoint only ever runs
+# once at container start, so any leftover lock here is always stale.
+rm -f "$PROFILE_DIR/SingletonLock" "$PROFILE_DIR/SingletonSocket" "$PROFILE_DIR/SingletonCookie"
+
 # Store the VNC password ( prompts never appear in logs ).
 x11vnc -storepasswd "$VNC_PASSWORD" "$HOME/.vnc/passwd"
 
