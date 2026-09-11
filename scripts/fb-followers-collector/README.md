@@ -80,6 +80,13 @@ invalidates it again.
   session was challenged mid-run. `401` with `authenticated: false` means
   `AUTH_REQUIRED`. `409` means a run is already in progress (one at a time —
   no parallel scraping).
+- `GET /progress` → `{ active, runId, phase, startedAt, updatedAt,
+  scrollAttempts, totalEncountered, uniqueFollowers, stopReason, error,
+  collectBusy, log: [{ at, phase, message }] }`. Polled by the Control Panel
+  GUI during a run so an operator can watch progress without opening noVNC.
+  Reflects the most recent run once one has started; `active: false` and
+  `phase: 'idle'` before the first run. Log messages are counts only, same
+  rule as everywhere else in this service — never follower names or URLs.
 
 ## Collection behavior
 

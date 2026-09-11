@@ -81,6 +81,51 @@ let statusCache = null; // { at: number, body: object }
 // now-possibly-stale result into the cache.
 let statusCacheEpoch = 0;
 
+// In-memory progress state for GET /progress, polled by the Control Panel
+// GUI so an operator can watch a run without opening noVNC. Counts only —
+// same "never log follower names, URLs, or page content" rule as everywhere
+// else in this file applies to every log line pushed here.
+const PROGRESS_LOG_MAX = 200;
+let progress = {
+  active: false,
+  runId: null,
+  phase: 'idle',
+  startedAt: null,
+  updatedAt: null,
+  scrollAttempts: 0,
+  totalEncountered: 0,
+  uniqueFollowers: 0,
+  stopReason: null,
+  error: null,
+  log: [],
+};
+
+function resetProgress(runId) {
+  progress = {
+    active: true,
+    runId: runId || null,
+    phase: 'starting',
+    startedAt: Date.now(),
+    updatedAt: Date.now(),
+    scrollAttempts: 0,
+    totalEncountered: 0,
+    uniqueFollowers: 0,
+    stopReason: null,
+    error: null,
+    log: [],
+  };
+}
+
+function logProgress(phase, message, extra) {
+  progress.phase = phase;
+  progress.updatedAt = Date.now();
+  if (extra) Object.assign(progress, extra);
+  progress.log.push({ at: Date.now(), phase: phase, message: message });
+  if (progress.log.length > PROGRESS_LOG_MAX) {
+    progress.log.splice(0, progress.log.length - PROGRESS_LOG_MAX);
+  }
+}
+
 function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
@@ -382,6 +427,9 @@ async function runCollection(opts) {
   }
   const selfId = identityOf(followersUrl);
 
+  resetProgress(opts.runId);
+  logProgress('loading', 'Opening followers page...');
+
   const b = await getBrowser();
   const page = await b.newPage();
   await page.setViewport({ width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT });
@@ -399,18 +447,23 @@ async function runCollection(opts) {
         break;
       } catch (err) {
         loadError = String((err && err.message) || err);
+        logProgress('loading', 'Navigation attempt ' + attempt + ' failed, retrying...');
         await sleep(3000);
       }
     }
     if (!loaded) {
+      logProgress('error', 'Could not load followers page.', { active: false, error: loadError });
       return { ok: false, authenticated: true, error: 'Could not load followers page: ' + loadError };
     }
     await sleep(postScrollWaitMs);
 
+    logProgress('auth', 'Checking Facebook login state...');
     const auth = await checkAuth(page, null);
     if (!auth.authenticated) {
+      logProgress('error', 'Not authenticated.', { active: false, error: auth.message });
       return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: ' + auth.message };
     }
+    logProgress('scrolling', 'Authenticated. Starting scroll and capture...');
 
     const seen = new Set();
     const profiles = [];
@@ -422,6 +475,7 @@ async function runCollection(opts) {
     while (scrollAttempts < maxScrolls) {
       const url = page.url();
       if (/login|checkpoint|two_step|captcha/i.test(url)) {
+        logProgress('error', 'Session challenged mid-run.', { active: false, error: 'AUTH_REQUIRED: session challenged mid-run.' });
         return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: session challenged mid-run.', stats: { totalEncountered: totalEncountered, scrollAttempts: scrollAttempts, stopReason: 'auth-lost' } };
       }
       await waitForNamedProfiles(page, 4000);
@@ -447,16 +501,22 @@ async function runCollection(opts) {
       } else {
         emptyStreak++;
       }
+      scrollAttempts++;
+      logProgress(
+        'scrolling',
+        'Scroll ' + scrollAttempts + ': +' + fresh + ' new (total unique ' + seen.size + ', encountered ' + totalEncountered + ')',
+        { scrollAttempts: scrollAttempts, totalEncountered: totalEncountered, uniqueFollowers: seen.size }
+      );
       if (emptyStreak >= emptyThreshold) {
         stopReason = 'empty-threshold-reached';
         break;
       }
       const target = await findScrollTarget(page);
       await scrollOnce(page, target);
-      scrollAttempts++;
       await sleep(scrollDelayMs);
       await sleep(postScrollWaitMs);
     }
+    logProgress('done', 'Finished: ' + seen.size + ' unique followers (' + stopReason + ').', { active: false, stopReason: stopReason, uniqueFollowers: seen.size });
     return {
       ok: true,
       authenticated: true,
@@ -532,6 +592,7 @@ const server = http.createServer(async function (req, res) {
         const result = await runCollection(body || {});
         sendJson(res, result.ok ? 200 : result.authenticated === false ? 401 : 500, result);
       } catch (err) {
+        logProgress('error', 'Collection crashed.', { active: false, error: String((err && err.message) || err) });
         sendJson(res, 500, { ok: false, error: String((err && err.message) || err) });
       } finally {
         // A collection run may have changed auth state (session expired or
@@ -545,7 +606,11 @@ const server = http.createServer(async function (req, res) {
       }
       return;
     }
-    sendJson(res, 404, { ok: false, error: 'Unknown endpoint. Use GET /status or POST /collect.' });
+    if (req.method === 'GET' && req.url.split('?')[0] === '/progress') {
+      sendJson(res, 200, Object.assign({}, progress, { collectBusy: collectBusy }));
+      return;
+    }
+    sendJson(res, 404, { ok: false, error: 'Unknown endpoint. Use GET /status, GET /progress, or POST /collect.' });
   } catch (err) {
     sendJson(res, 500, { ok: false, error: String((err && err.message) || err) });
   }
