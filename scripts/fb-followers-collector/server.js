@@ -203,6 +203,62 @@ function isProfileHref(href) {
   return true;
 }
 
+// The follower list can finish loading its link hrefs before the name text
+// (and image alt text) next to each link has painted — extracting at that
+// moment yields real profile URLs with blank displayName for every entry,
+// which then never gets fixed later since re-sighting the same URL on a
+// later scroll is recorded as a plain duplicate, not a name upgrade.
+// Wait for at least one visible, text-bearing profile link before reading,
+// bounded so a genuinely empty/slow-to-load page still proceeds eventually.
+async function waitForNamedProfiles(page, timeoutMs) {
+  await page.waitForFunction(function () {
+    // Simplified, browser-context readiness heuristic (page.evaluate/
+    // waitForFunction predicates can't call back into Node functions, so
+    // this can't reuse isProfileHref directly) — without it, the wait is
+    // satisfied instantly by any already-text-bearing nav/chrome link
+    // (independent review finding), never actually waiting for a
+    // follower's name to paint. A URL-shape denylist/allowlist is a losing
+    // game here — Facebook has many nav routes (notifications, home,
+    // photos, bookmarks, ...) and protocol-relative "//host/..." hrefs slip
+    // past a naive same-origin check (independent review findings). Use a
+    // structural signal instead: an actual follower row always shows an
+    // avatar image next to the name, while nav/chrome icons are almost
+    // always inline SVG, not <img> — requiring one avoids needing to
+    // enumerate Facebook's routes at all. This is only a gate for *when*
+    // to read; the real, boundary-aware isProfileHref still does the
+    // authoritative filtering on the actual extracted data afterward.
+    function looksLikeProfile(a, href) {
+      const s = String(href || '');
+      if (!s || s.startsWith('//')) return false; // empty or protocol-relative external
+      if (/^https?:\/\//i.test(s)) {
+        const m = s.match(/^https?:\/\/([^/:?#]+)/i);
+        const h = m ? m[1].toLowerCase() : '';
+        if (h !== 'facebook.com' && !h.endsWith('.facebook.com') && h !== 'fb.com' && !h.endsWith('.fb.com')) return false;
+      } else if (!s.startsWith('/')) {
+        return false;
+      }
+      return !!a.querySelector('img');
+    }
+    const scope =
+      document.querySelector('[role="dialog"]') ||
+      document.querySelector('[role="main"]') ||
+      document.body;
+    const links = scope.querySelectorAll('a[href]');
+    for (const a of links) {
+      const rect = a.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) continue;
+      if (!looksLikeProfile(a, a.getAttribute('href') || '')) continue;
+      // Trim each candidate independently before falling back — a
+      // whitespace-only innerText would otherwise win over a populated
+      // aria-label and read as empty, wasting the full timeout
+      // (independent review finding).
+      const text = (a.innerText || '').trim() || (a.getAttribute('aria-label') || '').trim();
+      if (text) return true;
+    }
+    return false;
+  }, { timeout: timeoutMs }).catch(function () {});
+}
+
 // Extracts only rendered profile links inside the followers surface: the
 // followers dialog when Facebook renders one, else the main column. Anchors
 // outside that surface, zero-size (hidden/unrendered) anchors, and non-profile
@@ -353,6 +409,7 @@ async function runCollection(opts) {
       if (/login|checkpoint|two_step|captcha/i.test(url)) {
         return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: session challenged mid-run.', stats: { totalEncountered: totalEncountered, scrollAttempts: scrollAttempts, stopReason: 'auth-lost' } };
       }
+      await waitForNamedProfiles(page, 4000);
       const found = await extractVisibleProfiles(page);
       let fresh = 0;
       for (const f of found) {
