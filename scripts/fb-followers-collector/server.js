@@ -486,11 +486,13 @@ async function runCollection(opts) {
       await waitForNamedProfiles(page, 4000);
       const found = await extractVisibleProfiles(page);
       let fresh = 0;
+      let rejectedHref = 0;
+      let rejectedSelf = 0;
       for (const f of found) {
-        if (!isProfileHref(f.profileUrl)) continue;
+        if (!isProfileHref(f.profileUrl)) { rejectedHref++; continue; }
         const key = normalizeUrl(f.profileUrl);
-        if (!key) continue;
-        if (selfId && identityOf(f.profileUrl) === selfId) continue;
+        if (!key) { rejectedHref++; continue; }
+        if (selfId && identityOf(f.profileUrl) === selfId) { rejectedSelf++; continue; }
         totalEncountered++;
         // Every encounter is returned, including repeats: n8n dedupes by
         // profile URL and records duplicate status per row in Raw Followers.
@@ -507,9 +509,16 @@ async function runCollection(opts) {
         emptyStreak++;
       }
       scrollAttempts++;
+      // Diagnostic breakdown (counts only, never names/URLs — same rule as
+      // everywhere else) added after a live run found 0 followers for 10
+      // straight scrolls with no visible error: this pinpoints whether that
+      // was 0 anchors on the page at all, anchors present but all rejected
+      // by the profile-link heuristic, or anchors passing but all
+      // self-referential, instead of guessing blind from "+0 new" alone.
       logProgress(
         'scrolling',
-        'Scroll ' + scrollAttempts + ': +' + fresh + ' new (total unique ' + seen.size + ', encountered ' + totalEncountered + ')',
+        'Scroll ' + scrollAttempts + ': +' + fresh + ' new (total unique ' + seen.size + ', encountered ' + totalEncountered +
+          ') — ' + found.length + ' anchors seen, ' + rejectedHref + ' rejected (not a profile link), ' + rejectedSelf + ' rejected (self)',
         { scrollAttempts: scrollAttempts, totalEncountered: totalEncountered, uniqueFollowers: seen.size }
       );
       if (emptyStreak >= emptyThreshold) {
