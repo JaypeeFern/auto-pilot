@@ -76,10 +76,14 @@ invalidates it again.
   authenticated, profiles: [{ displayName, profileUrl }], stats: {
   totalEncountered, scrollAttempts, stopReason, runLabel } }`.
   `stopReason` is `empty-threshold-reached` on a complete run,
-  `max-attempts-reached` if the safety cap hit, or `auth-lost` if the
-  session was challenged mid-run. `401` with `authenticated: false` means
-  `AUTH_REQUIRED`. `409` means a run is already in progress (one at a time —
-  no parallel scraping).
+  `max-attempts-reached` if the safety cap hit, `auth-lost` if the
+  session was challenged mid-run, or `canceled` if `POST /cancel` stopped it.
+  `401` with `authenticated: false` means `AUTH_REQUIRED`. `409` means a run
+  is already in progress (one at a time — no parallel scraping).
+- `POST /cancel` (no body) → `{ ok: true, message }` and the in-progress
+  `/collect` run stops at the next scroll-cycle boundary (`stopReason:
+  'canceled'` in its result and in `/progress`), or `{ ok: false, error }`
+  if nothing is running. Always returns `200`.
 - `GET /progress` → `{ active, runId, phase, startedAt, updatedAt,
   scrollAttempts, totalEncountered, uniqueFollowers, stopReason, error,
   collectBusy, log: [{ at, phase, message }] }`. Polled by the Control Panel

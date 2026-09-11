@@ -74,6 +74,7 @@ if (BIND === '0.0.0.0' && !ALLOW_NON_LOOPBACK) {
 
 let browser = null;
 let collectBusy = false;
+let cancelRequested = false;
 let statusCache = null; // { at: number, body: object }
 // Bumped whenever /collect finishes, so a live /status check that was
 // already in flight (its checkAuth navigation is a long series of awaits)
@@ -473,6 +474,10 @@ async function runCollection(opts) {
     let stopReason = 'max-attempts-reached';
 
     while (scrollAttempts < maxScrolls) {
+      if (cancelRequested) {
+        stopReason = 'canceled';
+        break;
+      }
       const url = page.url();
       if (/login|checkpoint|two_step|captcha/i.test(url)) {
         logProgress('error', 'Session challenged mid-run.', { active: false, error: 'AUTH_REQUIRED: session challenged mid-run.' });
@@ -587,6 +592,7 @@ const server = http.createServer(async function (req, res) {
         return;
       }
       collectBusy = true;
+      cancelRequested = false;
       try {
         const body = await readBody(req);
         const result = await runCollection(body || {});
@@ -610,7 +616,16 @@ const server = http.createServer(async function (req, res) {
       sendJson(res, 200, Object.assign({}, progress, { collectBusy: collectBusy }));
       return;
     }
-    sendJson(res, 404, { ok: false, error: 'Unknown endpoint. Use GET /status, GET /progress, or POST /collect.' });
+    if (req.method === 'POST' && req.url === '/cancel') {
+      if (!collectBusy) {
+        sendJson(res, 200, { ok: false, error: 'No collection is currently in progress.' });
+        return;
+      }
+      cancelRequested = true;
+      sendJson(res, 200, { ok: true, message: 'Cancel requested — the run will stop after its current scroll cycle.' });
+      return;
+    }
+    sendJson(res, 404, { ok: false, error: 'Unknown endpoint. Use GET /status, GET /progress, POST /collect, or POST /cancel.' });
   } catch (err) {
     sendJson(res, 500, { ok: false, error: String((err && err.message) || err) });
   }
