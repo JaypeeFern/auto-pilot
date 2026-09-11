@@ -65,6 +65,40 @@ one place. Local `docker compose` is only for validating config shape.
    (the sole user of that volume) during the archive — SQLite consistency
    (see docs/BACKUP.md for why) — and leaves the exporter running.
 
+## Browser-collector service (giveaway GUI + VPS Facebook session)
+
+9. **Set the secret.** Add `VNC_PASSWORD` (generate: `openssl rand -base64
+   24`) to the Coolify environment. NoVNC refuses unauthenticated use
+   without it.
+10. **Route noVNC.** Add a domain (e.g. a private subdomain) to the
+    `browser` service targeting container port `6080`. Publish **no** host
+    ports. This route must never be public bare — next step.
+11. **Protect noVNC.** Add the noVNC domain to the existing Cloudflare
+    Access policy that already protects the n8n GUI (same IdP, same users).
+    Webhook/MCP bypasses stay path-scoped and do not cover this domain.
+    Anyone reaching the browser must then pass Access AND the VNC password.
+12. **Back up the profile.** Add the `auto-pilot_browser_profile` volume to
+    the scheduled R2 backup alongside `auto-pilot_n8n_data` (same
+    stop-containers setting; see docs/BACKUP.md). This preserves the
+    Facebook session across VPS rebuilds.
+13. **Redeploy and verify.** After deploy: `curl` the collector from inside
+    the n8n container path is covered by the workflow's own status check —
+    open the noVNC domain, confirm the Access login, enter the VNC password,
+    and confirm a Chromium window is visible. Then perform the first
+    Facebook login there (docs/workflows/giveaway-control-panel/WORKFLOW.md).
+14. **n8n-side setup (in the UI, never in Git):** the `giveaway_runs` Data
+    Table already exists (created via MCP); create an HTTP Basic credential
+    for the giveaway GUI webhooks and attach it to all 6 routes of the
+    Giveaway Control Panel workflow; attach the chosen Telegram bot
+    credential to the panel's senders; replace the
+    `browser.example.invalid` noVNC URL in the panel's GUI/State configs
+    with the real noVNC domain from step 10. Activation order matters:
+    attach ALL credentials first, verify, and only then activate the panel
+    workflow — its webhook routes bypass Cloudflare Access by design, so
+    n8n-level auth must be in place before they serve traffic. The collector
+    workflow stays inactive (manual Execute and sub-workflow calls need no
+    activation).
+
 ## Redeploys / upgrades
 
 - Normal redeploys (config change, Coolify restart): nothing special. The

@@ -16,6 +16,10 @@ backups/
 .tmp-n8n-export/
 .tmp-n8n-restore/
 
+# Operator browser profile for the giveaway collector (holds Facebook
+# session cookies) — never commit
+scripts/fb-followers-collector/fb-giveaway-profile/
+
 # OS / editor noise
 .DS_Store
 Thumbs.db

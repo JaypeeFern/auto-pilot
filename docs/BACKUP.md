@@ -92,6 +92,17 @@ Two separate layers. Neither is optional.
   - Container path: `/home/node/.n8n`
   - Contains: `database.sqlite` (workflows, credentials, users, executions),
     instance config/keys, binary data.
+- **Plus, when the browser service is deployed:** the browser profile volume:
+  - Volume: `auto-pilot_browser_profile`
+  - Container path: `/profile`
+  - Contains: the persistent Chromium profile (Facebook session cookies).
+  - Same stop-containers treatment: Coolify stops only the containers USING
+    the selected storages, so selecting both volumes stops `auto-pilot-n8n`
+    and `auto-pilot-browser` during the archive. Never run a giveaway
+    collection across the backup window — a stopped browser fails the run
+    loudly (collector unreachable alert), never silently.
+  - n8n Data Tables (giveaway pending results) live inside `database.sqlite`,
+    so they are covered by the `auto-pilot_n8n_data` backup with no extra step.
 - **What NOT to back up:** `auto-pilot_export_staging` (transient CLI output,
   re-exportable in minutes) and `auto-pilot_repo_data` (replaceable clone
   cache, re-cloned automatically; GitHub is its source of truth). Selecting

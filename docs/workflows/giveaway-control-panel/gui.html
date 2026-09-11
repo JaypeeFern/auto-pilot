@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giveaway Collector — Control Panel</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0 auto; max-width: 960px; padding: 16px; }
+  .dry { display: inline-block; background: #fff3cd; border: 1px solid #c9a227; padding: 4px 10px; font-weight: bold; }
+  .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin: 12px 0; }
+  .ok { color: #0a6b2d; font-weight: bold; } .bad { color: #a31212; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+  button { padding: 8px 14px; margin: 4px 4px 4px 0; }
+  input[type=text] { width: 100%; padding: 6px; box-sizing: border-box; }
+  #msg { white-space: pre-wrap; background: #f6f6f6; padding: 8px; min-height: 2em; }
+</style>
+</head>
+<body>
+<h1>Giveaway Collector</h1>
+<p><span class="dry">DRY RUN BY DEFAULT — NOTHING IS WRITTEN TO SHEETS unless you press Commit</span></p>
+
+<div class="card" id="auth">
+  <h2>Facebook session</h2>
+  <p>Status: <span id="authStatus">loading…</span></p>
+  <p id="authMsg"></p>
+  <p><a id="novnc" href="__NOVNC_URL__" target="_blank" rel="noopener">Open the VPS browser (noVNC) to log in manually</a></p>
+  <button onclick="refresh()">Refresh status</button>
+</div>
+
+<div class="card">
+  <h2>Configuration</h2>
+  <label>Followers URL <input type="text" id="followersUrl"></label><br><br>
+  <label>Run label <input type="text" id="runLabel"></label>
+</div>
+
+<div class="card">
+  <h2>Actions</h2>
+  <button id="dryBtn" onclick="dryRun()">Run Dry Test</button>
+  <button id="commitBtn" onclick="commit()" disabled>Write to Google Sheets</button>
+  <button onclick="clearPending()">Clear reviewed result</button>
+  <p id="msg"></p>
+</div>
+
+<div class="card">
+  <h2>Collector state</h2>
+  <p id="state">loading…</p>
+</div>
+
+<div class="card">
+  <h2>Results summary <span class="dry">DRY RUN / NOT WRITTEN TO SHEETS</span></h2>
+  <div id="summary"><p>No reviewed result yet. Run a dry test first.</p></div>
+</div>
+
+<div class="card">
+  <h2>Results preview</h2>
+  <div id="preview"><p>—</p></div>
+</div>
+
+<script>
+var API = '__API_BASE__';
+var currentRunId = null;
+// Bounded auto-refresh while a dry run is in flight: poll state every 15 s
+// for at most 30 min, stopping early once the run is reviewable
+// (commit enabled) or gone. Manual Refresh always works on top of this.
+var pollTimer = null;
+var pollStart = 0;
+var POLL_MS = 15000;
+var POLL_MAX_MS = 30 * 60 * 1000;
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+function startPolling() {
+  stopPolling();
+  pollStart = Date.now();
+  pollTimer = setInterval(function () {
+    if (Date.now() - pollStart > POLL_MAX_MS) {
+      stopPolling();
+      say('Auto-refresh stopped after 30 min — press Refresh status.');
+      return;
+    }
+    refresh();
+  }, POLL_MS);
+}
+function say(t) { document.getElementById('msg').textContent = t; }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function refresh() {
+  fetch(API + '/state').then(function (r) { return r.json(); }).then(function (s) {
+    var a = document.getElementById('authStatus');
+    a.textContent = s.authenticated ? 'LOGGED IN' : 'AUTH_REQUIRED';
+    a.className = s.authenticated ? 'ok' : 'bad';
+    document.getElementById('authMsg').textContent =
+      (s.authMessage || '') + (s.facebookReachable === false ? ' (Facebook unreachable)' : '');
+    if (s.config) {
+      if (s.config.followersUrl) document.getElementById('followersUrl').value = s.config.followersUrl;
+      if (s.config.runLabel) document.getElementById('runLabel').value = s.config.runLabel;
+    }
+    var st = document.getElementById('state');
+    if (s.pending) {
+      currentRunId = s.pending.runId;
+      st.innerHTML = 'Pending run <b>' + esc(s.pending.runId) + '</b> (' +
+        esc(s.pending.runLabel || '') + ') — status <b>' + esc(s.pending.status) + '</b>';
+      document.getElementById('commitBtn').disabled = (s.pending.status !== 'dry-complete');
+      loadResults(currentRunId);
+    } else {
+      currentRunId = null;
+      st.textContent = 'No pending result.';
+      document.getElementById('commitBtn').disabled = true;
+    }
+    if (pollTimer && (!currentRunId || !document.getElementById('commitBtn').disabled)) stopPolling();
+  }).catch(function (e) { say('State error: ' + e); });
+}
+function dryRun() {
+  say('Dry test started — this takes a while (slow scrolling). Auto-refreshing every 15s for up to 30 min.');
+  document.getElementById('dryBtn').disabled = true;
+  fetch(API + '/dry-run', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      followersUrl: document.getElementById('followersUrl').value,
+      runLabel: document.getElementById('runLabel').value
+    })
+  }).then(function () {
+    say('Dry test accepted — auto-refreshing every 15s for up to 30 min.');
+    document.getElementById('dryBtn').disabled = false;
+    refresh();
+    startPolling();
+  }).catch(function (e) {
+    say('Dry test error: ' + e);
+    document.getElementById('dryBtn').disabled = false;
+  });
+}
+function loadResults(runId) {
+  fetch(API + '/results?runId=' + encodeURIComponent(runId))
+    .then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.summary) {
+        document.getElementById('summary').innerHTML = '<p>No summary yet.</p>';
+        return;
+      }
+      var s = j.summary;
+      document.getElementById('summary').innerHTML =
+        '<ul><li>Total profiles encountered: <b>' + s.totalEncountered + '</b></li>' +
+        '<li>Unique followers: <b>' + s.uniqueFollowers + '</b></li>' +
+        '<li>Duplicates: <b>' + s.duplicatesRemoved + '</b></li>' +
+        '<li>Invalid/missing entries: <b>' + (s.invalidIds + s.missingNames) + '</b></li>' +
+        '<li>Final roulette entries: <b>' + s.finalRouletteCount + '</b></li>' +
+        '<li>Scroll attempts: <b>' + s.scrollAttempts + '</b></li>' +
+        '<li>Stop reason: <b>' + esc(s.stopReason) + '</b></li></ul>';
+      var rows = j.preview || [];
+      var h = '<p>Showing ' + rows.length + ' of ' + j.previewTotal + ' roulette entries.</p>';
+      h += '<table><tr><th>Name</th><th>Profile ID</th><th>URL</th></tr>';
+      rows.forEach(function (r) {
+        h += '<tr><td>' + esc(r.displayName) + '</td><td>' + esc(r.profileId) +
+          '</td><td>' + esc(r.profileUrl) + '</td></tr>';
+      });
+      document.getElementById('preview').innerHTML = h + '</table>';
+    }).catch(function (e) { say('Results error: ' + e); });
+}
+function commit() {
+  if (!currentRunId) { say('Nothing to commit.'); return; }
+  if (!confirm('Write reviewed run ' + currentRunId + ' to Google Sheets? (No re-scrape; exact reviewed rows.)')) return;
+  say('Committing — writing Sheets now…');
+  fetch(API + '/commit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ runId: currentRunId })
+  }).then(function (r) { return r.json(); }).then(function (j) {
+    say(j.committed ? 'Committed ' + j.rouletteCount + ' entries to Sheets.' : 'Commit refused: ' + JSON.stringify(j));
+    refresh();
+  }).catch(function (e) { say('Commit error: ' + e); });
+}
+function clearPending() {
+  if (!currentRunId) { say('Nothing to clear.'); return; }
+  fetch(API + '/clear', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ runId: currentRunId })
+  }).then(function (r) { return r.json(); }).then(function () {
+    say('Reviewed result discarded.');
+    document.getElementById('summary').innerHTML = '<p>No reviewed result yet.</p>';
+    document.getElementById('preview').innerHTML = '<p>—</p>';
+    refresh();
+  }).catch(function (e) { say('Clear error: ' + e); });
+}
+refresh();
+</script>
+</body>
+</html>

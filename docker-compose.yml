@@ -98,6 +98,59 @@ services:
       retries: 3
       start_period: 120s
 
+  # Browser-collector for the Facebook giveaway workflow: ONE persistent headed
+  # Chromium that is both Puppeteer-driven (collector API :5679, n8n only over
+  # the internal network) and manually operable from a desktop browser (noVNC
+  # web :6080 behind the Coolify domain + Cloudflare Access, VNC password).
+  # Authorized by the giveaway-GUI task: the official n8n image has no
+  # Chromium and Code nodes have no network access, so this cannot live in
+  # n8n — see Dockerfile.browser and docs/ARCHITECTURE.md. No host ports are
+  # published; Coolify routes the noVNC domain to :6080, nothing else.
+  # Resource math (VPS ~2 GB shared): 768 (n8n) + 640 (browser) + 64
+  # (exporter) ≈ 1.5 GB. If the host OOMs, stop this service while no
+  # giveaway is running instead of shrinking n8n below its 768 MB floor.
+  browser:
+    build:
+      context: ./scripts/fb-followers-collector
+      dockerfile: Dockerfile.browser
+    image: auto-pilot-browser:1.0.0
+    container_name: auto-pilot-browser
+    restart: unless-stopped
+    mem_limit: 640m
+    mem_reservation: 256m
+    stop_grace_period: 30s
+    expose:
+      - "5679"
+      - "5900"
+      - "6080"
+    volumes:
+      # Persistent Chromium profile: Facebook session cookies. Survives
+      # container recreation and restarts; back up per docs/BACKUP.md.
+      - browser_profile:/profile
+    environment:
+      # Container network only: n8n reaches http://browser:5679. This port is
+      # never published and never routed publicly.
+      - COLLECTOR_BIND=0.0.0.0
+      - COLLECTOR_ALLOW_NON_LOOPBACK=true
+      - COLLECTOR_PROFILE_DIR=/profile
+      - COLLECTOR_HEADLESS=false
+      - CHROME_PATH=/usr/bin/chromium
+      - PROFILE_DIR=/profile
+      - VNC_PASSWORD=${VNC_PASSWORD}
+      - TZ=${TZ:-UTC}
+    healthcheck:
+      # Collector API answers without a browser running (chromium launches
+      # lazily on first /status or /collect).
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:5679/status').then(r=>{process.exit(r.ok||r.status===401?0:1)}).catch(()=>process.exit(1))\"",
+        ]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+
   # Git sync sidecar for workflow exports. Coolify Scheduled Tasks execute
   # INSIDE a service container, and the n8n container has no repo checkout —
   # so export runs scripts/export-workflows.sh inside n8n (Task 1; this image
@@ -153,6 +206,11 @@ volumes:
   n8n_data:
     # Coolify backs up this volume to Cloudflare R2 (see docs/BACKUP.md).
     name: auto-pilot_n8n_data
+  browser_profile:
+    # Persistent Chromium profile for the browser-collector (Facebook session
+    # cookies). Select for R2 backup alongside n8n_data — see docs/BACKUP.md
+    # for the stop-container consistency note, which applies here too.
+    name: auto-pilot_browser_profile
   export_staging:
     # Transient CLI output. Never select for R2 backup.
     name: auto-pilot_export_staging
