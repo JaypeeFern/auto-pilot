@@ -70,9 +70,15 @@ one place. Local `docker compose` is only for validating config shape.
 9. **Set the secret.** Add `VNC_PASSWORD` (generate: `openssl rand -base64
    24`) to the Coolify environment. NoVNC refuses unauthenticated use
    without it.
-10. **Route noVNC.** Add a domain (e.g. a private subdomain) to the
-    `browser` service targeting container port `6080`. Publish **no** host
-    ports. This route must never be public bare — next step.
+10. **Route noVNC through the Coolify proxy — same pattern as every other
+    service** (e.g. AgentBrain's `brain.jpfernandez.online:3000`, AutoPilot
+    n8n's own domain). In Coolify, add a domain (e.g. a private subdomain)
+    to the `browser` service targeting container port `6080`. Publish **no**
+    host ports. Traffic path stays Cloudflare → existing Tunnel →
+    `https://coolify-proxy:443` → Coolify/Traefik hostname routing →
+    `browser:6080`. Do NOT create a separate tunnel origin pointing
+    directly at the browser container — the tunnel entry stays at the
+    Coolify proxy. This route must never be public bare — next step.
 11. **Protect noVNC.** Add the noVNC domain to the existing Cloudflare
     Access policy that already protects the n8n GUI (same IdP, same users).
     Webhook/MCP bypasses stay path-scoped and do not cover this domain.

@@ -12,7 +12,9 @@ Upgrades are deliberate/manual. Never use `:latest`.
 ```text
 Internet
    ↓
-Cloudflare Tunnel  (exists on the VPS, managed outside this repo)
+Cloudflare Tunnel  (exists on the VPS, managed outside this repo — entry
+                     stays at https://coolify-proxy:443; Traefik routes by
+                     hostname below it, never a direct origin per container)
    ↓
 Coolify Proxy      (routes auto-pilot.jpfernandez.online → container :5678,
                     plus the operator-configured noVNC domain → browser :6080)
