@@ -1,0 +1,429 @@
+{
+   "active" : true,
+   "activeVersionId" : "33be966f-f1ab-42d5-8ca6-09f240d6cca7",
+   "connections" : {
+      "Build Pending Payload" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Store Pending Result",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Collect Followers via Browser" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Is Authenticated?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "GUI Input" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Giveaway Config",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Giveaway Config" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Collect Followers via Browser",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Has Valid Data?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build Pending Payload",
+                  "type" : "main"
+               }
+            ],
+            []
+         ]
+      },
+      "Is Authenticated?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Validate Dedupe and Build Rows",
+                  "type" : "main"
+               }
+            ],
+            []
+         ]
+      },
+      "Run Giveaway Collection" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Giveaway Config",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Validate Dedupe and Build Rows" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Has Valid Data?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-11T03:44:27.114Z",
+   "description" : "Manual-trigger-only collector of visible Facebook Page followers for giveaway roulette: persistent-profile Puppeteer service, URL dedupe, Data Table storage, results visible via the Control Panel GUI.",
+   "id" : "IYAP2evHsmMccCQA",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "Facebook Giveaway Followers Collector",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "id" : "cdf9f7dd-749e-4eda-b3e1-9c46cc691ca8",
+         "name" : "Run Giveaway Collection",
+         "parameters" : {},
+         "position" : [
+            0,
+            224
+         ],
+         "type" : "n8n-nodes-base.manualTrigger",
+         "typeVersion" : 1
+      },
+      {
+         "id" : "39dd2763-261e-4761-afd6-dc395182f509",
+         "name" : "Giveaway Config",
+         "parameters" : {
+            "jsCode" : "// Per-giveaway settings — edit these values between runs, then Execute.\n// GUI dry-run calls pass {runId, followersUrl?, runLabel?} via GUI Input.\n// Remote n8n (Coolify VPS) uses http://browser:5679 (same Compose network).\n// Local-dev collector: see scripts/fb-followers-collector/README.md and set\n// the collector URL to the tunneled address.\n// There is no separate pre-flight status call anymore — Collect Followers\n// via Browser does its own single-navigation auth check and returns a clean\n// authenticated:false + AUTH_REQUIRED error on its own, so a second HTTP\n// call (and the extra open/close browser-tab cycle it caused) is unnecessary.\n// Every run stores its full result to the giveaway_runs Data Table — visible\n// and downloadable from the Control Panel GUI (live activity log, results,\n// JSON download). No external Sheets or Telegram integration.\nconst incoming = $input.first().json || {};\nreturn [{\n  json: {\n    followersUrl: incoming.followersUrl || 'https://www.facebook.com/profile.php?id=61579485972085&sk=followers',\n    collectorCollectUrl: 'http://browser:5679/collect',\n    scrollDelayMs: 2500,\n    postScrollWaitMs: 2500,\n    emptyScrollThreshold: 10,\n    maxScrollAttempts: 500,\n    runLabel: incoming.runLabel || 'giveaway',\n    runId: incoming.runId || ('run-' + Date.now())\n  }\n}];"
+         },
+         "position" : [
+            224,
+            320
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "87e2e848-ec26-42c4-8347-989e0d8974fc",
+         "name" : "Architecture and Auth Handoff",
+         "parameters" : {
+            "content" : "## Architecture (why no browser in Compose n8n image). The official n8n image has no Chromium and Code nodes have no network access, so Puppeteer cannot run inside n8n; the VPS browser-collector service (scripts/fb-followers-collector, persistent profile, loopback-guarded API, noVNC) is the authorized exception. n8n drives it over HTTP only (http://browser:5679 on the Compose network). Never expose the collector publicly. Auth handoff: open noVNC, log into Facebook manually in the VPS Chromium window (2FA/captcha/checkpoint all manual), rerun workflow. On expiry the run stops at AUTH_REQUIRED — repeat login, rerun. No Facebook credentials ever enter n8n. Every run stores its full result (raw + roulette rows, stats) in the giveaway_runs Data Table, keyed by runId — visible and downloadable from the Control Panel GUI. No separate dry-run/commit distinction, no external Sheets or Telegram integration. GUI Input trigger accepts panel calls (manual-trigger-only preserved: no schedule; every run is human-initiated).",
+            "height" : 368,
+            "width" : 944
+         },
+         "position" : [
+            -336,
+            720
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c402",
+         "name" : "Is Authenticated?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.authenticated }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            672,
+            320
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.3
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c403",
+         "maxTries" : 2,
+         "name" : "Collect Followers via Browser",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "jsonBody" : "={{ { \"followersUrl\": $('Giveaway Config').item.json.followersUrl, \"scrollDelayMs\": $('Giveaway Config').item.json.scrollDelayMs, \"postScrollWaitMs\": $('Giveaway Config').item.json.postScrollWaitMs, \"emptyScrollThreshold\": $('Giveaway Config').item.json.emptyScrollThreshold, \"maxScrollAttempts\": $('Giveaway Config').item.json.maxScrollAttempts, \"runLabel\": $('Giveaway Config').item.json.runLabel, \"runId\": $('Giveaway Config').item.json.runId } }}",
+            "method" : "POST",
+            "options" : {
+               "timeout" : 3600000
+            },
+            "sendBody" : true,
+            "specifyBody" : "json",
+            "url" : "={{ $('Giveaway Config').item.json.collectorCollectUrl }}"
+         },
+         "position" : [
+            448,
+            320
+         ],
+         "retryOnFail" : true,
+         "type" : "n8n-nodes-base.httpRequest",
+         "typeVersion" : 4.5,
+         "waitBetweenTries" : 2000
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c404",
+         "name" : "Validate Dedupe and Build Rows",
+         "parameters" : {
+            "jsCode" : "const collected = $('Collect Followers via Browser').first().json;\nconst cfg = $('Giveaway Config').first().json;\nconst profiles = collected.profiles || [];\nconst stats = collected.stats || {};\nconst runLabel = cfg.runLabel || 'giveaway';\nconst extractedAt = new Date().toISOString();\nfunction normUrl(u) {\n  const s = String(u || '').trim();\n  if (!s) return '';\n  let v = s.split('#')[0];\n  const q = v.indexOf('?');\n  if (q >= 0) {\n    const base = v.slice(0, q);\n    const query = v.slice(q + 1);\n    const idm = query.match(/(^|&)id=(\\d+)/i);\n    v = idm ? base + '?id=' + idm[2] : base;\n  }\n  v = v.replace(/\\/+$/, '');\n  return v.toLowerCase();\n}\nfunction profileId(u) {\n  const s = String(u || '').trim();\n  if (!s) return '';\n  const idm = s.match(/[?&]id=(\\d+)/i);\n  if (idm) return 'id:' + idm[1];\n  const clean = s.split('?')[0].split('#')[0].replace(/\\/+$/, '');\n  const parts = clean.split('/').filter(function (p) { return p; });\n  return parts.length ? parts[parts.length - 1].toLowerCase() : '';\n}\nfunction fbHost(u) {\n  const m = String(u || '').trim().match(/^https?:\\/\\/([^/:?#]+)/i);\n  if (!m) return '';\n  return m[1].toLowerCase();\n}\nfunction validId(u) {\n  const s = String(u || '').trim();\n  if (!s) return false;\n  const h = fbHost(s);\n  if (h !== 'facebook.com' && !h.endsWith('.facebook.com') && h !== 'fb.com' && !h.endsWith('.fb.com')) return false;\n  return profileId(s) !== '';\n}\n// Facebook renders each follower row as TWO separate <a> elements sharing\n// the same profile URL: one wraps only the avatar image (no visible text),\n// one wraps the name. The collector emits every raw sighting as-is (needed\n// for the audit trail), so the same URL legitimately appears once with a\n// blank name and once with the real name. \"First sighting wins\" dedupe\n// always picked the blank one, since the avatar anchor renders first in DOM\n// order — confirmed live: 96 of 192 raw rows had real names, but\n// finalRouletteCount was 0 every time. Fix: prefer whichever sighting of a\n// key actually has a name, not just the first one encountered. Plain\n// Object.create(null) maps avoid any prototype-property key collision\n// (independent review note); an empty normalized key (never expected in\n// practice, since validId already requires a facebook.com host + id, which\n// normUrl always preserves, but kept as an explicit invariant rather than\n// assumed) falls back to the OLD permissive per-item behavior instead of\n// being force-marked a duplicate, so this can only improve eligibility\n// versus the old logic, never regress it (independent review finding).\nconst nameByKey = Object.create(null);\nfor (const p of profiles) {\n  const url = p && (p.profileUrl || p.url) ? String(p.profileUrl || p.url).trim() : '';\n  const key = normUrl(url);\n  const name = p && p.displayName ? String(p.displayName).trim() : '';\n  if (key && name && !nameByKey[key]) nameByKey[key] = name;\n}\nconst seenCanonical = Object.create(null);\nlet duplicates = 0;\nlet missingNames = 0;\nlet invalidIds = 0;\n// rawRows keeps only the canonical (non-duplicate) sighting per follower —\n// every raw DOM sighting used to go in here (76,930 rows for a ~931-person\n// page, one avatar-anchor row plus one name-anchor row per follower plus\n// re-sightings across scroll passes), which is impractical to write to the\n// Raw Followers Sheet. The full per-sighting detail was only ever useful\n// for debugging the dedupe logic itself, not for the audit trail. The\n// isDuplicate column is kept (always 'no' now) so the sheet schema/any\n// existing header stays stable rather than silently losing a column.\nconst rawRows = [];\nconst rouletteRows = [];\nfor (const p of profiles) {\n  const name = p && p.displayName ? String(p.displayName).trim() : '';\n  const url = p && (p.profileUrl || p.url) ? String(p.profileUrl || p.url).trim() : '';\n  const key = normUrl(url);\n  const id = profileId(url);\n  const okUrl = validId(url);\n  if (!name) missingNames++;\n  if (!okUrl) invalidIds++;\n  let isDup = false;\n  if (key !== '') {\n    const bestName = nameByKey[key] || '';\n    const isCanonical = !seenCanonical[key] && (bestName === '' || name === bestName);\n    if (isCanonical) seenCanonical[key] = true;\n    isDup = !isCanonical;\n  }\n  if (isDup) duplicates++;\n  let status = 'valid';\n  if (!okUrl) { status = 'invalid-id'; } else if (isDup) { status = name ? 'duplicate' : 'missing-name'; } else if (!name) { status = 'missing-name'; }\n  if (!isDup) { rawRows.push({ displayName: name, profileUrl: url, profileId: id, extractedAt: extractedAt, isDuplicate: 'no', validationStatus: status, runLabel: runLabel }); }\n  if (!isDup && okUrl && name) { rouletteRows.push({ displayName: name, profileUrl: url, profileId: id, runLabel: runLabel }); }\n}\nconst ok = collected.ok === true;\nconst stopReason = stats.stopReason || 'unknown';\nconst isComplete = ok && stopReason === 'empty-threshold-reached';\nreturn [{ json: { isComplete: isComplete, collectorOk: ok, collectorError: collected.error || '', authenticated: collected.authenticated !== false, stopReason: stopReason, scrollAttempts: stats.scrollAttempts || 0, totalEncountered: stats.totalEncountered || profiles.length, uniqueFollowers: Object.keys(seenCanonical).length, duplicatesRemoved: duplicates, missingNames: missingNames, invalidIds: invalidIds, finalRouletteCount: rouletteRows.length, readyForDraw: isComplete && rouletteRows.length > 0, rawRows: rawRows, rouletteRows: rouletteRows, runLabel: runLabel } }];"
+         },
+         "position" : [
+            896,
+            224
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c405",
+         "name" : "Has Valid Data?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.isComplete }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     },
+                     "rightValue" : true
+                  },
+                  {
+                     "leftValue" : "={{ $json.finalRouletteCount }}",
+                     "operator" : {
+                        "operation" : "gt",
+                        "type" : "number"
+                     },
+                     "rightValue" : 0
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            1120,
+            224
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.3
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c418",
+         "name" : "Config and Auth Notes",
+         "parameters" : {
+            "color" : 5,
+            "content" : "## Per-giveaway config lives in Giveaway Config (Code node, top of flow). Edit followersUrl, collector URL, runLabel, timing (scrollDelayMs/postScrollWaitMs), thresholds (emptyScrollThreshold default 10, maxScrollAttempts cap) there. Dedupe is by normalized profile URL/identifier — never by display name. Every run's full result (raw + roulette rows, stats) is stored in the giveaway_runs Data Table, keyed by runId; view or download it from the Control Panel GUI. No external Sheets or Telegram integration.",
+            "height" : 300,
+            "width" : 944
+         },
+         "position" : [
+            -336,
+            1120
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c422",
+         "name" : "GUI Input",
+         "parameters" : {
+            "inputSource" : "passthrough"
+         },
+         "position" : [
+            0,
+            416
+         ],
+         "type" : "n8n-nodes-base.executeWorkflowTrigger",
+         "typeVersion" : 1.2
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c424",
+         "name" : "Build Pending Payload",
+         "parameters" : {
+            "jsCode" : "const v = $('Validate Dedupe and Build Rows').first().json;\nconst cfg = $('Giveaway Config').first().json;\nconst summary = { runId: cfg.runId, runLabel: v.runLabel, totalEncountered: v.totalEncountered, uniqueFollowers: v.uniqueFollowers, duplicatesRemoved: v.duplicatesRemoved, missingNames: v.missingNames, invalidIds: v.invalidIds, finalRouletteCount: v.finalRouletteCount, scrollAttempts: v.scrollAttempts, stopReason: v.stopReason, readyForDraw: v.readyForDraw };\nreturn [{ json: { runId: cfg.runId, runLabel: v.runLabel, status: 'complete', summaryJson: JSON.stringify(summary), rawRowsJson: JSON.stringify(v.rawRows || []), rouletteRowsJson: JSON.stringify(v.rouletteRows || []) } }];"
+         },
+         "position" : [
+            1568,
+            240
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c425",
+         "name" : "Store Pending Result",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "runId",
+                     "id" : "runId",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "runLabel",
+                     "id" : "runLabel",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "status",
+                     "id" : "status",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : false,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "summaryJson",
+                     "id" : "summaryJson",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : false,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "rawRowsJson",
+                     "id" : "rawRowsJson",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : false,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "rouletteRowsJson",
+                     "id" : "rouletteRowsJson",
+                     "required" : false,
+                     "type" : "string"
+                  },
+                  {
+                     "canBeUsedToMatch" : false,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "telegramChatId",
+                     "id" : "telegramChatId",
+                     "required" : false,
+                     "type" : "string"
+                  }
+               ],
+               "value" : {
+                  "rawRowsJson" : "={{ $json.rawRowsJson }}",
+                  "rouletteRowsJson" : "={{ $json.rouletteRowsJson }}",
+                  "runId" : "={{ $json.runId }}",
+                  "runLabel" : "={{ $json.runLabel }}",
+                  "status" : "={{ $json.status }}",
+                  "summaryJson" : "={{ $json.summaryJson }}"
+               }
+            },
+            "dataTableId" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "giveaway_runs"
+            },
+            "options" : {}
+         },
+         "position" : [
+            1792,
+            240
+         ],
+         "type" : "n8n-nodes-base.dataTable",
+         "typeVersion" : 1.1
+      }
+   ],
+   "pinData" : {},
+   "settings" : {
+      "availableInMCP" : true,
+      "binaryMode" : "separate",
+      "executionOrder" : "v1",
+      "saveManualExecutions" : true
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-11T03:44:27.166Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-11T03:44:27.166Z",
+         "workflowId" : "IYAP2evHsmMccCQA"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 0,
+   "updatedAt" : "2026-09-11T14:09:58.522Z",
+   "versionCounter" : 43,
+   "versionId" : "33be966f-f1ab-42d5-8ca6-09f240d6cca7",
+   "versionMetadata" : {
+      "description" : "User decided to drop Telegram entirely rather than configure a real chat ID: telegramChatId was still the placeholder PASTE_TELEGRAM_CHAT_ID, causing the two Send Telegram nodes to hard-fail every run that reached AUTH_REQUIRED or the failure branch (visible as n8n node-issue errors). Results are now surfaced entirely through the Control Panel GUI (live log + Download/View JSON), so there's no remaining use for the Telegram path. Removes the 3 Build*Report/Message Code nodes and 3 Send Telegram nodes; both branches (auth-required, invalid-data) now simply end without a further action. Leaves the now-empty telegramChatId Data Table column in place, unused, consistent with how the earlier Sheets-column removal was handled.",
+      "name" : "Remove Telegram reporting"
+   }
+}

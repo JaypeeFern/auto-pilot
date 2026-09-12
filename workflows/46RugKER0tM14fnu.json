@@ -1,0 +1,950 @@
+{
+   "active" : true,
+   "activeVersionId" : "949aba87-d0f0-46a1-83fc-ee7739bc1889",
+   "connections" : {
+      "Build Dry Input" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Execute Collector",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Build Page" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond HTML",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Build Results" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond Results",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Build State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Check Browser Status" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Latest Pending",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Check Progress" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond Progress",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Clearable?" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Mark Discarded",
+                  "type" : "main"
+               }
+            ],
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond Clear Refused",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Dry Config" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build Dry Input",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "GET Page" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "GUI Config",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "GET Progress" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Check Progress",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "GET Results" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Pending By RunId",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "GET State" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "State Config",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "GUI Config" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build Page",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Latest Pending" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build State",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Mark Discarded" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond Cleared",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "POST Clear" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Read Clear Pending",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "POST Dry Run" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Dry Config",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "POST Stop" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Stop Collector",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Clear Pending" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Require Existing",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Read Pending By RunId" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Build Results",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Require Existing" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Clearable?",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "State Config" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Check Browser Status",
+                  "type" : "main"
+               }
+            ]
+         ]
+      },
+      "Stop Collector" : {
+         "main" : [
+            [
+               {
+                  "index" : 0,
+                  "node" : "Respond Stop",
+                  "type" : "main"
+               }
+            ]
+         ]
+      }
+   },
+   "createdAt" : "2026-09-11T04:46:03.197Z",
+   "description" : "Private webhook control panel for the giveaway collector: session status, noVNC access, run collection, view results. All routes basic-authenticated.",
+   "id" : "46RugKER0tM14fnu",
+   "isArchived" : false,
+   "meta" : {
+      "aiBuilderAssisted" : true,
+      "builderVariant" : "mcp"
+   },
+   "name" : "Giveaway Control Panel",
+   "nodeGroups" : [],
+   "nodes" : [
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "f3b077ee-fd15-4644-9ab5-5181e544b281",
+         "name" : "GET Page",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "options" : {},
+            "path" : "giveaway",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            0
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "0a63e4fa-d5a9-43c7-bb57-56ea1c91cc14"
+      },
+      {
+         "id" : "905ce777-2bb8-4905-b9d7-5952ff7d4d84",
+         "name" : "GUI Config",
+         "parameters" : {
+            "jsCode" : "// Panel-wide defaults. Webhook bodies may override followersUrl/runLabel\n// (dry-run form); page loads post empty bodies and get these defaults.\n// collectorStatusUrl uses ?fresh=1 so the user-triggered refresh always gets\n// a live Facebook check, never the cache the Docker healthcheck relies on.\nconst incoming = ($input.first() || { json: {} }).json || {};\nconst body = incoming.body || {};\nreturn [{ json: { novncUrl: 'https://fb-browser.jpfernandez.online/vnc.html', apiBase: '/webhook/giveaway/api', collectorStatusUrl: 'http://browser:5679/status?fresh=1', followersUrl: body.followersUrl || 'https://www.facebook.com/<your-page>/followers/', runLabel: body.runLabel || 'giveaway' } }];"
+         },
+         "position" : [
+            224,
+            0
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "f7b795ee-22c8-4202-af52-cb30dce0e5ed",
+         "name" : "Sticky Note 30fa7eb6",
+         "parameters" : {
+            "content" : "## Giveaway Control Panel — private webhook GUI. All routes use the Giveaway GUI basic-auth credential.",
+            "height" : 128,
+            "width" : 432
+         },
+         "position" : [
+            -736,
+            304
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      },
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c501",
+         "name" : "GET State",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "options" : {},
+            "path" : "giveaway/api/state",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            224
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "28465606-0d4c-4e09-887a-ab0b149fc955"
+      },
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c502",
+         "name" : "POST Dry Run",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "httpMethod" : "POST",
+            "options" : {},
+            "path" : "giveaway/api/dry-run"
+         },
+         "position" : [
+            0,
+            448
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "d452a4f7-559f-46e4-82c3-5fba00217dc6"
+      },
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c503",
+         "name" : "GET Results",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "options" : {},
+            "path" : "giveaway/api/results",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            672
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "b889d616-043a-4a92-b911-d7c320bab6bf"
+      },
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c505",
+         "name" : "POST Clear",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "httpMethod" : "POST",
+            "options" : {},
+            "path" : "giveaway/api/clear",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            1504
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "19d4505b-80ce-42ef-8d04-acb5bb8af285"
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c506",
+         "name" : "Build Page",
+         "parameters" : {
+            "jsCode" : "const cfg = $('GUI Config').first().json;\nlet html = `<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Giveaway Collector — Control Panel</title>\n<style>\n  :root {\n    --bg: #0b0d12; --surface: #12151c; --surface-2: #0d0f15; --sunken: #08090c;\n    --border: #232838; --border-soft: #1b1f2b;\n    --text: #e6e9f0; --text-dim: #8b93a7; --text-faint: #5b6172;\n    --accent: #7c7ffb; --accent-hover: #918ffc; --accent-bg: rgba(124,127,251,0.14);\n    --ok: #34d399; --ok-bg: rgba(52,211,153,0.13);\n    --bad: #f87171; --bad-bg: rgba(248,113,113,0.13);\n    --warn: #fbbf24; --warn-bg: rgba(251,191,36,0.13);\n    --muted-bg: rgba(139,147,167,0.13);\n    --radius: 14px; --radius-sm: 9px;\n  }\n  * { box-sizing: border-box; }\n  body {\n    margin: 0; padding: 40px 20px 80px; background: var(--bg); color: var(--text);\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Inter, Roboto, sans-serif;\n    font-size: 14px; line-height: 1.5;\n  }\n  .wrap { max-width: 760px; margin: 0 auto; }\n  header.page { margin-bottom: 28px; }\n  header.page h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.01em; }\n  header.page p { margin: 0; color: var(--text-dim); font-size: 13.5px; }\n  .card {\n    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);\n    padding: 20px 22px; margin-bottom: 16px;\n  }\n  .card h2 {\n    font-size: 14px; font-weight: 700; margin: 0 0 14px; display: flex; align-items: center;\n    justify-content: space-between; gap: 10px;\n  }\n  .card h2 .hint { font-size: 11.5px; font-weight: 500; color: var(--text-faint); }\n  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }\n  .badge {\n    display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px 4px 9px;\n    border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.01em;\n  }\n  .badge .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }\n  .badge.ok { background: var(--ok-bg); color: var(--ok); }\n  .badge.ok .dot { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-bg); }\n  .badge.bad { background: var(--bad-bg); color: var(--bad); }\n  .badge.bad .dot { background: var(--bad); box-shadow: 0 0 0 3px var(--bad-bg); }\n  .badge.warn { background: var(--warn-bg); color: var(--warn); }\n  .badge.warn .dot { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-bg); }\n  .badge.muted { background: var(--muted-bg); color: var(--text-dim); }\n  .badge.muted .dot { background: var(--text-faint); }\n  .sub-msg { color: var(--text-dim); font-size: 13px; margin: 8px 0 0; }\n  a { color: var(--accent); text-decoration: none; }\n  a:hover { color: var(--accent-hover); text-decoration: underline; }\n  label.field { display: block; margin-bottom: 14px; }\n  label.field:last-child { margin-bottom: 0; }\n  label.field .lbl {\n    display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;\n    letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 6px;\n  }\n  input[type=text] {\n    width: 100%; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border);\n    border-radius: var(--radius-sm); color: var(--text); font-size: 13.5px; font-family: inherit;\n    outline: none; transition: border-color .15s ease, box-shadow .15s ease;\n  }\n  input[type=text]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }\n  .btn {\n    appearance: none; border: 1px solid transparent; border-radius: var(--radius-sm);\n    padding: 10px 16px; font-size: 13.5px; font-weight: 700; font-family: inherit; cursor: pointer;\n    transition: background .15s ease, border-color .15s ease, transform .05s ease, opacity .15s ease;\n  }\n  .btn:active:not(:disabled) { transform: translateY(1px); }\n  .btn:disabled { opacity: 0.5; cursor: not-allowed; }\n  .btn-primary { background: var(--accent); color: #0b0d12; }\n  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }\n  .btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }\n  .btn-ghost:hover:not(:disabled) { background: var(--surface-2); border-color: var(--text-faint); }\n  .btn-danger-ghost { background: transparent; border-color: var(--border); color: var(--bad); }\n  .btn-danger-ghost:hover:not(:disabled) { background: var(--bad-bg); border-color: var(--bad); }\n  #msg { font-size: 13px; margin-top: 12px; min-height: 1.2em; }\n  #msg.ok { color: var(--ok); } #msg.err { color: var(--bad); } #msg.muted { color: var(--text-dim); }\n  .log-stats {\n    display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim);\n    margin-bottom: 10px;\n  }\n  .log-stats b { color: var(--text); font-weight: 700; }\n  #log {\n    background: var(--sunken); border: 1px solid var(--border-soft); border-radius: 10px;\n    padding: 10px 12px; height: 240px; overflow-y: auto;\n    font-family: ui-monospace, \"Cascadia Code\", \"SF Mono\", Consolas, \"Liberation Mono\", monospace;\n    font-size: 12px; line-height: 1.7;\n  }\n  #log .line { display: flex; gap: 10px; white-space: pre-wrap; word-break: break-word; }\n  #log .t { color: var(--text-faint); flex: none; width: 64px; }\n  #log .p { flex: none; font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.03em; padding-top: 2px; }\n  #log .m { color: #b7c0d4; }\n  #log .p-loading, #log .p-starting { color: #60a5fa; }\n  #log .p-auth { color: #c084fc; }\n  #log .p-scrolling { color: var(--ok); }\n  #log .p-done { color: var(--ok); }\n  #log .p-error { color: var(--bad); }\n  #log .empty { color: var(--text-faint); text-align: center; padding-top: 90px; }\n  .stat-grid {\n    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;\n    margin-bottom: 16px;\n  }\n  .stat {\n    background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: 10px;\n    padding: 12px 14px;\n  }\n  .stat .lbl { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 4px; }\n  .stat .val { font-size: 21px; font-weight: 700; }\n  .stat .val.ok { color: var(--ok); } .stat .val.bad { color: var(--bad); }\n  .table-wrap { max-height: 320px; overflow-y: auto; border: 1px solid var(--border-soft); border-radius: 10px; margin-bottom: 14px; }\n  table { border-collapse: collapse; width: 100%; font-size: 13px; }\n  th {\n    position: sticky; top: 0; background: var(--surface-2); text-align: left; padding: 8px 10px;\n    font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim);\n    border-bottom: 1px solid var(--border-soft);\n  }\n  td { padding: 7px 10px; border-bottom: 1px solid var(--border-soft); color: var(--text-dim); }\n  tr:last-child td { border-bottom: none; }\n  td.name { color: var(--text); }\n  .empty-note { color: var(--text-faint); font-size: 13px; margin: 0; }\n  pre#jsonView {\n    display: none; background: var(--sunken); border: 1px solid var(--border-soft); border-radius: 10px;\n    padding: 12px 14px; max-height: 360px; overflow: auto; font-size: 12px;\n    font-family: ui-monospace, \"Cascadia Code\", \"SF Mono\", Consolas, monospace; color: #b7c0d4;\n    margin: 0;\n  }\n</style>\n</head>\n<body>\n<div class=\"wrap\">\n<header class=\"page\">\n  <h1>Giveaway Collector</h1>\n  <p>Facebook follower collection and giveaway roulette prep.</p>\n</header>\n\n<div class=\"card\">\n  <h2>Facebook session</h2>\n  <div class=\"row\">\n    <span class=\"badge muted\" id=\"authBadge\"><span class=\"dot\"></span><span id=\"authBadgeText\">checking…</span></span>\n    <button class=\"btn btn-ghost\" onclick=\"refresh()\">Refresh status</button>\n    <a id=\"novnc\" href=\"__NOVNC_URL__\" target=\"_blank\" rel=\"noopener\">Open the VPS browser (noVNC) to log in manually →</a>\n  </div>\n  <p class=\"sub-msg\" id=\"authMsg\"></p>\n</div>\n\n<div class=\"card\">\n  <h2>Configuration</h2>\n  <label class=\"field\">\n    <span class=\"lbl\">Followers URL</span>\n    <input type=\"text\" id=\"followersUrl\" oninput=\"saveFieldsToStorage()\">\n  </label>\n  <label class=\"field\">\n    <span class=\"lbl\">Run label</span>\n    <input type=\"text\" id=\"runLabel\" oninput=\"saveFieldsToStorage()\">\n  </label>\n</div>\n\n<div class=\"card\">\n  <h2>Run</h2>\n  <div class=\"row\">\n    <button class=\"btn btn-primary\" id=\"runBtn\" onclick=\"runCollection()\">Run collection</button>\n    <button class=\"btn btn-danger-ghost\" id=\"stopBtn\" onclick=\"stopCollection()\" disabled>Stop</button>\n    <button class=\"btn btn-danger-ghost\" onclick=\"clearPending()\">Clear last result</button>\n  </div>\n  <p id=\"msg\" class=\"muted\"></p>\n</div>\n\n<div class=\"card\">\n  <h2>Live activity <span class=\"hint\" id=\"logRunLabel\"></span></h2>\n  <div class=\"log-stats\" id=\"logStats\"></div>\n  <div id=\"log\"><p class=\"empty\">No run yet. Click Run collection to watch it work here.</p></div>\n</div>\n\n<div class=\"card\">\n  <h2>Results</h2>\n  <div id=\"summary\"><p class=\"empty-note\">No result yet. Run a collection first.</p></div>\n  <div id=\"preview\"></div>\n  <div class=\"row\" id=\"resultActions\" style=\"display:none;\">\n    <button class=\"btn btn-ghost\" onclick=\"downloadJson()\">Download JSON</button>\n    <button class=\"btn btn-ghost\" id=\"viewJsonBtn\" onclick=\"toggleJson()\">View raw JSON</button>\n  </div>\n  <pre id=\"jsonView\"></pre>\n</div>\n\n</div>\n<script>\nvar API = '__API_BASE__';\nvar currentRunId = null;\nvar renderedLogCount = 0;\nvar loggedRunId = null;\nvar pollTimer = null;\nvar jsonVisible = false;\nvar jsonCache = null;\n// This page's own load already went through HTTP Basic Auth (the browser's\n// native login popup), but browsers do not reliably reuse those cached\n// credentials for background fetch() calls to sibling API paths (confirmed:\n// a live 401 on /api/state even with the same realm as the page). So this\n// page asks once for the same credentials and attaches them explicitly to\n// every API call instead of depending on browser-specific reuse behavior.\nvar AUTH = null;\nfunction ensureAuth() {\n  if (AUTH) return AUTH;\n  var u = prompt('Panel username (same login used to open this page):');\n  var p = prompt('Panel password:');\n  AUTH = 'Basic ' + btoa((u || '') + ':' + (p || ''));\n  return AUTH;\n}\nfunction authHeaders(extra) {\n  return Object.assign({ Authorization: ensureAuth() }, extra || {});\n}\nfunction handleAuthFailure() {\n  AUTH = null;\n  say('Authentication failed — check the username/password and try again (it will re-prompt on the next action).', 'err');\n}\nfunction say(t, kind) {\n  var el = document.getElementById('msg');\n  el.textContent = t;\n  el.className = kind || 'muted';\n}\nfunction esc(s) {\n  return String(s == null ? '' : s).replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;').replace(/>/g, '&gt;');\n}\nfunction setBadge(state, text) {\n  var b = document.getElementById('authBadge');\n  b.className = 'badge ' + state;\n  document.getElementById('authBadgeText').textContent = text;\n}\nfunction fmtTime(ms) {\n  var d = new Date(ms);\n  function pad(n) { return (n < 10 ? '0' : '') + n; }\n  return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());\n}\n\n// Followers URL / run label are remembered per-browser via localStorage —\n// the server has no durable record of what was typed (only of completed\n// run results), and re-populating these fields from a hardcoded server\n// default on every refresh() previously clobbered whatever the operator had\n// typed, including right after their own run finished. localStorage can be\n// unavailable (private browsing, blocked site data) or throw, so every\n// access is wrapped and the page still works with plain in-memory fields.\nvar LS_URL_KEY = 'giveawayPanel.followersUrl';\nvar LS_LABEL_KEY = 'giveawayPanel.runLabel';\nfunction lsGet(key) {\n  try { return window.localStorage.getItem(key); } catch (e) { return null; }\n}\nfunction lsSet(key, val) {\n  try { window.localStorage.setItem(key, val); } catch (e) { /* ignore — not critical */ }\n}\nfunction saveFieldsToStorage() {\n  lsSet(LS_URL_KEY, document.getElementById('followersUrl').value);\n  lsSet(LS_LABEL_KEY, document.getElementById('runLabel').value);\n}\nvar fieldsInitialized = false;\nfunction initFieldsOnce(serverDefaults) {\n  if (fieldsInitialized) return;\n  fieldsInitialized = true;\n  var savedUrl = lsGet(LS_URL_KEY);\n  var savedLabel = lsGet(LS_LABEL_KEY);\n  var urlEl = document.getElementById('followersUrl');\n  var labelEl = document.getElementById('runLabel');\n  urlEl.value = savedUrl || (serverDefaults && serverDefaults.followersUrl) || '';\n  labelEl.value = savedLabel || (serverDefaults && serverDefaults.runLabel) || '';\n}\n\nfunction refresh() {\n  setBadge('muted', 'checking…');\n  fetch(API + '/state', { headers: authHeaders() }).then(function (r) {\n    if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n    if (!r.ok) { throw new Error('HTTP ' + r.status); }\n    return r.json();\n  }).then(function (s) {\n    setBadge(s.authenticated ? 'ok' : 'bad', s.authenticated ? 'Logged in' : 'Login required');\n    document.getElementById('authMsg').textContent =\n      (s.authMessage || '') + (s.facebookReachable === false ? ' (Facebook unreachable)' : '');\n    initFieldsOnce(s.config);\n    if (s.pending) {\n      currentRunId = s.pending.runId;\n      loadResults(currentRunId);\n    } else {\n      currentRunId = null;\n    }\n  }).catch(function (e) { if (e.message !== 'unauthorized') setBadge('bad', 'Error'); });\n}\n\nfunction setRunningUi(running) {\n  document.getElementById('runBtn').disabled = running;\n  document.getElementById('stopBtn').disabled = !running;\n}\n\nvar lastRunStartedAt = 0;\n\nfunction runCollection() {\n  say('Starting collection…', 'muted');\n  saveFieldsToStorage();\n  lastRunStartedAt = Date.now();\n  setRunningUi(true);\n  resetLog();\n  fetch(API + '/dry-run', {\n    method: 'POST', headers: authHeaders({ 'Content-Type': 'application/json' }),\n    body: JSON.stringify({\n      followersUrl: document.getElementById('followersUrl').value,\n      runLabel: document.getElementById('runLabel').value\n    })\n  }).then(function (r) {\n    if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n    if (!r.ok) { throw new Error('HTTP ' + r.status); }\n    say('Collection started — watch it work below.', 'ok');\n    startPolling();\n  }).catch(function (e) {\n    if (e.message !== 'unauthorized') say('Run error: ' + e, 'err');\n    setRunningUi(false);\n  });\n}\n\n// /dry-run responds as soon as n8n accepts the webhook, before the\n// followers-url payload has actually reached server.js's /collect (it still\n// has to traverse Dry Config -> Build Dry Input -> Execute Collector ->\n// Giveaway Config -> the HTTP node). If the operator hits Stop inside that\n// short window, server.js sees collectBusy === false and reports \"nothing\n// to stop\" even though a run is about to start — auto-retry for a few\n// seconds after Run was clicked instead of taking that at face value.\nvar STOP_RACE_GRACE_MS = 20000;\nvar STOP_RETRY_DELAY_MS = 1500;\nvar STOP_MAX_RETRIES = 8;\nfunction stopCollection(attempt) {\n  attempt = attempt || 0;\n  document.getElementById('stopBtn').disabled = true;\n  say('Stopping…', 'muted');\n  fetch(API + '/stop', { method: 'POST', headers: authHeaders() }).then(function (r) {\n    if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n    if (!r.ok) { throw new Error('HTTP ' + r.status); }\n    return r.json();\n  }).then(function (j) {\n    if (j.ok) {\n      say('Stop requested — the run will end after its current scroll cycle.', 'muted');\n      return;\n    }\n    if (typeof j.ok === 'undefined') {\n      say('Could not reach the collector to stop it' + (j.error ? (': ' + j.error) : '') + '. Try again.', 'err');\n      document.getElementById('stopBtn').disabled = false;\n      return;\n    }\n    var withinGraceWindow = (Date.now() - lastRunStartedAt) < STOP_RACE_GRACE_MS;\n    if (withinGraceWindow && attempt < STOP_MAX_RETRIES) {\n      say('Waiting for the run to register before stopping…', 'muted');\n      setTimeout(function () { stopCollection(attempt + 1); }, STOP_RETRY_DELAY_MS);\n      return;\n    }\n    say(j.error || 'Nothing to stop.', 'muted');\n    document.getElementById('stopBtn').disabled = false;\n  }).catch(function (e) {\n    if (e.message !== 'unauthorized') say('Stop error: ' + e, 'err');\n    document.getElementById('stopBtn').disabled = false;\n  });\n}\n\nfunction resetLog() {\n  renderedLogCount = 0;\n  loggedRunId = null;\n  document.getElementById('log').innerHTML = '';\n  document.getElementById('logStats').textContent = '';\n  document.getElementById('logRunLabel').textContent = '';\n}\n\nfunction startPolling() {\n  if (pollTimer) return;\n  pollProgress();\n  pollTimer = setInterval(pollProgress, 1500);\n}\n\nfunction stopPolling() {\n  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }\n}\n\nfunction pollProgress() {\n  fetch(API + '/progress', { headers: authHeaders() }).then(function (r) {\n    if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n    if (!r.ok) { throw new Error('HTTP ' + r.status); }\n    return r.json();\n  }).then(function (p) { renderProgress(p); }).catch(function (e) {\n    if (e.message !== 'unauthorized') { /* transient — next poll will retry */ }\n  });\n}\n\nfunction renderProgress(p) {\n  var logEl = document.getElementById('log');\n  if (p.runId && p.runId !== loggedRunId) {\n    loggedRunId = p.runId;\n    renderedLogCount = 0;\n    logEl.innerHTML = '';\n  }\n  document.getElementById('logRunLabel').textContent = p.runId ? ('· ' + p.runId) : '';\n  var log = p.log || [];\n  if (log.length && renderedLogCount === 0 && logEl.querySelector('.empty')) {\n    logEl.innerHTML = '';\n  }\n  var wasNearBottom = (logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight) < 40;\n  for (var i = renderedLogCount; i < log.length; i++) {\n    var e = log[i];\n    var row = document.createElement('div');\n    row.className = 'line';\n    row.innerHTML = '<span class=\"t\">' + fmtTime(e.at) + '</span>' +\n      '<span class=\"p p-' + esc(e.phase || '') + '\">' + esc(e.phase || '') + '</span>' +\n      '<span class=\"m\">' + esc(e.message || '') + '</span>';\n    logEl.appendChild(row);\n  }\n  renderedLogCount = log.length;\n  if (wasNearBottom) logEl.scrollTop = logEl.scrollHeight;\n\n  var stats = document.getElementById('logStats');\n  if (p.phase && p.phase !== 'idle') {\n    stats.innerHTML =\n      'Scrolls: <b>' + (p.scrollAttempts || 0) + '</b> · ' +\n      'Encountered: <b>' + (p.totalEncountered || 0) + '</b> · ' +\n      'Unique: <b>' + (p.uniqueFollowers || 0) + '</b>';\n  }\n\n  if (p.active === false && pollTimer) {\n    stopPolling();\n    setRunningUi(false);\n    if (p.phase === 'error') {\n      say('Collection stopped: ' + (p.error || 'unknown error') + '. See log above.', 'err');\n    } else if (p.stopReason === 'canceled') {\n      say('Collection stopped by operator. Loading results…', 'ok');\n    } else if (p.phase === 'done') {\n      say('Collection finished. Loading results…', 'ok');\n    }\n    refresh();\n  }\n}\n\nfunction loadResults(runId) {\n  fetch(API + '/results?runId=' + encodeURIComponent(runId), { headers: authHeaders() })\n    .then(function (r) {\n      if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n      if (!r.ok) { throw new Error('HTTP ' + r.status); }\n      return r.json();\n    }).then(function (j) {\n      if (!j.summary) {\n        document.getElementById('summary').innerHTML = '<p class=\"empty-note\">No summary yet.</p>';\n        document.getElementById('resultActions').style.display = 'none';\n        return;\n      }\n      var s = j.summary;\n      document.getElementById('summary').innerHTML =\n        '<div class=\"stat-grid\">' +\n        '<div class=\"stat\"><div class=\"lbl\">Encountered</div><div class=\"val\">' + s.totalEncountered + '</div></div>' +\n        '<div class=\"stat\"><div class=\"lbl\">Unique followers</div><div class=\"val\">' + s.uniqueFollowers + '</div></div>' +\n        '<div class=\"stat\"><div class=\"lbl\">Duplicates</div><div class=\"val\">' + s.duplicatesRemoved + '</div></div>' +\n        '<div class=\"stat\"><div class=\"lbl\">Invalid / missing</div><div class=\"val\">' + (s.invalidIds + s.missingNames) + '</div></div>' +\n        '<div class=\"stat\"><div class=\"lbl\">Roulette entries</div><div class=\"val ' + (s.finalRouletteCount > 0 ? 'ok' : 'bad') + '\">' + s.finalRouletteCount + '</div></div>' +\n        '<div class=\"stat\"><div class=\"lbl\">Stop reason</div><div class=\"val\" style=\"font-size:14px;\">' + esc(s.stopReason) + '</div></div>' +\n        '</div>';\n      var rows = j.preview || [];\n      var h = '<div class=\"table-wrap\"><table><tr><th>Name</th><th>Profile ID</th><th>URL</th></tr>';\n      rows.forEach(function (r) {\n        h += '<tr><td class=\"name\">' + esc(r.displayName) + '</td><td>' + esc(r.profileId) +\n          '</td><td>' + esc(r.profileUrl) + '</td></tr>';\n      });\n      h += '</table></div><p class=\"empty-note\">Showing ' + rows.length + ' of ' + j.previewTotal + ' roulette entries — download the full JSON below for everything.</p>';\n      document.getElementById('preview').innerHTML = h;\n      document.getElementById('resultActions').style.display = 'flex';\n      jsonCache = null;\n      jsonVisible = false;\n      document.getElementById('jsonView').style.display = 'none';\n      document.getElementById('viewJsonBtn').textContent = 'View raw JSON';\n    }).catch(function (e) { if (e.message !== 'unauthorized') say('Results error: ' + e, 'err'); });\n}\n\nfunction fetchFullResults() {\n  if (!currentRunId) return Promise.reject(new Error('no run selected'));\n  if (jsonCache) return Promise.resolve(jsonCache);\n  return fetch(API + '/results?runId=' + encodeURIComponent(currentRunId) + '&full=1', { headers: authHeaders() })\n    .then(function (r) {\n      if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n      if (!r.ok) { throw new Error('HTTP ' + r.status); }\n      return r.json();\n    }).then(function (j) { jsonCache = j; return j; });\n}\n\nfunction downloadJson() {\n  fetchFullResults().then(function (j) {\n    var blob = new Blob([JSON.stringify(j, null, 2)], { type: 'application/json' });\n    var url = URL.createObjectURL(blob);\n    var a = document.createElement('a');\n    a.href = url;\n    a.download = 'giveaway-' + (j.runId || 'results') + '.json';\n    document.body.appendChild(a);\n    a.click();\n    a.remove();\n    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);\n  }).catch(function (e) { if (e.message !== 'unauthorized') say('Download error: ' + e, 'err'); });\n}\n\nfunction toggleJson() {\n  var pre = document.getElementById('jsonView');\n  var btn = document.getElementById('viewJsonBtn');\n  if (jsonVisible) {\n    pre.style.display = 'none';\n    jsonVisible = false;\n    btn.textContent = 'View raw JSON';\n    return;\n  }\n  fetchFullResults().then(function (j) {\n    pre.textContent = JSON.stringify(j, null, 2);\n    pre.style.display = 'block';\n    jsonVisible = true;\n    btn.textContent = 'Hide raw JSON';\n  }).catch(function (e) { if (e.message !== 'unauthorized') say('View error: ' + e, 'err'); });\n}\n\nfunction clearPending() {\n  if (!currentRunId) { say('Nothing to clear.', 'muted'); return; }\n  fetch(API + '/clear', {\n    method: 'POST', headers: authHeaders({ 'Content-Type': 'application/json' }),\n    body: JSON.stringify({ runId: currentRunId })\n  }).then(function (r) {\n    if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n    if (!r.ok) { throw new Error('HTTP ' + r.status); }\n    return r.json();\n  }).then(function () {\n    say('Result discarded.', 'muted');\n    document.getElementById('summary').innerHTML = '<p class=\"empty-note\">No result yet. Run a collection first.</p>';\n    document.getElementById('preview').innerHTML = '';\n    document.getElementById('resultActions').style.display = 'none';\n    refresh();\n  }).catch(function (e) { if (e.message !== 'unauthorized') say('Clear error: ' + e, 'err'); });\n}\n\nfunction initProgress() {\n  fetch(API + '/progress', { headers: authHeaders() }).then(function (r) {\n    if (r.status === 401) { handleAuthFailure(); throw new Error('unauthorized'); }\n    if (!r.ok) { throw new Error('HTTP ' + r.status); }\n    return r.json();\n  }).then(function (p) {\n    renderProgress(p);\n    if (p.active === true) {\n      setRunningUi(true);\n      startPolling();\n    }\n  }).catch(function (e) {});\n}\n\nrefresh();\ninitProgress();\n</script>\n</body>\n</html>`;\nhtml = html.split('__NOVNC_URL__').join(cfg.novncUrl).split('__API_BASE__').join(cfg.apiBase);\nreturn [{ json: { html: html } }];\n"
+         },
+         "position" : [
+            448,
+            0
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c507",
+         "name" : "Respond HTML",
+         "parameters" : {
+            "options" : {
+               "responseHeaders" : {
+                  "entries" : [
+                     {
+                        "name" : "Content-Type",
+                        "value" : "text/html"
+                     }
+                  ]
+               }
+            },
+            "respondWith" : "text",
+            "responseBody" : "={{ $json.html }}"
+         },
+         "position" : [
+            672,
+            0
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c508",
+         "name" : "Check Browser Status",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "options" : {
+               "timeout" : 15000
+            },
+            "url" : "={{ $('State Config').item.json.collectorStatusUrl }}"
+         },
+         "position" : [
+            448,
+            224
+         ],
+         "type" : "n8n-nodes-base.httpRequest",
+         "typeVersion" : 4.5
+      },
+      {
+         "alwaysOutputData" : true,
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c509",
+         "name" : "Latest Pending",
+         "parameters" : {
+            "dataTableId" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "giveaway_runs"
+            },
+            "filters" : {
+               "conditions" : [
+                  {
+                     "keyName" : "status",
+                     "keyValue" : "complete"
+                  }
+               ]
+            },
+            "limit" : 1,
+            "matchType" : "allConditions",
+            "operation" : "get",
+            "orderBy" : true
+         },
+         "position" : [
+            672,
+            224
+         ],
+         "type" : "n8n-nodes-base.dataTable",
+         "typeVersion" : 1.1
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c510",
+         "name" : "Build State",
+         "parameters" : {
+            "jsCode" : "const st = $('Check Browser Status').first().json;\nconst cfg = $('State Config').first().json;\nconst rows = $input.all();\nconst p = rows.length && rows[0].json && rows[0].json.runId ? rows[0].json : null;\nconst authed = st.authenticated === true;\nreturn [{ json: { authenticated: authed, authMessage: st.message || (st.error ? 'collector error' : 'collector unreachable'), facebookReachable: st.facebookReachable !== false, pending: p ? { runId: p.runId, runLabel: p.runLabel, status: p.status } : null, config: { followersUrl: cfg.followersUrl, runLabel: cfg.runLabel }, novncUrl: cfg.novncUrl } }];"
+         },
+         "position" : [
+            896,
+            224
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c511",
+         "name" : "Respond State",
+         "parameters" : {
+            "options" : {}
+         },
+         "position" : [
+            1120,
+            224
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c512",
+         "name" : "Build Dry Input",
+         "parameters" : {
+            "jsCode" : "const cfg = $('Dry Config').first().json;\nconst stamp = Date.now();\nreturn [{ json: { runId: 'gui-' + stamp, followersUrl: cfg.followersUrl, runLabel: cfg.runLabel || ('giveaway-' + stamp) } }];"
+         },
+         "position" : [
+            448,
+            448
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c513",
+         "name" : "State Config",
+         "parameters" : {
+            "jsCode" : "// collectorStatusUrl uses ?fresh=1 so the panel's status check always gets a\n// live Facebook check, never the cache the Docker healthcheck relies on.\nreturn [{ json: { novncUrl: 'https://fb-browser.jpfernandez.online/vnc.html', apiBase: '/webhook/giveaway/api', collectorStatusUrl: 'http://browser:5679/status?fresh=1', followersUrl: 'https://www.facebook.com/<your-page>/followers/', runLabel: 'giveaway' } }];"
+         },
+         "position" : [
+            224,
+            224
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c514",
+         "name" : "Dry Config",
+         "parameters" : {
+            "jsCode" : "const body = ($input.first().json || {}).body || {};\nreturn [{ json: { followersUrl: body.followersUrl || 'https://www.facebook.com/<your-page>/followers/', runLabel: body.runLabel || 'giveaway' } }];"
+         },
+         "position" : [
+            224,
+            448
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c515",
+         "name" : "Execute Collector",
+         "parameters" : {
+            "options" : {},
+            "workflowId" : {
+               "__rl" : true,
+               "mode" : "id",
+               "value" : "IYAP2evHsmMccCQA"
+            }
+         },
+         "position" : [
+            672,
+            448
+         ],
+         "type" : "n8n-nodes-base.executeWorkflow",
+         "typeVersion" : 1.3
+      },
+      {
+         "alwaysOutputData" : true,
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c516",
+         "name" : "Read Pending By RunId",
+         "parameters" : {
+            "dataTableId" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "giveaway_runs"
+            },
+            "filters" : {
+               "conditions" : [
+                  {
+                     "keyName" : "runId",
+                     "keyValue" : "={{ $('GET Results').item.json.query.runId }}"
+                  }
+               ]
+            },
+            "matchType" : "allConditions",
+            "operation" : "get",
+            "returnAll" : true
+         },
+         "position" : [
+            224,
+            672
+         ],
+         "type" : "n8n-nodes-base.dataTable",
+         "typeVersion" : 1.1
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c517",
+         "name" : "Build Results",
+         "parameters" : {
+            "jsCode" : "const rows = $input.all();\nconst req = $('GET Results').first().json;\nconst want = ((req || {}).query || {}).runId || '';\nconst full = ((req || {}).query || {}).full === '1';\nif (!rows.length || !rows[0].json || !rows[0].json.runId) {\n  return [{ json: { error: 'unknown runId', runId: want } }];\n}\nconst r = rows[0].json;\nlet summary = {};\ntry { summary = JSON.parse(r.summaryJson || '{}'); } catch (e) { summary = {}; }\nlet roulette = [];\ntry { roulette = JSON.parse(r.rouletteRowsJson || '[]'); } catch (e) { roulette = []; }\nconst preview = roulette.slice(0, 200).map(function (x) { return { displayName: x.displayName, profileId: x.profileId, profileUrl: x.profileUrl }; });\nconst out = { runId: r.runId, status: r.status, summary: summary, preview: preview, previewTotal: roulette.length };\nif (full) {\n  let raw = [];\n  try { raw = JSON.parse(r.rawRowsJson || '[]'); } catch (e) { raw = []; }\n  out.roulette = roulette;\n  out.raw = raw;\n}\nreturn [{ json: out }];\n"
+         },
+         "position" : [
+            448,
+            672
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c518",
+         "name" : "Respond Results",
+         "parameters" : {
+            "options" : {}
+         },
+         "position" : [
+            672,
+            672
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c539",
+         "name" : "Mark Discarded",
+         "parameters" : {
+            "columns" : {
+               "mappingMode" : "defineBelow",
+               "schema" : [
+                  {
+                     "canBeUsedToMatch" : true,
+                     "defaultMatch" : false,
+                     "display" : true,
+                     "displayName" : "status",
+                     "id" : "status",
+                     "required" : false,
+                     "type" : "string"
+                  }
+               ],
+               "value" : {
+                  "status" : "discarded"
+               }
+            },
+            "dataTableId" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "giveaway_runs"
+            },
+            "filters" : {
+               "conditions" : [
+                  {
+                     "keyName" : "runId",
+                     "keyValue" : "={{ $('POST Clear').item.json.body.runId }}"
+                  }
+               ]
+            },
+            "matchType" : "allConditions",
+            "operation" : "update",
+            "options" : {}
+         },
+         "position" : [
+            896,
+            1408
+         ],
+         "type" : "n8n-nodes-base.dataTable",
+         "typeVersion" : 1.1
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c540",
+         "name" : "Respond Cleared",
+         "parameters" : {
+            "options" : {}
+         },
+         "position" : [
+            1120,
+            1408
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      },
+      {
+         "alwaysOutputData" : true,
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c541",
+         "name" : "Read Clear Pending",
+         "parameters" : {
+            "dataTableId" : {
+               "__rl" : true,
+               "mode" : "name",
+               "value" : "giveaway_runs"
+            },
+            "filters" : {
+               "conditions" : [
+                  {
+                     "keyName" : "runId",
+                     "keyValue" : "={{ $('POST Clear').item.json.body.runId }}"
+                  }
+               ]
+            },
+            "matchType" : "allConditions",
+            "operation" : "get",
+            "returnAll" : true
+         },
+         "position" : [
+            224,
+            1504
+         ],
+         "type" : "n8n-nodes-base.dataTable",
+         "typeVersion" : 1.1
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c542",
+         "name" : "Require Existing",
+         "parameters" : {
+            "jsCode" : "const rows = $input.all();\nconst body = ($('POST Clear').first().json || {}).body || {};\nconst want = body.runId || '';\nconst r = rows.length && rows[0].json && rows[0].json.runId ? rows[0].json : null;\nif (!r) return [{ json: { ok: false, reason: 'unknown runId', runId: want } }];\nreturn [{ json: { ok: true, runId: r.runId, status: r.status } }];"
+         },
+         "position" : [
+            448,
+            1504
+         ],
+         "type" : "n8n-nodes-base.code",
+         "typeVersion" : 2
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c543",
+         "name" : "Clearable?",
+         "parameters" : {
+            "conditions" : {
+               "combinator" : "and",
+               "conditions" : [
+                  {
+                     "leftValue" : "={{ $json.ok }}",
+                     "operator" : {
+                        "operation" : "true",
+                        "type" : "boolean"
+                     }
+                  }
+               ],
+               "options" : {
+                  "caseSensitive" : true,
+                  "leftValue" : "",
+                  "typeValidation" : "strict",
+                  "version" : 1
+               }
+            },
+            "options" : {}
+         },
+         "position" : [
+            672,
+            1504
+         ],
+         "type" : "n8n-nodes-base.if",
+         "typeVersion" : 2.3
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c544",
+         "name" : "Respond Clear Refused",
+         "parameters" : {
+            "options" : {}
+         },
+         "position" : [
+            896,
+            1600
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      },
+      {
+         "id" : "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c545",
+         "name" : "Activation Warning",
+         "parameters" : {
+            "color" : 5,
+            "content" : "## BLOCKING activation order: attach the GUI basic-auth credential to all 7 webhook routes FIRST, set the real noVNC URL in GUI/State configs, then activate. Webhook routes bypass Cloudflare Access by design — n8n auth must be live before this serves traffic. Collector workflow stays inactive.",
+            "height" : 260,
+            "width" : 432
+         },
+         "position" : [
+            -736,
+            480
+         ],
+         "type" : "n8n-nodes-base.stickyNote",
+         "typeVersion" : 1
+      },
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "196943cc-4a35-43d8-9937-7137d77025e1",
+         "name" : "GET Progress",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "options" : {},
+            "path" : "giveaway/api/progress",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            896
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "740af066-b5fe-4cd8-b9f3-feb5eaa7eb18"
+      },
+      {
+         "id" : "b067b93f-6700-4491-9d7b-cb087bdacb4a",
+         "name" : "Check Progress",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "options" : {
+               "timeout" : 10000
+            },
+            "url" : "http://browser:5679/progress"
+         },
+         "position" : [
+            224,
+            896
+         ],
+         "type" : "n8n-nodes-base.httpRequest",
+         "typeVersion" : 4.5
+      },
+      {
+         "id" : "007d204a-aad0-47a9-95e5-9151d8c81bdd",
+         "name" : "Respond Progress",
+         "parameters" : {
+            "options" : {}
+         },
+         "position" : [
+            448,
+            896
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      },
+      {
+         "credentials" : {
+            "httpBasicAuth" : {
+               "id" : "bN5XXSQcG7mZ53Cw",
+               "name" : "Get Followers Workflow"
+            }
+         },
+         "id" : "f89ca9a4-74cf-4e1f-9d2d-b2c56e55bddb",
+         "name" : "POST Stop",
+         "parameters" : {
+            "authentication" : "basicAuth",
+            "httpMethod" : "POST",
+            "options" : {},
+            "path" : "giveaway/api/stop",
+            "responseMode" : "responseNode"
+         },
+         "position" : [
+            0,
+            1120
+         ],
+         "type" : "n8n-nodes-base.webhook",
+         "typeVersion" : 2.1,
+         "webhookId" : "6a13ff25-7a9d-4777-996d-3e251d380f87"
+      },
+      {
+         "id" : "0be7b421-9b02-4ddb-b6c6-be59bc9ea810",
+         "name" : "Stop Collector",
+         "onError" : "continueRegularOutput",
+         "parameters" : {
+            "method" : "POST",
+            "options" : {
+               "timeout" : 10000
+            },
+            "url" : "http://browser:5679/cancel"
+         },
+         "position" : [
+            224,
+            1120
+         ],
+         "type" : "n8n-nodes-base.httpRequest",
+         "typeVersion" : 4.5
+      },
+      {
+         "id" : "d822a8c4-e023-4b61-a708-6051066cc5d4",
+         "name" : "Respond Stop",
+         "parameters" : {
+            "options" : {}
+         },
+         "position" : [
+            448,
+            1120
+         ],
+         "type" : "n8n-nodes-base.respondToWebhook",
+         "typeVersion" : 1.5
+      }
+   ],
+   "pinData" : {},
+   "settings" : {
+      "availableInMCP" : true,
+      "binaryMode" : "separate",
+      "executionOrder" : "v1",
+      "saveManualExecutions" : true
+   },
+   "shared" : [
+      {
+         "createdAt" : "2026-09-11T04:46:03.205Z",
+         "project" : {
+            "createdAt" : "2026-09-04T13:35:13.257Z",
+            "creatorId" : "c6c00e8c-4384-4f3d-861f-551837b75b28",
+            "customTelemetryTags" : [],
+            "description" : null,
+            "icon" : null,
+            "id" : "pVuCX4dYTMtf8ahU",
+            "name" : "John Paul Fernandez <jpfernandez0721@gmail.com>",
+            "type" : "personal",
+            "updatedAt" : "2026-09-04T13:42:27.719Z"
+         },
+         "projectId" : "pVuCX4dYTMtf8ahU",
+         "role" : "workflow:owner",
+         "updatedAt" : "2026-09-11T04:46:03.205Z",
+         "workflowId" : "46RugKER0tM14fnu"
+      }
+   ],
+   "sourceWorkflowId" : null,
+   "staticData" : null,
+   "tags" : [],
+   "triggerCount" : 7,
+   "updatedAt" : "2026-09-11T13:53:55.628Z",
+   "versionCounter" : 82,
+   "versionId" : "949aba87-d0f0-46a1-83fc-ee7739bc1889",
+   "versionMetadata" : {
+      "description" : "Independent review found that POST /dry-run's fire-and-forget response means a Stop click right after Run can race ahead of the collector actually starting, so server.js reports \"nothing to stop\" while the run proceeds unaffected. Fixed by auto-retrying the stop request for up to 20s after Run is clicked, and by distinguishing a genuinely-unreachable collector (undefined ok) from an explicit \"not running\" (ok: false).",
+      "name" : "Fix Stop-button race window"
+   }
+}
