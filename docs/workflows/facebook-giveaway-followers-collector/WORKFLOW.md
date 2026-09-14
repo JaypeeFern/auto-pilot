@@ -110,8 +110,9 @@ or forwards Facebook credentials.
 Production uses `http://browser:5679` on the private Compose network. The
 collector API is not publicly routed. The browser keeps the known-safe
 `1366x900` viewport default and the Compose browser service retains its
-`640 MB` memory ceiling. Do not raise either limit without a separately
-verified memory result.
+`768 MB` memory ceiling, raised from `640 MB` after observed Chromium renderer
+crashes during long collections. Do not raise either limit further without a
+separately verified memory result.
 
 Only Facebook/fb.com profile URLs that pass the collector's strict boundary
 checks are accepted. The configured followers URL is also restricted to

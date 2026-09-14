@@ -42,11 +42,10 @@ const CHROME_PATH = process.env.CHROME_PATH || undefined;
 // changes) — a headed Chromium window cannot render larger than the X11
 // display behind it. A larger viewport surfaces more follower rows per
 // scroll, which would mean fewer scroll cycles overall — but 1920x1080
-// OOM-crashed Chromium inside the browser container's 640m
+// OOM-crashed Chromium inside the browser container's former 640m
 // mem_limit mid-collection (Chrome "Aw, Snap!" error code 9, observed in
-// production), so the default is back to the known-safe 1366x900 until
-// either mem_limit is raised or a smaller bump is verified against actual
-// container memory headroom. clampInt (defined below; hoisted) guards
+// production), so the default remains the known-safe 1366x900 even with the
+// staged 768m browser ceiling. clampInt (defined below; hoisted) guards
 // against non-numeric/zero/negative overrides producing invalid Chromium
 // launch args.
 const VIEWPORT_WIDTH = clampInt(process.env.COLLECTOR_VIEWPORT_WIDTH, 1366, 320, 3840);

@@ -28,7 +28,7 @@ AutoPilot / n8n    (single container, SQLite, 768 MB ceiling)
    ├── Data Tables       (live state in SQLite: giveaway pending results)
    └── SQLite            /home/node/.n8n/database.sqlite
 
-AutoPilot / browser  (collector service, 640 MB ceiling, Chromium profile)
+AutoPilot / browser  (collector service, 768 MB ceiling, Chromium profile)
    ├── Collector API     http://browser:5679 (container network only, n8n only)
    ├── noVNC web         container :6080 (Coolify domain + Cloudflare Access
    │                     + VNC password — never public bare)
@@ -78,7 +78,7 @@ changes:
   restores.
 - The current n8n memory baseline is 768 MB.
 - The `browser` giveaway service (custom `auto-pilot-browser` image: headed
-  Chromium under Xvfb + noVNC + the collector API, 640 MB ceiling, persistent
+  Chromium under Xvfb + noVNC + the collector API, 768 MB ceiling, persistent
   `browser_profile` volume) runs the Facebook session on the VPS. Its noVNC
   route is protected by Cloudflare Access plus a VNC password; its collector
   API is reachable only over the internal container network. The noVNC domain,
@@ -120,7 +120,7 @@ volume backup (same `N8N_ENCRYPTION_KEY` required to decrypt after restore).
 | Ports | None published; `expose: 5678` for the Coolify proxy (host port mapping would bypass the proxy) |
 | Health | n8n: custom `healthcheck` against `GET /healthz` via node (official image ships no `HEALTHCHECK`; `/healthz` = reachable, `/healthz/readiness` = DB-ready; uses `127.0.0.1` + `${N8N_PORT}`). Exporter: checks baked scripts executable, git runnable, and `/exports/export-workflows.sh` delivered |
 | Export sidecar | `exporter` service, thin wrapper (`Dockerfile.exporter`) around pinned `alpine/git:2.54.0` (git + sh only, 64 MB cap) with the sync scripts baked into `/usr/local/bin`, idle `sleep infinity` for tasks to exec into; owns checkout + push, never touches `n8n_data` |
-| Browser-collector | `browser` service, custom image (`scripts/fb-followers-collector/Dockerfile.browser`, `node:22-bookworm-slim` + Chromium/Xvfb/x11vnc/noVNC, tagged `auto-pilot-browser:1.0.0`); `mem_limit: 640m`, no CPU limit; profile in `browser_profile:/profile`; `expose: 5679/5900/6080`, no published ports; healthcheck against the collector API |
+| Browser-collector | `browser` service, custom image (`scripts/fb-followers-collector/Dockerfile.browser`, `node:22-bookworm-slim` + Chromium/Xvfb/x11vnc/noVNC, tagged `auto-pilot-browser:1.0.0`); `mem_limit: 768m`, no CPU limit; profile in `browser_profile:/profile`; `expose: 5679/5900/6080`, no published ports; healthcheck against the collector API |
 | Staging | `export_staging` volume at `/exports` in both containers (transient, excluded from R2 backups); `repo_data` volume holds the exporter's replaceable clone |
 | Proxy config | `N8N_PROTOCOL=https`, `N8N_HOST` + `N8N_EDITOR_BASE_URL` + `N8N_WEBHOOK_URL` = public URL, `N8N_PROXY_HOPS=1` |
 | Pruning | `EXECUTIONS_DATA_PRUNE=true`, `MAX_AGE=168` (~7 d), `PRUNE_MAX_COUNT=10000`, manual/progress saves off (see `docs/BACKUP.md` for the success/failure limitation) |
@@ -140,7 +140,7 @@ volume backup (same `N8N_ENCRYPTION_KEY` required to decrypt after restore).
 
 The VPS has ~2 GB RAM / ~25 GB free disk with other apps running. n8n gets 768 MB
 max (verified floor for 2.37.x — 512 MB OOMs at boot). The browser service
-gets 640 MB max (headed Chromium budget). Combined steady state is ~1.5 GB
+gets 768 MB max (headed Chromium budget). Combined steady state is ~1.6 GB
 with the exporter: if the host OOMs, stop the browser container while no
 giveaway is running rather than shrinking n8n below its floor.
 Execution pruning + `DB_SQLITE_VACUUM_ON_STARTUP=true` keep disk bounded.

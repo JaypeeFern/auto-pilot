@@ -11,10 +11,9 @@ set -eu
 # Keep in sync with server.js's COLLECTOR_VIEWPORT_WIDTH/HEIGHT defaults —
 # Chromium's page.setViewport() cannot exceed this X11 display size.
 # NOTE: 1920x1080 was tried and reverted — it OOM-crashed Chromium inside
-# the browser container's 640m mem_limit mid-collection (Chrome "Aw, Snap!"
-# error code 9, observed in production). Raising this again needs either a
-# larger mem_limit in docker-compose.yml (browser service) or a smaller
-# resolution bump, verified against actual container memory headroom first.
+# the browser container's former 640m mem_limit mid-collection (Chrome "Aw, Snap!"
+# error code 9, observed in production). Raising this again needs a separately
+# verified memory result and a larger mem_limit in docker-compose.yml.
 : "${SCREEN:=1366x900x24}"
 : "${VNC_PORT:=5900}"
 : "${NOVNC_PORT:=6080}"

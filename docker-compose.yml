@@ -106,8 +106,8 @@ services:
   # Chromium and Code nodes have no network access, so this cannot live in
   # n8n — see Dockerfile.browser and docs/ARCHITECTURE.md. No host ports are
   # published; Coolify routes the noVNC domain to :6080, nothing else.
-  # Resource math (VPS ~2 GB shared): 768 (n8n) + 640 (browser) + 64
-  # (exporter) ≈ 1.5 GB. If the host OOMs, stop this service while no
+  # Resource math (VPS ~2 GB shared): 768 (n8n) + 768 (browser) + 64
+  # (exporter) ≈ 1.6 GB. If the host OOMs, stop this service while no
   # giveaway is running instead of shrinking n8n below its 768 MB floor.
   browser:
     build:
@@ -116,7 +116,7 @@ services:
     image: auto-pilot-browser:1.0.0
     container_name: auto-pilot-browser
     restart: unless-stopped
-    mem_limit: 640m
+    mem_limit: 768m
     mem_reservation: 256m
     stop_grace_period: 30s
     expose:
