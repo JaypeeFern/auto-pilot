@@ -524,7 +524,7 @@ async function installFollowerCapture(page) {
       const memory = performance.memory || {};
       const container = state.scrollContainer;
       const surface = state.surface;
-      return {
+      const result = {
         captures: captures,
         dropped: state.dropped,
         queueOverflow: state.queueOverflow,
@@ -547,6 +547,7 @@ async function installFollowerCapture(page) {
       };
       state.mutationRecordsSinceDrain = 0;
       state.mutationRecordOverflow = false;
+      return result;
     };
 
     state.scroll = function () {
