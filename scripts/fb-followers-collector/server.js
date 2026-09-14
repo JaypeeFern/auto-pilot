@@ -51,6 +51,11 @@ const CHROME_PATH = process.env.CHROME_PATH || undefined;
 // launch args.
 const VIEWPORT_WIDTH = clampInt(process.env.COLLECTOR_VIEWPORT_WIDTH, 1366, 320, 3840);
 const VIEWPORT_HEIGHT = clampInt(process.env.COLLECTOR_VIEWPORT_HEIGHT, 900, 240, 2160);
+const CAPTURE_QUEUE_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_QUEUE_LIMIT, 4096, 256, 20000);
+const CAPTURE_MUTATION_NODE_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_MUTATION_NODE_LIMIT, 512, 64, 4000);
+const CAPTURE_INITIAL_NODE_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_INITIAL_NODE_LIMIT, 10000, 1024, 50000);
+const CAPTURE_MUTATION_RECORD_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_MUTATION_RECORD_LIMIT, 2048, 128, 10000);
+const MAX_CANONICAL_PROFILES = clampInt(process.env.COLLECTOR_MAX_CANONICAL_PROFILES, 20000, 1000, 100000);
 
 // Network posture: loopback is the safe default for local runs. Inside the
 // browser container the API must bind the container network so n8n can reach
@@ -94,9 +99,14 @@ let progress = {
   updatedAt: null,
   scrollAttempts: 0,
   totalEncountered: 0,
+  anchorSightings: 0,
+  anchorRepeats: 0,
+  profileCapSkipped: 0,
+  nameUpgrades: 0,
   uniqueFollowers: 0,
   stopReason: null,
   error: null,
+  telemetry: null,
   log: [],
 };
 
@@ -109,18 +119,30 @@ function resetProgress(runId) {
     updatedAt: Date.now(),
     scrollAttempts: 0,
     totalEncountered: 0,
+    anchorSightings: 0,
+    anchorRepeats: 0,
+    profileCapSkipped: 0,
+    nameUpgrades: 0,
     uniqueFollowers: 0,
     stopReason: null,
     error: null,
+    telemetry: null,
     log: [],
   };
+}
+
+function safeText(value, maxLength) {
+  return String(value == null ? '' : value)
+    .replace(/https?:\/\/[^\s"'<>]+/gi, '[url]')
+    .slice(0, maxLength || 240);
 }
 
 function logProgress(phase, message, extra) {
   progress.phase = phase;
   progress.updatedAt = Date.now();
   if (extra) Object.assign(progress, extra);
-  progress.log.push({ at: Date.now(), phase: phase, message: message });
+  if (progress.error) progress.error = safeText(progress.error);
+  progress.log.push({ at: Date.now(), phase: phase, message: safeText(message) });
   if (progress.log.length > PROGRESS_LOG_MAX) {
     progress.log.splice(0, progress.log.length - PROGRESS_LOG_MAX);
   }
@@ -263,121 +285,347 @@ function isProfileHref(href) {
   return true;
 }
 
-// The follower list can finish loading its link hrefs before the name text
-// (and image alt text) next to each link has painted — extracting at that
-// moment yields real profile URLs with blank displayName for every entry,
-// which then never gets fixed later since re-sighting the same URL on a
-// later scroll is recorded as a plain duplicate, not a name upgrade.
-// Wait for at least one visible, text-bearing profile link before reading,
-// bounded so a genuinely empty/slow-to-load page still proceeds eventually.
-async function waitForNamedProfiles(page, timeoutMs) {
-  await page.waitForFunction(function () {
-    // Simplified, browser-context readiness heuristic (page.evaluate/
-    // waitForFunction predicates can't call back into Node functions, so
-    // this can't reuse isProfileHref directly) — without it, the wait is
-    // satisfied instantly by any already-text-bearing nav/chrome link
-    // (independent review finding), never actually waiting for a
-    // follower's name to paint. A URL-shape denylist/allowlist is a losing
-    // game here — Facebook has many nav routes (notifications, home,
-    // photos, bookmarks, ...) and protocol-relative "//host/..." hrefs slip
-    // past a naive same-origin check (independent review findings). Use a
-    // structural signal instead: an actual follower row always shows an
-    // avatar image next to the name, while nav/chrome icons are almost
-    // always inline SVG, not <img> — requiring one avoids needing to
-    // enumerate Facebook's routes at all. This is only a gate for *when*
-    // to read; the real, boundary-aware isProfileHref still does the
-    // authoritative filtering on the actual extracted data afterward.
-    function looksLikeProfile(a, href) {
-      const s = String(href || '');
-      if (!s || s.startsWith('//')) return false; // empty or protocol-relative external
-      if (/^https?:\/\//i.test(s)) {
-        const m = s.match(/^https?:\/\/([^/:?#]+)/i);
-        const h = m ? m[1].toLowerCase() : '';
-        if (h !== 'facebook.com' && !h.endsWith('.facebook.com') && h !== 'fb.com' && !h.endsWith('.fb.com')) return false;
-      } else if (!s.startsWith('/')) {
-        return false;
-      }
-      return !!a.querySelector('img');
+// Capture is installed once per collection. MutationObserver receives only
+// newly added/reused anchors and text/attribute changes inside the resolved
+// followers surface; the Node side drains a bounded queue after each scroll.
+// Blank-name sightings remain retryable until a later mutation provides text.
+async function installFollowerCapture(page) {
+  return page.evaluate(function (config) {
+    function isVisible(element) {
+      if (!element || !element.isConnected) return false;
+      if (element.closest('[hidden], [aria-hidden="true"]')) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
     }
-    const scope =
-      document.querySelector('[role="dialog"]') ||
-      document.querySelector('[role="main"]') ||
-      document.body;
-    const links = scope.querySelectorAll('a[href]');
-    for (const a of links) {
-      const rect = a.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) continue;
-      if (!looksLikeProfile(a, a.getAttribute('href') || '')) continue;
-      // Trim each candidate independently before falling back — a
-      // whitespace-only innerText would otherwise win over a populated
-      // aria-label and read as empty, wasting the full timeout
-      // (independent review finding).
-      const text = (a.innerText || '').trim() || (a.getAttribute('aria-label') || '').trim();
-      if (text) return true;
-    }
-    return false;
-  }, { timeout: timeoutMs }).catch(function () {});
-}
 
-// Extracts only rendered profile links inside the followers surface: the
-// followers dialog when Facebook renders one, else the main column. Anchors
-// outside that surface, zero-size (hidden/unrendered) anchors, and non-profile
-// hrefs are skipped. Relative hrefs are absolutized against the page URL so
-// downstream validation always sees absolute http(s) URLs.
-async function extractVisibleProfiles(page) {
-  return page.$$eval('a[href]', function (anchors) {
-    const scope =
-      document.querySelector('[role="dialog"]') ||
-      document.querySelector('[role="main"]') ||
-      document.body;
-    const out = [];
-    const links = scope.querySelectorAll('a[href]');
-    for (const a of links) {
-      const rect = a.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) continue;
-      const raw = a.getAttribute('href') || '';
-      if (!raw) continue;
-      let abs = raw;
-      try {
-        abs = new URL(raw, document.location.href).href;
-      } catch (err) {
-        continue;
+    function candidateScore(element, rootIndex) {
+      if (!element || !element.isConnected || element.clientHeight <= 0) return -1;
+      const overflow = element.scrollHeight - element.clientHeight;
+      if (overflow < 40) return -1;
+      const style = window.getComputedStyle(element);
+      if (element !== document.scrollingElement &&
+          style.overflowY !== 'auto' && style.overflowY !== 'scroll' &&
+          style.overflow !== 'auto' && style.overflow !== 'scroll') return -1;
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return -1;
+      const dialogBonus = element.getAttribute('role') === 'dialog' ? 100000 : 0;
+      const rootBonus = Math.max(0, 10000 - rootIndex * 1000);
+      return dialogBonus + rootBonus + Math.min(overflow, 50000);
+    }
+
+    function boundedElements(root, limit) {
+      const elements = [];
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+      let node = walker.nextNode();
+      let truncated = false;
+      while (node && elements.length < limit) {
+        elements.push(node);
+        node = walker.nextNode();
       }
-      let text = (a.innerText || '').trim();
-      if (!text) text = (a.getAttribute('aria-label') || '').trim();
+      if (node) truncated = true;
+      return { elements: elements, truncated: truncated };
+    }
+
+    function findSurface() {
+      const roots = [];
+      const dialog = document.querySelector('[role="dialog"]');
+      const main = document.querySelector('[role="main"]');
+      if (dialog) roots.push(dialog);
+      if (main && main !== dialog) roots.push(main);
+      if (!roots.length) roots.push(document.body);
+      let best = null;
+      let bestScore = -1;
+      let truncated = false;
+      roots.forEach(function (root, rootIndex) {
+        const candidates = [root];
+        const bounded = boundedElements(root, config.surfaceNodeLimit);
+        truncated = truncated || bounded.truncated;
+        bounded.elements.forEach(function (element) {
+          candidates.push(element);
+        });
+        candidates.forEach(function (candidate) {
+          const score = candidateScore(candidate, rootIndex);
+          if (score > bestScore) {
+            best = candidate;
+            bestScore = score;
+          }
+        });
+      });
+      const scrollContainer = best || document.scrollingElement || document.documentElement;
+      const surface = best || roots[0] || document.body;
+      return { surface: surface, scrollContainer: scrollContainer, truncated: truncated };
+    }
+
+    function textForAnchor(anchor) {
+      let text = (anchor.innerText || '').trim();
+      if (!text) text = (anchor.getAttribute('aria-label') || '').trim();
       if (!text) {
-        const img = a.querySelector('img[alt]');
-        if (img) text = (img.getAttribute('alt') || '').trim();
+        const image = anchor.querySelector('img[alt]');
+        if (image) text = (image.getAttribute('alt') || '').trim();
       }
-      out.push({ displayName: text, profileUrl: abs });
+      return text;
     }
-    return out;
-  }).catch(function () { return []; });
-}
 
-async function findScrollTarget(page) {
-  return page.evaluate(function () {
-    const dialogs = Array.from(document.querySelectorAll('[role="dialog"]'));
-    for (const d of dialogs) {
-      if (d.scrollHeight > d.clientHeight + 100) return 'dialog';
+    const prior = window.__fgCaptureSession;
+    if (prior && typeof prior.dispose === 'function') prior.dispose();
+    const state = {
+      queue: [],
+      maxQueue: config.queueLimit,
+      mutationNodeLimit: config.mutationNodeLimit,
+      mutationRecordLimit: config.mutationRecordLimit,
+      dropped: 0,
+      queueOverflow: false,
+      mutationRecords: 0,
+      mutationRecordOverflow: false,
+      captureTruncated: false,
+      truncationReasons: [],
+      initialAnchorCount: 0,
+      attachedCount: 0,
+      queueHighWaterMark: 0,
+      surfaceNodeCount: 0,
+      waiters: [],
+      observer: null,
+      surface: null,
+      scrollContainer: null,
+      disposed: false,
+    };
+
+    function notifyWaiters(reason) {
+      const waiters = state.waiters.splice(0);
+      waiters.forEach(function (resolve) { resolve(reason); });
     }
-    return 'page';
-  }).catch(function () { return 'page'; });
-}
 
-async function scrollOnce(page, target) {
-  await page.evaluate(function (t) {
-    if (t === 'dialog') {
-      const dialogs = Array.from(document.querySelectorAll('[role="dialog"]'));
-      for (const d of dialogs) {
-        if (d.scrollHeight > d.clientHeight + 100) {
-          d.scrollTop = d.scrollHeight;
-          return;
+    function enqueue(anchor) {
+      if (state.disposed || !anchor || anchor.tagName !== 'A' ||
+          !anchor.getAttribute('href') || !isVisible(anchor) ||
+          !state.surface || !state.surface.contains(anchor)) return;
+      let profileUrl = '';
+      try {
+        profileUrl = new URL(anchor.getAttribute('href'), document.location.href).href;
+      } catch (err) {
+        return;
+      }
+      if (state.queue.length >= state.maxQueue) {
+        state.dropped++;
+        state.queueOverflow = true;
+        notifyWaiters('queue-overflow');
+        return;
+      }
+      state.queue.push({ displayName: textForAnchor(anchor), profileUrl: profileUrl });
+      state.queueHighWaterMark = Math.max(state.queueHighWaterMark, state.queue.length);
+      notifyWaiters('capture');
+    }
+
+    function inspectAdded(node) {
+      if (!node || node.nodeType !== 1) return;
+      if (node.matches('a[href]')) enqueue(node);
+      const bounded = boundedElements(node, state.mutationNodeLimit);
+      if (bounded.truncated) {
+        state.captureTruncated = true;
+        if (state.truncationReasons.indexOf('mutation-subtree') < 0) state.truncationReasons.push('mutation-subtree');
+      }
+      bounded.elements.forEach(function (element) {
+        if (element.matches('a[href]')) enqueue(element);
+      });
+    }
+
+    function inspectMutation(record) {
+      state.mutationRecords++;
+      if (record.target) {
+        const targetElement = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+        const parentAnchor = targetElement && targetElement.matches('a[href]') ? targetElement : targetElement && targetElement.closest('a[href]');
+        if (parentAnchor) enqueue(parentAnchor);
+        if (record.type === 'attributes' && targetElement) inspectAdded(targetElement);
+      }
+      if (record.type === 'childList') {
+        if (record.addedNodes.length > state.mutationNodeLimit) {
+          state.captureTruncated = true;
+          if (state.truncationReasons.indexOf('mutation-added-nodes') < 0) state.truncationReasons.push('mutation-added-nodes');
+        }
+        for (let i = 0; i < record.addedNodes.length && i < state.mutationNodeLimit; i++) {
+          inspectAdded(record.addedNodes[i]);
         }
       }
     }
-    window.scrollTo(0, document.body.scrollHeight);
-  }, target).catch(function () {});
+
+    function attach() {
+      const resolved = findSurface();
+      if (state.surface === resolved.surface && state.scrollContainer === resolved.scrollContainer && state.observer) return;
+      if (state.observer) state.observer.disconnect();
+      state.surface = resolved.surface;
+      state.scrollContainer = resolved.scrollContainer;
+      if (resolved.truncated) {
+        state.captureTruncated = true;
+        if (state.truncationReasons.indexOf('surface-walk') < 0) state.truncationReasons.push('surface-walk');
+      }
+      const surfaceNodes = boundedElements(state.surface, config.surfaceNodeLimit);
+      state.surfaceNodeCount = surfaceNodes.elements.length;
+      if (surfaceNodes.truncated) {
+        state.captureTruncated = true;
+        if (state.truncationReasons.indexOf('surface-count') < 0) state.truncationReasons.push('surface-count');
+      }
+      state.observer = new MutationObserver(function (records) {
+        if (state.mutationRecordOverflow) return;
+        if (state.mutationRecords + records.length > state.mutationRecordLimit) {
+          state.mutationRecords = state.mutationRecordLimit;
+          state.mutationRecordOverflow = true;
+          notifyWaiters('mutation-overflow');
+          return;
+        }
+        records.forEach(inspectMutation);
+      });
+      state.observer.observe(state.surface, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['href', 'aria-label', 'alt', 'class', 'style', 'hidden', 'aria-hidden'],
+      });
+      let initialLimit = 0;
+      const bounded = boundedElements(state.surface, config.initialNodeLimit);
+      if (bounded.truncated) {
+        state.captureTruncated = true;
+        if (state.truncationReasons.indexOf('initial-walk') < 0) state.truncationReasons.push('initial-walk');
+      }
+      bounded.elements.forEach(function (element) {
+        if (element.matches('a[href]')) {
+          enqueue(element);
+          initialLimit++;
+        }
+      });
+      state.initialAnchorCount += initialLimit;
+      state.attachedCount++;
+    }
+
+    state.waitForEvent = function (timeoutMs) {
+      attach();
+      if (state.queue.length) return Promise.resolve('queued');
+      return new Promise(function (resolve) {
+        let settled = false;
+        const finish = function (reason) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          const index = state.waiters.indexOf(finish);
+          if (index >= 0) state.waiters.splice(index, 1);
+          resolve(reason);
+        };
+        const timer = setTimeout(function () { finish('timeout'); }, timeoutMs);
+        state.waiters.push(finish);
+      });
+    };
+
+    state.drain = function () {
+      attach();
+      const captures = state.queue.splice(0, state.queue.length);
+      const memory = performance.memory || {};
+      const container = state.scrollContainer;
+      const surface = state.surface;
+      return {
+        captures: captures,
+        dropped: state.dropped,
+        queueOverflow: state.queueOverflow,
+        mutationRecords: state.mutationRecords,
+        mutationRecordOverflow: state.mutationRecordOverflow,
+        captureTruncated: state.captureTruncated,
+        truncationReasons: state.truncationReasons.slice(),
+        initialAnchorCount: state.initialAnchorCount,
+        attachedCount: state.attachedCount,
+        queueHighWaterMark: state.queueHighWaterMark,
+        queueLength: state.queue.length,
+        surfaceNodeCount: state.surfaceNodeCount,
+        scrollTop: container ? Math.round(container.scrollTop || 0) : 0,
+        scrollHeight: container ? Math.round(container.scrollHeight || 0) : 0,
+        clientHeight: container ? Math.round(container.clientHeight || 0) : 0,
+        usedJSHeapSize: Number.isFinite(memory.usedJSHeapSize) ? memory.usedJSHeapSize : null,
+        totalJSHeapSize: Number.isFinite(memory.totalJSHeapSize) ? memory.totalJSHeapSize : null,
+        jsHeapSizeLimit: Number.isFinite(memory.jsHeapSizeLimit) ? memory.jsHeapSizeLimit : null,
+      };
+    };
+
+    state.scroll = function () {
+      attach();
+      const container = state.scrollContainer;
+      if (!container) return Promise.resolve({ moved: false, atEnd: true });
+      const before = Math.round(container.scrollTop || 0);
+      const maxTop = Math.max(0, container.scrollHeight - container.clientHeight);
+      const nextTop = Math.min(maxTop, before + Math.max(240, Math.floor(container.clientHeight * 0.85)));
+      return new Promise(function (resolve) {
+        let settled = false;
+        const finish = function () {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          container.removeEventListener('scroll', finish);
+          resolve({
+            moved: Math.round(container.scrollTop || 0) !== before,
+            atEnd: Math.round(container.scrollTop || 0) >= maxTop - 2,
+            scrollTop: Math.round(container.scrollTop || 0),
+            scrollHeight: Math.round(container.scrollHeight || 0),
+            clientHeight: Math.round(container.clientHeight || 0),
+          });
+        };
+        const timer = setTimeout(finish, 250);
+        container.addEventListener('scroll', finish, { once: true, passive: true });
+        if (container === document.scrollingElement) {
+          window.scrollTo(0, nextTop);
+        } else {
+          container.scrollTo({ top: nextTop, behavior: 'auto' });
+        }
+        if (nextTop === before) finish();
+      });
+    };
+
+    state.dispose = function () {
+      state.disposed = true;
+      if (state.observer) state.observer.disconnect();
+      notifyWaiters('disposed');
+      state.queue.length = 0;
+    };
+    window.__fgCaptureSession = state;
+    attach();
+    return state.drain();
+  }, {
+    queueLimit: CAPTURE_QUEUE_LIMIT,
+    mutationNodeLimit: CAPTURE_MUTATION_NODE_LIMIT,
+    mutationRecordLimit: CAPTURE_MUTATION_RECORD_LIMIT,
+    initialNodeLimit: CAPTURE_INITIAL_NODE_LIMIT,
+    surfaceNodeLimit: CAPTURE_INITIAL_NODE_LIMIT,
+  }).catch(function () { return null; });
+}
+
+async function waitForFollowerCapture(page, timeoutMs) {
+  const startedAt = Date.now();
+  const reason = await page.evaluate(function (timeout) {
+    const state = window.__fgCaptureSession;
+    if (!state || typeof state.waitForEvent !== 'function') return 'missing';
+    return state.waitForEvent(timeout);
+  }, timeoutMs).catch(function () { return 'error'; });
+  return { reason: reason, waitMs: Date.now() - startedAt };
+}
+
+async function drainFollowerCapture(page) {
+  const startedAt = Date.now();
+  const data = await page.evaluate(function () {
+    const state = window.__fgCaptureSession;
+    return state && typeof state.drain === 'function' ? state.drain() : null;
+  }).catch(function () { return null; });
+  return { data: data, durationMs: Date.now() - startedAt };
+}
+
+async function scrollFollowers(page) {
+  return page.evaluate(function () {
+    const state = window.__fgCaptureSession;
+    return state && typeof state.scroll === 'function' ? state.scroll() : null;
+  }).catch(function () { return null; });
+}
+
+async function disposeFollowerCapture(page) {
+  await page.evaluate(function () {
+    const state = window.__fgCaptureSession;
+    if (state && typeof state.dispose === 'function') state.dispose();
+    delete window.__fgCaptureSession;
+  }).catch(function () {});
 }
 
 async function runCollection(opts) {
@@ -446,97 +694,248 @@ async function runCollection(opts) {
         loaded = true;
         break;
       } catch (err) {
-        loadError = String((err && err.message) || err);
+        loadError = safeText((err && err.message) || err);
         logProgress('loading', 'Navigation attempt ' + attempt + ' failed, retrying...');
         await sleep(3000);
       }
     }
     if (!loaded) {
-      logProgress('error', 'Could not load followers page.', { active: false, error: loadError });
+      logProgress('error', 'Could not load followers page.', { active: false, stopReason: 'navigation-failed', error: loadError });
       return { ok: false, authenticated: true, error: 'Could not load followers page: ' + loadError };
     }
-    await sleep(postScrollWaitMs);
+    await page.waitForFunction(function () {
+      return !!document.querySelector('[role="dialog"], [role="main"]');
+    }, { timeout: postScrollWaitMs }).catch(function () {});
 
     logProgress('auth', 'Checking Facebook login state...');
     const auth = await checkAuth(page, null);
     if (!auth.authenticated) {
-      logProgress('error', 'Not authenticated.', { active: false, error: auth.message });
+      logProgress('error', 'Not authenticated.', { active: false, stopReason: 'auth-required', error: auth.message });
       return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: ' + auth.message };
     }
     logProgress('scrolling', 'Authenticated. Starting scroll and capture...');
 
-    const seen = new Set();
-    const profiles = [];
+    const installed = await installFollowerCapture(page);
+    if (!installed) {
+      logProgress('error', 'Could not attach the bounded follower capture.', { active: false, stopReason: 'capture-unavailable', error: 'CAPTURE_UNAVAILABLE' });
+      return { ok: false, authenticated: true, error: 'CAPTURE_UNAVAILABLE: followers surface was not available.' };
+    }
+
+    const seen = new Map();
     let totalEncountered = 0;
+    let nameUpgrades = 0;
     let emptyStreak = 0;
     let scrollAttempts = 0;
     let stopReason = 'max-attempts-reached';
+    let profileCapReached = false;
+    let profileCapSkippedUnique = 0;
+    const telemetry = {
+      captureWaitMs: 0,
+      captureReadMs: 0,
+      captureBatches: 0,
+      captureRecords: 0,
+      mutationRecords: 0,
+      initialAnchorCount: 0,
+      attachedSurfaces: 0,
+      queueHighWaterMark: 0,
+      queueDrops: 0,
+      queueOverflow: false,
+      captureTruncated: false,
+      mutationRecordOverflow: false,
+      truncationReasons: [],
+      surfaceNodeCount: 0,
+      scrollTop: 0,
+      scrollHeight: 0,
+      clientHeight: 0,
+      browserUsedJSHeapSize: null,
+      browserTotalJSHeapSize: null,
+      browserJsHeapSizeLimit: null,
+      nodeHeapUsedBytes: 0,
+      nodeRssBytes: 0,
+      lastCaptureAt: null,
+    };
+    const waitTimeoutMs = Math.max(scrollDelayMs, postScrollWaitMs);
 
-    while (scrollAttempts < maxScrolls) {
+    function updateTelemetry(sample, readMs, waitMs) {
+      if (waitMs) telemetry.captureWaitMs += waitMs;
+      if (readMs) telemetry.captureReadMs += readMs;
+      if (!sample) return;
+      telemetry.captureBatches++;
+      telemetry.captureRecords += sample.captures.length;
+      telemetry.mutationRecords = sample.mutationRecords;
+      telemetry.initialAnchorCount = sample.initialAnchorCount;
+      telemetry.attachedSurfaces = sample.attachedCount;
+      telemetry.queueHighWaterMark = sample.queueHighWaterMark;
+      telemetry.queueDrops = sample.dropped;
+      telemetry.queueOverflow = sample.queueOverflow;
+      telemetry.captureTruncated = sample.captureTruncated;
+      telemetry.mutationRecordOverflow = sample.mutationRecordOverflow;
+      telemetry.truncationReasons = sample.truncationReasons;
+      telemetry.surfaceNodeCount = sample.surfaceNodeCount;
+      telemetry.scrollTop = sample.scrollTop;
+      telemetry.scrollHeight = sample.scrollHeight;
+      telemetry.clientHeight = sample.clientHeight;
+      telemetry.browserUsedJSHeapSize = sample.usedJSHeapSize;
+      telemetry.browserTotalJSHeapSize = sample.totalJSHeapSize;
+      telemetry.browserJsHeapSizeLimit = sample.jsHeapSizeLimit;
+      telemetry.nodeHeapUsedBytes = process.memoryUsage().heapUsed;
+      telemetry.nodeRssBytes = process.memoryUsage().rss;
+      telemetry.lastCaptureAt = Date.now();
+      progress.telemetry = Object.assign({}, telemetry);
+    }
+
+    function captureFailureReason(sample) {
+      if (!sample) return 'capture-unavailable';
+      if (sample.mutationRecordOverflow) return 'mutation-record-overflow';
+      if (sample.captureTruncated) return 'capture-truncated';
+      if (sample.queueOverflow || sample.dropped > 0) return 'capture-buffer-overflow';
+      return '';
+    }
+
+    function processCaptures(captures) {
+      let fresh = 0;
+      let upgrades = 0;
+      let rejectedHref = 0;
+      let rejectedSelf = 0;
+      for (const sighting of captures) {
+        if (!isProfileHref(sighting.profileUrl)) { rejectedHref++; continue; }
+        const key = normalizeUrl(sighting.profileUrl);
+        if (!key) { rejectedHref++; continue; }
+        if (selfId && identityOf(sighting.profileUrl) === selfId) { rejectedSelf++; continue; }
+        totalEncountered++;
+        const displayName = String(sighting.displayName || '').trim();
+        const existing = seen.get(key);
+        if (!existing) {
+          if (seen.size >= MAX_CANONICAL_PROFILES) {
+            profileCapReached = true;
+            profileCapSkippedUnique++;
+            break;
+          }
+          seen.set(key, { displayName: displayName, profileUrl: key });
+          fresh++;
+        } else if (!existing.displayName && displayName) {
+          existing.displayName = displayName;
+          nameUpgrades++;
+          upgrades++;
+        }
+      }
+      return { fresh: fresh, upgrades: upgrades, rejectedHref: rejectedHref, rejectedSelf: rejectedSelf, captured: captures.length };
+    }
+
+    function currentStats() {
+      return {
+        totalEncountered: totalEncountered,
+        anchorSightings: totalEncountered,
+        anchorRepeats: Math.max(0, totalEncountered - seen.size - profileCapSkippedUnique),
+        profileCapSkipped: profileCapSkippedUnique,
+        nameUpgrades: nameUpgrades,
+        uniqueFollowers: seen.size,
+        scrollAttempts: scrollAttempts,
+        stopReason: stopReason,
+        runLabel: String(opts.runLabel || ''),
+        telemetry: Object.assign({}, telemetry, {
+          elapsedMs: Date.now() - progress.startedAt,
+        }),
+      };
+    }
+
+    function logCapture(label, result) {
+      logProgress(
+        'scrolling',
+        label + ': +' + result.fresh + ' new (unique ' + seen.size + ', sightings ' + totalEncountered +
+          ', repeats ' + Math.max(0, totalEncountered - seen.size - profileCapSkippedUnique) + ', upgrades ' + nameUpgrades +
+          ') — ' + result.captured + ' captures, ' + result.rejectedHref + ' rejected, ' + result.rejectedSelf + ' self',
+        {
+          scrollAttempts: scrollAttempts,
+          totalEncountered: totalEncountered,
+          anchorSightings: totalEncountered,
+          anchorRepeats: Math.max(0, totalEncountered - seen.size - profileCapSkippedUnique),
+          profileCapSkipped: profileCapSkippedUnique,
+          nameUpgrades: nameUpgrades,
+          uniqueFollowers: seen.size,
+          telemetry: Object.assign({}, telemetry, { elapsedMs: Date.now() - progress.startedAt }),
+        }
+      );
+    }
+
+    const initialDrain = await drainFollowerCapture(page);
+    updateTelemetry(initialDrain.data, initialDrain.durationMs, 0);
+    const initialResult = processCaptures(initialDrain.data ? initialDrain.data.captures : []);
+    emptyStreak = (initialResult.fresh > 0 || initialResult.upgrades > 0) ? 0 : 1;
+    logCapture('Initial capture', initialResult);
+    const initialCaptureFailure = captureFailureReason(initialDrain.data);
+    if (initialCaptureFailure) stopReason = initialCaptureFailure;
+    if (profileCapReached) stopReason = 'canonical-profile-cap-reached';
+
+    while (scrollAttempts < maxScrolls && emptyStreak < emptyThreshold && stopReason === 'max-attempts-reached') {
       if (cancelRequested) {
         stopReason = 'canceled';
         break;
       }
       const url = page.url();
       if (/login|checkpoint|two_step|captcha/i.test(url)) {
-        logProgress('error', 'Session challenged mid-run.', { active: false, error: 'AUTH_REQUIRED: session challenged mid-run.' });
-        return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: session challenged mid-run.', stats: { totalEncountered: totalEncountered, scrollAttempts: scrollAttempts, stopReason: 'auth-lost' } };
+        stopReason = 'auth-lost';
+        logProgress('error', 'Session challenged mid-run.', { active: false, stopReason: 'auth-lost', error: 'AUTH_REQUIRED: session challenged mid-run.' });
+        return { ok: false, authenticated: false, error: 'AUTH_REQUIRED: session challenged mid-run.', stats: currentStats() };
       }
-      await waitForNamedProfiles(page, 4000);
-      const found = await extractVisibleProfiles(page);
-      let fresh = 0;
-      let rejectedHref = 0;
-      let rejectedSelf = 0;
-      for (const f of found) {
-        if (!isProfileHref(f.profileUrl)) { rejectedHref++; continue; }
-        const key = normalizeUrl(f.profileUrl);
-        if (!key) { rejectedHref++; continue; }
-        if (selfId && identityOf(f.profileUrl) === selfId) { rejectedSelf++; continue; }
-        totalEncountered++;
-        // Every encounter is returned, including repeats: n8n dedupes by
-        // profile URL and records duplicate status per row in Raw Followers.
-        // The local seen-set only measures scroll freshness for stopping.
-        if (!seen.has(key)) {
-          seen.add(key);
-          fresh++;
-        }
-        profiles.push({ displayName: f.displayName || '', profileUrl: f.profileUrl });
-      }
-      if (fresh > 0) {
-        emptyStreak = 0;
-      } else {
-        emptyStreak++;
-      }
+      const scrollInfo = await scrollFollowers(page);
       scrollAttempts++;
-      // Diagnostic breakdown (counts only, never names/URLs — same rule as
-      // everywhere else) added after a live run found 0 followers for 10
-      // straight scrolls with no visible error: this pinpoints whether that
-      // was 0 anchors on the page at all, anchors present but all rejected
-      // by the profile-link heuristic, or anchors passing but all
-      // self-referential, instead of guessing blind from "+0 new" alone.
-      logProgress(
-        'scrolling',
-        'Scroll ' + scrollAttempts + ': +' + fresh + ' new (total unique ' + seen.size + ', encountered ' + totalEncountered +
-          ') — ' + found.length + ' anchors seen, ' + rejectedHref + ' rejected (not a profile link), ' + rejectedSelf + ' rejected (self)',
-        { scrollAttempts: scrollAttempts, totalEncountered: totalEncountered, uniqueFollowers: seen.size }
-      );
+      if (!scrollInfo) {
+        stopReason = 'capture-unavailable';
+        break;
+      }
+      const waited = await waitForFollowerCapture(page, waitTimeoutMs);
+      if (waited.reason === 'missing' || waited.reason === 'error' || waited.reason === 'disposed') {
+        stopReason = 'capture-unavailable';
+        break;
+      }
+      const drained = await drainFollowerCapture(page);
+      if (!drained.data) {
+        stopReason = 'capture-unavailable';
+        break;
+      }
+      updateTelemetry(drained.data, drained.durationMs, waited.waitMs);
+      const result = processCaptures(drained.data.captures);
+      emptyStreak = (result.fresh > 0 || result.upgrades > 0) ? 0 : emptyStreak + 1;
+      logCapture('Scroll ' + scrollAttempts, result);
+      const captureFailure = captureFailureReason(drained.data);
+      if (captureFailure) {
+        stopReason = captureFailure;
+        break;
+      }
+      if (profileCapReached) {
+        stopReason = 'canonical-profile-cap-reached';
+        break;
+      }
+      if (cancelRequested) {
+        stopReason = 'canceled';
+        break;
+      }
       if (emptyStreak >= emptyThreshold) {
         stopReason = 'empty-threshold-reached';
         break;
       }
-      const target = await findScrollTarget(page);
-      await scrollOnce(page, target);
-      await sleep(scrollDelayMs);
-      await sleep(postScrollWaitMs);
     }
-    logProgress('done', 'Finished: ' + seen.size + ' unique followers (' + stopReason + ').', { active: false, stopReason: stopReason, uniqueFollowers: seen.size });
+    if (cancelRequested && stopReason === 'max-attempts-reached') stopReason = 'canceled';
+    if (stopReason === 'max-attempts-reached' && scrollAttempts < maxScrolls && emptyStreak >= emptyThreshold) {
+      stopReason = 'empty-threshold-reached';
+    }
+    const profiles = Array.from(seen.values());
+    const stats = currentStats();
+    logProgress('done', 'Finished: ' + seen.size + ' unique followers (' + stopReason + ').', {
+      active: false,
+      stopReason: stopReason,
+      uniqueFollowers: seen.size,
+      telemetry: stats.telemetry,
+    });
     return {
       ok: true,
       authenticated: true,
       profiles: profiles,
-      stats: { totalEncountered: totalEncountered, scrollAttempts: scrollAttempts, stopReason: stopReason, runLabel: String(opts.runLabel || '') },
+      stats: stats,
     };
   } finally {
+    await disposeFollowerCapture(page);
     await page.close().catch(function () {});
   }
 }
@@ -606,8 +1005,9 @@ const server = http.createServer(async function (req, res) {
         const result = await runCollection(body || {});
         sendJson(res, result.ok ? 200 : result.authenticated === false ? 401 : 500, result);
       } catch (err) {
-        logProgress('error', 'Collection crashed.', { active: false, error: String((err && err.message) || err) });
-        sendJson(res, 500, { ok: false, error: String((err && err.message) || err) });
+        const safeError = safeText((err && err.message) || err);
+        logProgress('error', 'Collection crashed.', { active: false, error: safeError });
+        sendJson(res, 500, { ok: false, error: safeError });
       } finally {
         // A collection run may have changed auth state (session expired or
         // got challenged mid-run) — drop the cache so the next /status
@@ -635,7 +1035,7 @@ const server = http.createServer(async function (req, res) {
     }
     sendJson(res, 404, { ok: false, error: 'Unknown endpoint. Use GET /status, GET /progress, POST /collect, or POST /cancel.' });
   } catch (err) {
-    sendJson(res, 500, { ok: false, error: String((err && err.message) || err) });
+    sendJson(res, 500, { ok: false, error: safeText((err && err.message) || err) });
   }
 });
 
