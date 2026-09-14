@@ -196,6 +196,14 @@
                "__rl" : true,
                "mode" : "id",
                "value" : "l2D7Iw4wteynVbk3"
+            },
+            "workflowInputs" : {
+               "attemptToConvertTypes" : false,
+               "convertFieldsToString" : true,
+               "mappingMode" : "defineBelow",
+               "matchingColumns" : [],
+               "schema" : [],
+               "value" : {}
             }
          },
          "position" : [
@@ -252,11 +260,11 @@
    "staticData" : null,
    "tags" : [],
    "triggerCount" : 1,
-   "updatedAt" : "2026-09-06T15:33:26.100Z",
-   "versionCounter" : 8,
-   "versionId" : "102392be-6c86-4e08-958e-3427266d52b9",
+   "updatedAt" : "2026-09-13T07:01:57.143Z",
+   "versionCounter" : 9,
+   "versionId" : "4e0ba5d8-a0c3-41a4-8fe2-c684759cd47d",
    "versionMetadata" : {
-      "description" : "Updated nodes: Answer Button Tap",
-      "name" : "Honest refresh acknowledgment"
+      "description" : null,
+      "name" : null
    }
 }
