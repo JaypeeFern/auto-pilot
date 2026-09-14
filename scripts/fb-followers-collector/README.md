@@ -46,7 +46,7 @@ in Compose (container network only). |
 | `COLLECTOR_CAPTURE_QUEUE_LIMIT` | `4096` | Maximum pending incremental captures per run; overflow fails completeness. |
 | `COLLECTOR_CAPTURE_MUTATION_NODE_LIMIT` | `512` | Maximum nodes inspected per mutation/initial bounded walk. |
 | `COLLECTOR_CAPTURE_INITIAL_NODE_LIMIT` | `10000` | Maximum nodes inspected while resolving/capturing the initial surface. Truncation fails completeness. |
-| `COLLECTOR_CAPTURE_MUTATION_RECORD_LIMIT` | `2048` | Maximum cumulative MutationObserver records per run. Overflow fails completeness. |
+| `COLLECTOR_CAPTURE_MUTATION_RECORD_LIMIT` | `2048` | Maximum pending MutationObserver records between capture drains. Overflow fails completeness for that batch. |
 | `COLLECTOR_MAX_CANONICAL_PROFILES` | `20000` | Maximum canonical profiles retained per run; the cap fails completeness. |
 
 ## First login (manual handoff)

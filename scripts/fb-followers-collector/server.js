@@ -376,6 +376,7 @@ async function installFollowerCapture(page) {
       dropped: 0,
       queueOverflow: false,
       mutationRecords: 0,
+      mutationRecordsSinceDrain: 0,
       mutationRecordOverflow: false,
       captureTruncated: false,
       truncationReasons: [],
@@ -431,6 +432,7 @@ async function installFollowerCapture(page) {
 
     function inspectMutation(record) {
       state.mutationRecords++;
+      state.mutationRecordsSinceDrain++;
       if (record.target) {
         const targetElement = record.target.nodeType === 1 ? record.target : record.target.parentElement;
         const parentAnchor = targetElement && targetElement.matches('a[href]') ? targetElement : targetElement && targetElement.closest('a[href]');
@@ -466,8 +468,7 @@ async function installFollowerCapture(page) {
       }
       state.observer = new MutationObserver(function (records) {
         if (state.mutationRecordOverflow) return;
-        if (state.mutationRecords + records.length > state.mutationRecordLimit) {
-          state.mutationRecords = state.mutationRecordLimit;
+        if (state.mutationRecordsSinceDrain + records.length > state.mutationRecordLimit) {
           state.mutationRecordOverflow = true;
           notifyWaiters('mutation-overflow');
           return;
@@ -518,6 +519,8 @@ async function installFollowerCapture(page) {
     state.drain = function () {
       attach();
       const captures = state.queue.splice(0, state.queue.length);
+      const mutationRecordsSinceDrain = state.mutationRecordsSinceDrain;
+      const mutationRecordOverflow = state.mutationRecordOverflow;
       const memory = performance.memory || {};
       const container = state.scrollContainer;
       const surface = state.surface;
@@ -526,7 +529,8 @@ async function installFollowerCapture(page) {
         dropped: state.dropped,
         queueOverflow: state.queueOverflow,
         mutationRecords: state.mutationRecords,
-        mutationRecordOverflow: state.mutationRecordOverflow,
+        mutationRecordsSinceDrain: mutationRecordsSinceDrain,
+        mutationRecordOverflow: mutationRecordOverflow,
         captureTruncated: state.captureTruncated,
         truncationReasons: state.truncationReasons.slice(),
         initialAnchorCount: state.initialAnchorCount,
@@ -541,6 +545,8 @@ async function installFollowerCapture(page) {
         totalJSHeapSize: Number.isFinite(memory.totalJSHeapSize) ? memory.totalJSHeapSize : null,
         jsHeapSizeLimit: Number.isFinite(memory.jsHeapSizeLimit) ? memory.jsHeapSizeLimit : null,
       };
+      state.mutationRecordsSinceDrain = 0;
+      state.mutationRecordOverflow = false;
     };
 
     state.scroll = function () {
@@ -735,6 +741,7 @@ async function runCollection(opts) {
       captureBatches: 0,
       captureRecords: 0,
       mutationRecords: 0,
+      mutationRecordsSinceDrain: 0,
       initialAnchorCount: 0,
       attachedSurfaces: 0,
       queueHighWaterMark: 0,
@@ -763,6 +770,7 @@ async function runCollection(opts) {
       telemetry.captureBatches++;
       telemetry.captureRecords += sample.captures.length;
       telemetry.mutationRecords = sample.mutationRecords;
+      telemetry.mutationRecordsSinceDrain = sample.mutationRecordsSinceDrain;
       telemetry.initialAnchorCount = sample.initialAnchorCount;
       telemetry.attachedSurfaces = sample.attachedCount;
       telemetry.queueHighWaterMark = sample.queueHighWaterMark;
