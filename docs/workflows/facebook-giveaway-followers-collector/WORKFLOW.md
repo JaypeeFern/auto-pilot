@@ -64,7 +64,8 @@ to upgrade; a named profile is never downgraded by a later blank sighting.
 `nameUpgrades` counts blank-to-named upgrades.
 
 The collector uses a bounded `MutationObserver` queue attached to the resolved
-followers surface. It captures added/reused anchors and name changes, then
+followers surface. It captures added/reused anchors and name changes, coalesces
+duplicate pending sightings, ignores presentation-only class/style churn, then
 drains the queue after each event-driven scroll. The queue has a finite limit;
 overflow is an incomplete run rather than silent data loss. No permanent
 `data-*` markers or unbounded page-level URL cache is used.

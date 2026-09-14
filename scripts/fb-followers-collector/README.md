@@ -116,8 +116,11 @@ relative hrefs are absolutized, and only facebook.com/fb.com hosts are
 accepted. Only normally visible follower entries are read; hidden/private
 data and security/privacy controls are never bypassed.
 
-The observer queue is finite and blank-name captures stay retryable. The
-collector returns one canonical profile per normalized URL and upgrades its
+The observer queue is finite, pending sightings for the same anchor are
+coalesced, and blank-name captures stay retryable. Presentation-only class and
+style mutations are ignored; href, name, and visibility changes remain
+observable.
+The collector returns one canonical profile per normalized URL and upgrades its
 name when a later named sighting arrives. `telemetry` is bounded and PII-free:
 capture timing, mutation/capture counts, queue pressure, bounded surface
 descendant count,

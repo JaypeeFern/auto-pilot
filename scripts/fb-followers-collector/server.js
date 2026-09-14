@@ -369,6 +369,7 @@ async function installFollowerCapture(page) {
     if (prior && typeof prior.dispose === 'function') prior.dispose();
     const state = {
       queue: [],
+      pendingByAnchor: new Map(),
       maxQueue: config.queueLimit,
       mutationNodeLimit: config.mutationNodeLimit,
       mutationRecordLimit: config.mutationRecordLimit,
@@ -405,13 +406,22 @@ async function installFollowerCapture(page) {
       } catch (err) {
         return;
       }
+      const displayName = textForAnchor(anchor);
+      const pending = state.pendingByAnchor.get(anchor);
+      if (pending) {
+        pending.profileUrl = profileUrl;
+        if (displayName) pending.displayName = displayName;
+        return;
+      }
       if (state.queue.length >= state.maxQueue) {
         state.dropped++;
         state.queueOverflow = true;
         notifyWaiters('queue-overflow');
         return;
       }
-      state.queue.push({ displayName: textForAnchor(anchor), profileUrl: profileUrl });
+      const entry = { anchor: anchor, displayName: displayName, profileUrl: profileUrl };
+      state.pendingByAnchor.set(anchor, entry);
+      state.queue.push(entry);
       state.queueHighWaterMark = Math.max(state.queueHighWaterMark, state.queue.length);
       notifyWaiters('capture');
     }
@@ -429,14 +439,28 @@ async function installFollowerCapture(page) {
       });
     }
 
-    function inspectMutation(record) {
+    function addMutationRoot(roots, node) {
+      if (!node || node.nodeType !== 1) return;
+      for (const root of roots) {
+        if (root === node || root.contains(node)) return;
+      }
+      for (let i = roots.length - 1; i >= 0; i--) {
+        if (node.contains(roots[i])) roots.splice(i, 1);
+      }
+      roots.push(node);
+    }
+
+    function inspectMutation(record, addedRoots) {
       state.mutationRecords++;
       state.mutationRecordsSinceDrain++;
       if (record.target) {
         const targetElement = record.target.nodeType === 1 ? record.target : record.target.parentElement;
         const parentAnchor = targetElement && targetElement.matches('a[href]') ? targetElement : targetElement && targetElement.closest('a[href]');
         if (parentAnchor) enqueue(parentAnchor);
-        if (record.type === 'attributes' && targetElement) inspectAdded(targetElement);
+        if (record.type === 'attributes' && targetElement &&
+            (record.attributeName === 'hidden' || record.attributeName === 'aria-hidden')) {
+          inspectAdded(targetElement);
+        }
       }
       if (record.type === 'childList') {
         if (record.addedNodes.length > state.mutationNodeLimit) {
@@ -444,9 +468,15 @@ async function installFollowerCapture(page) {
           if (state.truncationReasons.indexOf('mutation-added-nodes') < 0) state.truncationReasons.push('mutation-added-nodes');
         }
         for (let i = 0; i < record.addedNodes.length && i < state.mutationNodeLimit; i++) {
-          inspectAdded(record.addedNodes[i]);
+          addMutationRoot(addedRoots, record.addedNodes[i]);
         }
       }
+    }
+
+    function inspectMutations(records) {
+      const addedRoots = [];
+      records.forEach(function (record) { inspectMutation(record, addedRoots); });
+      addedRoots.forEach(inspectAdded);
     }
 
     function attach() {
@@ -472,14 +502,17 @@ async function installFollowerCapture(page) {
           notifyWaiters('mutation-overflow');
           return;
         }
-        records.forEach(inspectMutation);
+        inspectMutations(records);
       });
       state.observer.observe(state.surface, {
         childList: true,
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: ['href', 'aria-label', 'alt', 'class', 'style', 'hidden', 'aria-hidden'],
+        // Presentation churn on the append-only Facebook surface is frequent
+        // and does not change profile identity. Visibility changes stay
+        // observable because they can make an existing row capturable.
+        attributeFilter: ['href', 'aria-label', 'alt', 'hidden', 'aria-hidden'],
       });
       let initialLimit = 0;
       const bounded = boundedElements(state.surface, config.initialNodeLimit);
@@ -517,7 +550,11 @@ async function installFollowerCapture(page) {
 
     state.drain = function () {
       attach();
-      const captures = state.queue.splice(0, state.queue.length);
+      const queued = state.queue.splice(0, state.queue.length);
+      queued.forEach(function (entry) { state.pendingByAnchor.delete(entry.anchor); });
+      const captures = queued.map(function (entry) {
+        return { displayName: entry.displayName, profileUrl: entry.profileUrl };
+      });
       const mutationRecordsSinceDrain = state.mutationRecordsSinceDrain;
       const mutationRecordOverflow = state.mutationRecordOverflow;
       const memory = performance.memory || {};
@@ -587,6 +624,7 @@ async function installFollowerCapture(page) {
       if (state.observer) state.observer.disconnect();
       notifyWaiters('disposed');
       state.queue.length = 0;
+      state.pendingByAnchor.clear();
     };
     window.__fgCaptureSession = state;
     attach();

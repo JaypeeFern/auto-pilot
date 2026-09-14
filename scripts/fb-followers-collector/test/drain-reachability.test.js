@@ -27,3 +27,12 @@ test('drain resets the per-drain mutation budget before returning', function () 
   assert.ok(resetOffset < returnOffset, 'mutationRecordsSinceDrain reset must be reachable');
   assert.ok(overflowResetOffset < returnOffset, 'mutationRecordOverflow reset must be reachable');
 });
+
+test('observer ignores presentation churn and coalesces pending anchors', function () {
+  assert.match(serverSource, /pendingByAnchor: new Map\(\)/);
+  assert.match(serverSource, /pending\.profileUrl = profileUrl/);
+  assert.match(serverSource, /attributeFilter: \['href', 'aria-label', 'alt', 'hidden', 'aria-hidden'\]/);
+  assert.doesNotMatch(serverSource, /attributeFilter: \[[^\]]*'class'/);
+  assert.match(serverSource, /record\.attributeName === 'hidden'/);
+  assert.match(serverSource, /record\.attributeName === 'aria-hidden'/);
+});
