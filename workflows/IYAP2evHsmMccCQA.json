@@ -86,17 +86,6 @@
             [
                {
                   "index" : 0,
-                  "node" : "Normalize Canonical Contract",
-                  "type" : "main"
-               }
-            ]
-         ]
-      },
-      "Normalize Canonical Contract" : {
-         "main" : [
-            [
-               {
-                  "index" : 0,
                   "node" : "Has Valid Data?",
                   "type" : "main"
                }
@@ -213,7 +202,7 @@
          "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c404",
          "name" : "Validate Dedupe and Build Rows",
          "parameters" : {
-            "jsCode" : "const collected = $('Collect Followers via Browser').first().json || {};\nconst cfg = $('Giveaway Config').first().json || {};\nconst profiles = Array.isArray(collected.profiles) ? collected.profiles : [];\nconst stats = collected.stats || {};\nconst runLabel = cfg.runLabel || 'giveaway';\nconst extractedAt = new Date().toISOString();\nfunction normUrl(u) {\n  const s = String(u || '').trim();\n  if (!s) return '';\n  let v = s.split('#')[0];\n  const q = v.indexOf('?');\n  if (q >= 0) {\n    const base = v.slice(0, q);\n    const query = v.slice(q + 1);\n    const idm = query.match(/(^|&)id=(\\d+)/i);\n    v = idm ? base + '?id=' + idm[2] : base;\n  }\n  return v.replace(/\\/+$/, '').toLowerCase();\n}\nfunction profileId(u) {\n  const s = String(u || '').trim();\n  if (!s) return '';\n  const idm = s.match(/[?&]id=(\\d+)/i);\n  if (idm) return 'id:' + idm[1];\n  const parts = s.split('?')[0].split('#')[0].replace(/\\/+$/, '').split('/').filter(function (p) { return p; });\n  return parts.length ? parts[parts.length - 1].toLowerCase() : '';\n}\nfunction validId(u) {\n  const s = String(u || '').trim();\n  const match = s.match(/^https?:\\/\\/([^/:?#]+)/i);\n  if (!match) return false;\n  const host = match[1].toLowerCase();\n  return (host === 'facebook.com' || host.endsWith('.facebook.com') || host === 'fb.com' || host.endsWith('.fb.com')) && profileId(s) !== '';\n}\nconst canonicalByKey = Object.create(null);\nfor (const p of profiles) {\n  const url = p && (p.profileUrl || p.url) ? String(p.profileUrl || p.url).trim() : '';\n  const key = normUrl(url);\n  const name = p && p.displayName ? String(p.displayName).trim() : '';\n  if (!key) continue;\n  if (!canonicalByKey[key]) {\n    canonicalByKey[key] = { displayName: name, profileUrl: key };\n  } else if (!canonicalByKey[key].displayName && name) {\n    canonicalByKey[key].displayName = name;\n  }\n}\nconst canonicalProfiles = Object.keys(canonicalByKey).map(function (key) { return canonicalByKey[key]; });\nconst rawRows = [];\nconst rouletteRows = [];\nlet missingNames = 0;\nlet invalidIds = 0;\nfor (const p of canonicalProfiles) {\n  const name = p.displayName || '';\n  const url = p.profileUrl || '';\n  const valid = validId(url);\n  if (!name) missingNames++;\n  if (!valid) invalidIds++;\n  rawRows.push({\n    displayName: name,\n    profileUrl: url,\n    profileId: profileId(url),\n    extractedAt: extractedAt,\n    isDuplicate: 'no',\n    validationStatus: valid ? (name ? 'valid' : 'missing-name') : 'invalid-id',\n    runLabel: runLabel\n  });\n  if (valid && name) {\n    rouletteRows.push({ displayName: name, profileUrl: url, profileId: profileId(url), runLabel: runLabel });\n  }\n}\nconst anchorSightings = Number.isFinite(Number(stats.anchorSightings)) ? Number(stats.anchorSightings) : Number(stats.totalEncountered || profiles.length);\nconst uniqueFollowers = canonicalProfiles.length;\nconst anchorRepeats = Math.max(0, anchorSightings - uniqueFollowers);\nconst stopReason = stats.stopReason || 'unknown';\nconst isComplete = collected.ok === true && stopReason === 'empty-threshold-reached';\nreturn [{ json: {\n  isComplete: isComplete,\n  collectorOk: collected.ok === true,\n  collectorError: collected.error || '',\n  authenticated: collected.authenticated !== false,\n  stopReason: stopReason,\n  scrollAttempts: Number(stats.scrollAttempts || 0),\n  totalEncountered: anchorSightings,\n  anchorSightings: anchorSightings,\n  anchorRepeats: anchorRepeats,\n  nameUpgrades: Number(stats.nameUpgrades || 0),\n  uniqueFollowers: uniqueFollowers,\n  duplicatesRemoved: anchorRepeats,\n  missingNames: missingNames,\n  invalidIds: invalidIds,\n  finalRouletteCount: rouletteRows.length,\n  readyForDraw: isComplete && rouletteRows.length > 0,\n  rawRows: rawRows,\n  rouletteRows: rouletteRows,\n  runLabel: runLabel,\n  telemetry: stats.telemetry || {}\n} }];"
+            "jsCode" : "const collected = $('Collect Followers via Browser').first().json;\nconst cfg = $('Giveaway Config').first().json;\nconst profiles = collected.profiles || [];\nconst stats = collected.stats || {};\nconst runLabel = cfg.runLabel || 'giveaway';\nconst extractedAt = new Date().toISOString();\nfunction normUrl(u) {\n  const s = String(u || '').trim();\n  if (!s) return '';\n  let v = s.split('#')[0];\n  const q = v.indexOf('?');\n  if (q >= 0) {\n    const base = v.slice(0, q);\n    const query = v.slice(q + 1);\n    const idm = query.match(/(^|&)id=(\\d+)/i);\n    v = idm ? base + '?id=' + idm[2] : base;\n  }\n  v = v.replace(/\\/+$/, '');\n  return v.toLowerCase();\n}\nfunction profileId(u) {\n  const s = String(u || '').trim();\n  if (!s) return '';\n  const idm = s.match(/[?&]id=(\\d+)/i);\n  if (idm) return 'id:' + idm[1];\n  const clean = s.split('?')[0].split('#')[0].replace(/\\/+$/, '');\n  const parts = clean.split('/').filter(function (p) { return p; });\n  return parts.length ? parts[parts.length - 1].toLowerCase() : '';\n}\nfunction fbHost(u) {\n  const m = String(u || '').trim().match(/^https?:\\/\\/([^/:?#]+)/i);\n  if (!m) return '';\n  return m[1].toLowerCase();\n}\nfunction validId(u) {\n  const s = String(u || '').trim();\n  if (!s) return false;\n  const h = fbHost(s);\n  if (h !== 'facebook.com' && !h.endsWith('.facebook.com') && h !== 'fb.com' && !h.endsWith('.fb.com')) return false;\n  return profileId(s) !== '';\n}\n// Facebook renders each follower row as TWO separate <a> elements sharing\n// the same profile URL: one wraps only the avatar image (no visible text),\n// one wraps the name. The collector emits every raw sighting as-is (needed\n// for the audit trail), so the same URL legitimately appears once with a\n// blank name and once with the real name. \"First sighting wins\" dedupe\n// always picked the blank one, since the avatar anchor renders first in DOM\n// order — confirmed live: 96 of 192 raw rows had real names, but\n// finalRouletteCount was 0 every time. Fix: prefer whichever sighting of a\n// key actually has a name, not just the first one encountered. Plain\n// Object.create(null) maps avoid any prototype-property key collision\n// (independent review note); an empty normalized key (never expected in\n// practice, since validId already requires a facebook.com host + id, which\n// normUrl always preserves, but kept as an explicit invariant rather than\n// assumed) falls back to the OLD permissive per-item behavior instead of\n// being force-marked a duplicate, so this can only improve eligibility\n// versus the old logic, never regress it (independent review finding).\nconst nameByKey = Object.create(null);\nfor (const p of profiles) {\n  const url = p && (p.profileUrl || p.url) ? String(p.profileUrl || p.url).trim() : '';\n  const key = normUrl(url);\n  const name = p && p.displayName ? String(p.displayName).trim() : '';\n  if (key && name && !nameByKey[key]) nameByKey[key] = name;\n}\nconst seenCanonical = Object.create(null);\nlet duplicates = 0;\nlet missingNames = 0;\nlet invalidIds = 0;\n// rawRows keeps only the canonical (non-duplicate) sighting per follower —\n// every raw DOM sighting used to go in here (76,930 rows for a ~931-person\n// page, one avatar-anchor row plus one name-anchor row per follower plus\n// re-sightings across scroll passes), which is impractical to write to the\n// Raw Followers Sheet. The full per-sighting detail was only ever useful\n// for debugging the dedupe logic itself, not for the audit trail. The\n// isDuplicate column is kept (always 'no' now) so the sheet schema/any\n// existing header stays stable rather than silently losing a column.\nconst rawRows = [];\nconst rouletteRows = [];\nfor (const p of profiles) {\n  const name = p && p.displayName ? String(p.displayName).trim() : '';\n  const url = p && (p.profileUrl || p.url) ? String(p.profileUrl || p.url).trim() : '';\n  const key = normUrl(url);\n  const id = profileId(url);\n  const okUrl = validId(url);\n  if (!name) missingNames++;\n  if (!okUrl) invalidIds++;\n  let isDup = false;\n  if (key !== '') {\n    const bestName = nameByKey[key] || '';\n    const isCanonical = !seenCanonical[key] && (bestName === '' || name === bestName);\n    if (isCanonical) seenCanonical[key] = true;\n    isDup = !isCanonical;\n  }\n  if (isDup) duplicates++;\n  let status = 'valid';\n  if (!okUrl) { status = 'invalid-id'; } else if (isDup) { status = name ? 'duplicate' : 'missing-name'; } else if (!name) { status = 'missing-name'; }\n  if (!isDup) { rawRows.push({ displayName: name, profileUrl: url, profileId: id, extractedAt: extractedAt, isDuplicate: 'no', validationStatus: status, runLabel: runLabel }); }\n  if (!isDup && okUrl && name) { rouletteRows.push({ displayName: name, profileUrl: url, profileId: id, runLabel: runLabel }); }\n}\nconst ok = collected.ok === true;\nconst stopReason = stats.stopReason || 'unknown';\nconst isComplete = ok && stopReason === 'empty-threshold-reached';\nreturn [{ json: { isComplete: isComplete, collectorOk: ok, collectorError: collected.error || '', authenticated: collected.authenticated !== false, stopReason: stopReason, scrollAttempts: stats.scrollAttempts || 0, totalEncountered: stats.totalEncountered || profiles.length, uniqueFollowers: Object.keys(seenCanonical).length, duplicatesRemoved: duplicates, missingNames: missingNames, invalidIds: invalidIds, finalRouletteCount: rouletteRows.length, readyForDraw: isComplete && rouletteRows.length > 0, rawRows: rawRows, rouletteRows: rouletteRows, runLabel: runLabel } }];"
          },
          "position" : [
             896,
@@ -222,21 +211,8 @@
          "type" : "n8n-nodes-base.code",
          "typeVersion" : 2
       },
-       {
-          "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c425",
-          "name" : "Normalize Canonical Contract",
-          "parameters" : {
-              "jsCode" : "const v = $('Validate Dedupe and Build Rows').first().json || {};\nconst collected = $('Collect Followers via Browser').first().json || {};\nconst stats = collected.stats || {};\nfunction count(value, fallback) {\n  const n = Number(value);\n  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;\n}\nconst uniqueFollowers = count(stats.uniqueFollowers, count(v.uniqueFollowers, 0));\nconst anchorSightings = count(stats.anchorSightings, count(stats.totalEncountered, count(v.totalEncountered, 0)));\nconst anchorRepeats = count(stats.anchorRepeats, Math.max(0, anchorSightings - uniqueFollowers));\nconst nameUpgrades = count(stats.nameUpgrades, count(v.nameUpgrades, 0));\nconst profileCapSkipped = count(stats.profileCapSkipped, count(v.profileCapSkipped, 0));\nreturn [{ json: Object.assign({}, v, {\n  totalEncountered: anchorSightings,\n  anchorSightings: anchorSightings,\n  anchorRepeats: anchorRepeats,\n  duplicatesRemoved: anchorRepeats,\n  nameUpgrades: nameUpgrades,\n  profileCapSkipped: profileCapSkipped,\n  uniqueFollowers: uniqueFollowers,\n  telemetry: stats.telemetry || v.telemetry || {}\n}) }];"
-          },
-          "position" : [
-             1120,
-             224
-          ],
-          "type" : "n8n-nodes-base.code",
-          "typeVersion" : 2
-       },
-       {
-          "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c405",
+      {
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c405",
          "name" : "Has Valid Data?",
          "parameters" : {
             "conditions" : {
@@ -280,7 +256,7 @@
          "name" : "Config and Auth Notes",
          "parameters" : {
             "color" : 5,
-            "content" : "## Per-giveaway config lives in Giveaway Config (Code node, top of flow). Edit followersUrl, collector URL, runLabel, bounded event-wait limits (scrollDelayMs/postScrollWaitMs), thresholds (emptyScrollThreshold default 10, maxScrollAttempts cap) there. The collector returns one canonical profile per normalized URL plus truthful anchorSightings, anchorRepeats, nameUpgrades, uniqueFollowers, scrollAttempts, stopReason, and bounded PII-free telemetry. Every run's canonical raw + roulette rows and stored summary are written to the giveaway_runs Data Table, keyed by runId; view or download it from the Control Panel GUI. No external Sheets or Telegram integration.",
+            "content" : "## Per-giveaway config lives in Giveaway Config (Code node, top of flow). Edit followersUrl, collector URL, runLabel, timing (scrollDelayMs/postScrollWaitMs), thresholds (emptyScrollThreshold default 10, maxScrollAttempts cap) there. Dedupe is by normalized profile URL/identifier — never by display name. Every run's full result (raw + roulette rows, stats) is stored in the giveaway_runs Data Table, keyed by runId; view or download it from the Control Panel GUI. No external Sheets or Telegram integration.",
             "height" : 300,
             "width" : 944
          },
@@ -308,7 +284,7 @@
          "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c424",
          "name" : "Build Pending Payload",
          "parameters" : {
-            "jsCode" : "const v = $('Normalize Canonical Contract').first().json;\nconst cfg = $('Giveaway Config').first().json;\nconst summary = { runId: cfg.runId, runLabel: v.runLabel, totalEncountered: v.totalEncountered, anchorSightings: v.anchorSightings, anchorRepeats: v.anchorRepeats, profileCapSkipped: v.profileCapSkipped, nameUpgrades: v.nameUpgrades, uniqueFollowers: v.uniqueFollowers, duplicatesRemoved: v.duplicatesRemoved, missingNames: v.missingNames, invalidIds: v.invalidIds, finalRouletteCount: v.finalRouletteCount, scrollAttempts: v.scrollAttempts, stopReason: v.stopReason, readyForDraw: v.readyForDraw, telemetry: v.telemetry || {} };\nreturn [{ json: { runId: cfg.runId, runLabel: v.runLabel, status: 'complete', summaryJson: JSON.stringify(summary), rawRowsJson: JSON.stringify(v.rawRows || []), rouletteRowsJson: JSON.stringify(v.rouletteRows || []) } }];"
+            "jsCode" : "const v = $('Validate Dedupe and Build Rows').first().json;\nconst cfg = $('Giveaway Config').first().json;\nconst summary = { runId: cfg.runId, runLabel: v.runLabel, totalEncountered: v.totalEncountered, uniqueFollowers: v.uniqueFollowers, duplicatesRemoved: v.duplicatesRemoved, missingNames: v.missingNames, invalidIds: v.invalidIds, finalRouletteCount: v.finalRouletteCount, scrollAttempts: v.scrollAttempts, stopReason: v.stopReason, readyForDraw: v.readyForDraw };\nreturn [{ json: { runId: cfg.runId, runLabel: v.runLabel, status: 'complete', summaryJson: JSON.stringify(summary), rawRowsJson: JSON.stringify(v.rawRows || []), rouletteRowsJson: JSON.stringify(v.rouletteRows || []) } }];"
          },
          "position" : [
             1568,
@@ -318,7 +294,7 @@
          "typeVersion" : 2
       },
       {
-         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c426",
+         "id" : "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c425",
          "name" : "Store Pending Result",
          "parameters" : {
             "columns" : {
