@@ -28,14 +28,14 @@ AutoPilot / n8n    (single container, SQLite, 768 MB ceiling)
 
 The AutoPilot hostname serves the Web UI and the built-in MCP HTTP endpoint —
 there is deliberately no separate MCP hostname. Workflow-specific standalone
-applications, including the Facebook Giveaway Tool, are external runtime
-dependencies and are deployed separately. The current route-level auth and
+workflow-specific standalone applications are external runtime dependencies
+and are deployed separately. The current route-level auth and
 bypass policy is recorded below and in `docs/MCP.md`.
 
 What is NOT in this stack, on purpose: PostgreSQL, MySQL/MariaDB, Redis, queue
 workers, external databases, a custom n8n image, `cloudflared` (already on the
-VPS separately), or Chromium/Puppeteer/VNC/noVNC runtimes. Do not add further
-services without a demonstrated n8n need.
+VPS separately), or browser-automation runtimes. Do not add further services
+without a demonstrated n8n need.
 
 ## Data topology
 
@@ -66,9 +66,9 @@ changes:
 - `N8N_ENCRYPTION_KEY` is secret and must remain stable across redeploys and
   restores.
 - The current n8n memory baseline is 768 MB.
-- Giveaway workflows remain n8n-owned artifacts. If they call a standalone
-  collector, that collector is an external dependency and its deployment,
-  profile persistence, and browser access are outside this Compose stack.
+- Workflow-specific standalone applications are external dependencies. Their
+  deployment, profile persistence, and browser access are outside this Compose
+  stack.
 - SQLite/full-instance backups are separate from workflow Git exports; the
   former is handled through the deployment backup system.
 

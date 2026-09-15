@@ -93,8 +93,8 @@ Two separate layers. Neither is optional.
   - Contains: `database.sqlite` (workflows, credentials, users, executions),
     instance config/keys, binary data.
 - n8n Data Tables live inside `database.sqlite`, so workflow state is covered
-  by the `auto-pilot_n8n_data` backup. The separately deployed Giveaway Tool
-  owns its own browser-profile backup and restore process.
+  by the `auto-pilot_n8n_data` backup. Separately deployed applications own
+  their own backup and restore processes.
 - **What NOT to back up:** `auto-pilot_export_staging` (transient CLI output,
   re-exportable in minutes) and `auto-pilot_repo_data` (replaceable clone
   cache, re-cloned automatically; GitHub is its source of truth). Selecting
