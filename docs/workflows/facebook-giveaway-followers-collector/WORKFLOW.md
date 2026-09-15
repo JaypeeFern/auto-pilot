@@ -115,7 +115,7 @@ The current workflow export uses `http://browser:5679` as its existing private
 deployment-network contract. AutoPilot no longer deploys that service; the
 collector API must be provided privately by the separate Giveaway Tool and is
 not publicly routed. The browser keeps the known-safe
-`1366x900` viewport default and the Compose browser service retains its
+`1366x900` viewport default and the Giveaway Tool Compose runtime retains its
 `768 MB` memory ceiling, raised from `640 MB` after observed Chromium renderer
 crashes during long collections. Do not raise either limit further without a
 separately verified memory result.
