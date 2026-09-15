@@ -15,15 +15,16 @@ No schedule anywhere — every collection is human-initiated.
 
 ## Why it exists
 
-The collector and its Facebook session live on the VPS, not on your
-desktop. This panel lets you check session status, open the VPS browser for
+The collector and its Facebook session live in the separately deployed
+Giveaway Tool, not on your desktop. This panel lets you check session status, open the VPS browser for
 manual login, run a dry test that never touches Sheets, inspect the exact
 rows, and commit the reviewed result without re-scraping.
 
 ## Routes (all authenticated)
 
-- `GET /giveaway` — the control panel page (kept in `gui.html` in this
-  folder; embedded into the workflow at build time).
+- `GET /giveaway` — the control panel page embedded in the n8n workflow. The
+  extracted source copy is preserved in the Giveaway Tool branch; this repo
+  retains the workflow export as the n8n source of truth.
 - `GET /giveaway/api/state` — `{ authenticated, authMessage,
   facebookReachable, pending, config, novncUrl }`.
 - `POST /giveaway/api/dry-run` — starts a dry collection in the background

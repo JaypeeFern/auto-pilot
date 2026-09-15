@@ -104,15 +104,17 @@ An auth challenge returns `401` with `authenticated:false`; cancellation is
 checked at the bounded scroll/capture boundaries. None of these paths is
 draw-ready.
 
-## Browser and security boundary
+## External browser dependency and security boundary
 
-The browser service runs the pinned Chromium/Puppeteer collector with a
+The separately deployed Giveaway Tool runs the pinned Chromium/Puppeteer collector with a
 persistent profile. Login, password, 2FA, CAPTCHA, checkpoints, and device
 confirmation remain manual in noVNC. The service never accepts, stores, logs,
 or forwards Facebook credentials.
 
-Production uses `http://browser:5679` on the private Compose network. The
-collector API is not publicly routed. The browser keeps the known-safe
+The current workflow export uses `http://browser:5679` as its existing private
+deployment-network contract. AutoPilot no longer deploys that service; the
+collector API must be provided privately by the separate Giveaway Tool and is
+not publicly routed. The browser keeps the known-safe
 `1366x900` viewport default and the Compose browser service retains its
 `768 MB` memory ceiling, raised from `640 MB` after observed Chromium renderer
 crashes during long collections. Do not raise either limit further without a
