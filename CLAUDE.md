@@ -1,13 +1,13 @@
-<!-- agent-brain:bootstrap:start -->
-<!-- agent-brain:bootstrap:schema=5;owner=agent-brain -->
-## Agent Brain bootstrap
-Before planning or performing orchestration for any meaningful task, activate and follow the globally installed Agent Brain capability.
-- Claude Code authority: `C:\Users\Paul\.claude\skills\agent-brain\SKILL.md`
-- Codex and OpenCode authority: `C:\Users\Paul\.agents\skills\agent-brain\SKILL.md`
-- Optional frontend specialist catalog: `C:\Users\Paul\.claude\skills\agent-brain\frontend-specialists.json`
-- Optional frontend specialist catalog: `C:\Users\Paul\.agents\skills\agent-brain\frontend-specialists.json`
-- Lifecycle authority: `C:\Users\Paul\.agents\skills\agent-brain\agent-brain-orchestration-gate.ps1`
-Activation boundary: project harness -> Agent Brain capability -> Herdr capability when delegation is selected.
-Do not plan, delegate, or control Herdr until the capability is active. Use its supported Windows launch and Herdr prompt-delivery contract.
-Keep project-owned instructions and configuration here. Do not copy Agent Brain policy, skills, hooks, or global configuration into this project.
-<!-- agent-brain:bootstrap:end -->
+<!-- agent-brain:knowledge:start -->
+<!-- agent-brain:knowledge:schema=1;owner=agent-brain -->
+## Agent Brain knowledge
+Agent Brain is optional persistent reusable engineering knowledge. Search it when
+prior knowledge could materially help a non-trivial investigation. After a
+non-trivial problem is understood and verified where practical, store a concise
+reusable lesson only when it would save meaningful future investigation time;
+search first and update an existing record instead of duplicating it.
+Completion reminders are only a selective, non-blocking fallback for missed
+lessons. Agent Brain never gates completion, reviews, orchestration, lifecycle,
+Herdr, model selection, intent, or task state. If its MCP is unavailable,
+continue normally.
+<!-- agent-brain:knowledge:end -->
