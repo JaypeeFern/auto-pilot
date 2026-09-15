@@ -47,6 +47,7 @@ in Compose (container network only). |
 | `COLLECTOR_CAPTURE_MUTATION_NODE_LIMIT` | `512` | Maximum nodes inspected per mutation/initial bounded walk. |
 | `COLLECTOR_CAPTURE_INITIAL_NODE_LIMIT` | `10000` | Maximum nodes inspected while resolving/capturing the initial surface. Truncation fails completeness. |
 | `COLLECTOR_CAPTURE_MUTATION_RECORD_LIMIT` | `2048` | Maximum pending MutationObserver records between capture drains. Overflow fails completeness for that batch. |
+| `COLLECTOR_CAPTURE_ROW_LIMIT` | `20000` | Maximum direct follower-row children swept per drain. Truncation fails completeness. |
 | `COLLECTOR_MAX_CANONICAL_PROFILES` | `20000` | Maximum canonical profiles retained per run; the cap fails completeness. |
 
 ## First login (manual handoff)
@@ -107,10 +108,16 @@ Future runs reuse the profile until Facebook invalidates it again.
 
 ## Collection behavior
 
-The collector resolves the actual scroll container in the followers dialog or
-main surface, installs one bounded `MutationObserver`, and waits on capture or
-scroll events with bounded timeouts. It does not rescan all anchors on every
-scroll, use a permanent `data-*` marker, or keep an unbounded page cache.
+The collector resolves the actual scroll container and follower-row container
+in the followers dialog or main surface, installs one bounded
+`MutationObserver`, and waits on capture or scroll events with bounded
+timeouts. After each scroll boundary it sweeps the row container's direct
+children, taking the first Facebook link with non-empty text from each child.
+Blank placeholder children are ignored. The sweep is bounded by
+`COLLECTOR_CAPTURE_ROW_LIMIT`; truncation fails completeness instead of
+silently dropping rows. The observer queue remains a bounded fallback for
+transient rows and name updates.
+
 Extraction is restricted to rendered (non-zero-size) anchors in that surface;
 relative hrefs are absolutized, and only facebook.com/fb.com hosts are
 accepted. Only normally visible follower entries are read; hidden/private
@@ -122,8 +129,8 @@ style mutations are ignored; href, name, and visibility changes remain
 observable.
 The collector returns one canonical profile per normalized URL and upgrades its
 name when a later named sighting arrives. `telemetry` is bounded and PII-free:
-capture timing, mutation/capture counts, queue pressure, bounded surface
-descendant count,
+capture timing, mutation/capture counts, direct-row sweep counts, queue
+pressure, bounded surface descendant count,
 scroll geometry, browser heap samples when available, and Node heap/RSS. It
 never includes follower names, URLs, page text, or credentials. Stops after
 `emptyScrollThreshold` (default 10) consecutive scrolls with zero new unique

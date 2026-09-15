@@ -63,17 +63,20 @@ the bounded canonical-profile cap stops a run. A blank display name remains elig
 to upgrade; a named profile is never downgraded by a later blank sighting.
 `nameUpgrades` counts blank-to-named upgrades.
 
-The collector uses a bounded `MutationObserver` queue attached to the resolved
-followers surface. It captures added/reused anchors and name changes, coalesces
-duplicate pending sightings, ignores presentation-only class/style churn, then
-drains the queue after each event-driven scroll. The queue has a finite limit;
-overflow is an incomplete run rather than silent data loss. No permanent
-`data-*` markers or unbounded page-level URL cache is used.
+The collector resolves the follower-row container and, after each scroll
+boundary, sweeps its direct children. For each child it takes the first
+Facebook link with non-empty text and ignores blank placeholder children. The
+bounded `MutationObserver` queue remains attached to the resolved followers
+surface as a fallback for transient rows and name changes. The direct-row cap
+and queue both fail the run closed on truncation or overflow rather than
+silently dropping data. No permanent `data-*` markers or unbounded page-level
+URL cache is used.
 
 `telemetry` is bounded and PII-free. It contains capture wait/read time,
-mutation and capture counts, queue high-water/drops, bounded descendant count
-for the resolved surface, scroll geometry, browser heap samples when available, Node heap/RSS,
-and elapsed time. It never contains names, URLs, page text, or credentials.
+mutation and capture counts, direct-row sweep counts, queue high-water/drops,
+bounded descendant count for the resolved surface, scroll geometry, browser
+heap samples when available, Node heap/RSS, and elapsed time. It never contains
+names, URLs, page text, or credentials.
 `GET /progress` exposes the same counters and telemetry for the panel; its log
 messages are counts and stop states only.
 

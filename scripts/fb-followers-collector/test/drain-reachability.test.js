@@ -36,3 +36,22 @@ test('observer ignores presentation churn and coalesces pending anchors', functi
   assert.match(serverSource, /record\.attributeName === 'hidden'/);
   assert.match(serverSource, /record\.attributeName === 'aria-hidden'/);
 });
+
+test('drain sweeps bounded direct follower rows and ignores blank placeholders', function () {
+  assert.match(serverSource, /const CAPTURE_ROW_LIMIT = clampInt\(/);
+  assert.match(serverSource, /function firstFacebookLink\(row\)/);
+  assert.match(serverSource, /const displayName = \(link\.textContent \|\| ''\)\.trim\(\);/);
+  assert.match(serverSource, /function scanDirectRows\(container, limit\)/);
+  assert.match(serverSource, /const children = container && container\.children \? container\.children : \[\];/);
+  assert.match(serverSource, /truncated: children\.length > limit/);
+  assert.match(serverSource, /const swept = scanDirectRows\(state\.rowContainer, config\.rowLimit\);/);
+  assert.match(serverSource, /swept\.captures\.forEach\(mergeCapture\);/);
+  assert.match(serverSource, /rowSweepTruncated: swept\.truncated/);
+});
+
+test('direct row sweep keeps Facebook host filtering before Node profile validation', function () {
+  assert.match(serverSource, /function isFacebookHref\(href\)/);
+  assert.match(serverSource, /if \(!displayName \|\| !isFacebookHref\(href\) \|\| !isVisible\(link\)\) continue;/);
+  assert.match(serverSource, /if \(!isProfileHref\(sighting\.profileUrl\)\) \{ rejectedHref\+\+; continue; \}/);
+  assert.match(serverSource, /if \(selfId && identityOf\(sighting\.profileUrl\) === selfId\) \{ rejectedSelf\+\+; continue; \}/);
+});

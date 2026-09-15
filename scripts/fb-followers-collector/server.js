@@ -54,6 +54,7 @@ const CAPTURE_QUEUE_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_QUEUE_LIMIT, 
 const CAPTURE_MUTATION_NODE_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_MUTATION_NODE_LIMIT, 512, 64, 4000);
 const CAPTURE_INITIAL_NODE_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_INITIAL_NODE_LIMIT, 10000, 1024, 50000);
 const CAPTURE_MUTATION_RECORD_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_MUTATION_RECORD_LIMIT, 2048, 128, 10000);
+const CAPTURE_ROW_LIMIT = clampInt(process.env.COLLECTOR_CAPTURE_ROW_LIMIT, 20000, 512, 100000);
 const MAX_CANONICAL_PROFILES = clampInt(process.env.COLLECTOR_MAX_CANONICAL_PROFILES, 20000, 1000, 100000);
 
 // Network posture: loopback is the safe default for local runs. Inside the
@@ -284,10 +285,11 @@ function isProfileHref(href) {
   return true;
 }
 
-// Capture is installed once per collection. MutationObserver receives only
-// newly added/reused anchors and text/attribute changes inside the resolved
-// followers surface; the Node side drains a bounded queue after each scroll.
-// Blank-name sightings remain retryable until a later mutation provides text.
+// Capture is installed once per collection. The observer remains a bounded
+// event signal/fallback, while each drain also sweeps the resolved follower
+// row container's direct children. Facebook appends rows without guaranteeing
+// that every usable anchor arrives as a distinct mutation, so the direct-child
+// sweep is the authoritative DOM snapshot for each scroll boundary.
 async function installFollowerCapture(page) {
   return page.evaluate(function (config) {
     function isVisible(element) {
@@ -365,6 +367,75 @@ async function installFollowerCapture(page) {
       return text;
     }
 
+    function isFacebookHref(href) {
+      try {
+        const parsed = new URL(href, document.location.href);
+        const host = parsed.hostname.toLowerCase();
+        return host === 'facebook.com' || host.endsWith('.facebook.com') ||
+          host === 'fb.com' || host.endsWith('.fb.com');
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function firstFacebookLink(row) {
+      if (!row || !row.querySelectorAll) return null;
+      const links = row.querySelectorAll('a[href]');
+      for (let index = 0; index < links.length && index < config.rowLinkLimit; index++) {
+        const link = links[index];
+        const href = link.getAttribute('href') || '';
+        const displayName = (link.textContent || '').trim();
+        if (!displayName || !isFacebookHref(href) || !isVisible(link)) continue;
+        let profileUrl = '';
+        try {
+          profileUrl = new URL(href, document.location.href).href;
+        } catch (err) {
+          continue;
+        }
+        return { displayName: displayName, profileUrl: profileUrl };
+      }
+      return null;
+    }
+
+    function scanDirectRows(container, limit) {
+      const children = container && container.children ? container.children : [];
+      const rowLimit = Math.min(children.length, limit);
+      const captures = [];
+      let blankRows = 0;
+      for (let index = 0; index < rowLimit; index++) {
+        const capture = firstFacebookLink(children[index]);
+        if (capture) captures.push(capture);
+        else blankRows++;
+      }
+      return {
+        captures: captures,
+        childCount: children.length,
+        namedRowCount: captures.length,
+        blankRowCount: blankRows,
+        truncated: children.length > limit,
+      };
+    }
+
+    function findRowContainer(root) {
+      if (!root) return null;
+      const candidates = [root];
+      const bounded = boundedElements(root, config.surfaceNodeLimit);
+      bounded.elements.forEach(function (element) { candidates.push(element); });
+      let best = null;
+      let bestScore = -1;
+      candidates.forEach(function (candidate) {
+        if (!candidate.children || candidate.children.length < 4) return;
+        const probe = scanDirectRows(candidate, Math.min(config.rowProbeLimit, config.rowLimit));
+        if (!probe.namedRowCount) return;
+        const score = probe.namedRowCount * 1000000 + Math.min(candidate.children.length, config.rowLimit);
+        if (score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
+      });
+      return best || root;
+    }
+
     const prior = window.__fgCaptureSession;
     if (prior && typeof prior.dispose === 'function') prior.dispose();
     const state = {
@@ -388,6 +459,7 @@ async function installFollowerCapture(page) {
       observer: null,
       surface: null,
       scrollContainer: null,
+      rowContainer: null,
       disposed: false,
     };
 
@@ -485,6 +557,7 @@ async function installFollowerCapture(page) {
       if (state.observer) state.observer.disconnect();
       state.surface = resolved.surface;
       state.scrollContainer = resolved.scrollContainer;
+      state.rowContainer = findRowContainer(state.surface);
       if (resolved.truncated) {
         state.captureTruncated = true;
         if (state.truncationReasons.indexOf('surface-walk') < 0) state.truncationReasons.push('surface-walk');
@@ -550,11 +623,26 @@ async function installFollowerCapture(page) {
 
     state.drain = function () {
       attach();
+      state.rowContainer = findRowContainer(state.surface) || state.rowContainer || state.surface;
       const queued = state.queue.splice(0, state.queue.length);
       queued.forEach(function (entry) { state.pendingByAnchor.delete(entry.anchor); });
-      const captures = queued.map(function (entry) {
-        return { displayName: entry.displayName, profileUrl: entry.profileUrl };
+      const swept = scanDirectRows(state.rowContainer, config.rowLimit);
+      const capturesByUrl = new Map();
+      function mergeCapture(capture) {
+        if (!capture || !capture.profileUrl) return;
+        const existing = capturesByUrl.get(capture.profileUrl);
+        if (!existing || (!existing.displayName && capture.displayName)) {
+          capturesByUrl.set(capture.profileUrl, {
+            displayName: capture.displayName || '',
+            profileUrl: capture.profileUrl,
+          });
+        }
+      }
+      swept.captures.forEach(mergeCapture);
+      queued.forEach(function (entry) {
+        mergeCapture({ displayName: entry.displayName, profileUrl: entry.profileUrl });
       });
+      const captures = Array.from(capturesByUrl.values());
       const mutationRecordsSinceDrain = state.mutationRecordsSinceDrain;
       const mutationRecordOverflow = state.mutationRecordOverflow;
       const memory = performance.memory || {};
@@ -574,6 +662,10 @@ async function installFollowerCapture(page) {
         queueHighWaterMark: state.queueHighWaterMark,
         queueLength: state.queue.length,
         surfaceNodeCount: state.surfaceNodeCount,
+        rowSweepChildren: swept.childCount,
+        rowSweepNamedRows: swept.namedRowCount,
+        rowSweepBlankRows: swept.blankRowCount,
+        rowSweepTruncated: swept.truncated,
         scrollTop: container ? Math.round(container.scrollTop || 0) : 0,
         scrollHeight: container ? Math.round(container.scrollHeight || 0) : 0,
         clientHeight: container ? Math.round(container.clientHeight || 0) : 0,
@@ -635,6 +727,9 @@ async function installFollowerCapture(page) {
     mutationRecordLimit: CAPTURE_MUTATION_RECORD_LIMIT,
     initialNodeLimit: CAPTURE_INITIAL_NODE_LIMIT,
     surfaceNodeLimit: CAPTURE_INITIAL_NODE_LIMIT,
+    rowLimit: CAPTURE_ROW_LIMIT,
+    rowProbeLimit: Math.min(CAPTURE_ROW_LIMIT, 64),
+    rowLinkLimit: 64,
   }).catch(function () { return null; });
 }
 
@@ -789,6 +884,10 @@ async function runCollection(opts) {
       mutationRecordOverflow: false,
       truncationReasons: [],
       surfaceNodeCount: 0,
+      rowSweepChildren: 0,
+      rowSweepNamedRows: 0,
+      rowSweepBlankRows: 0,
+      rowSweepTruncated: false,
       scrollTop: 0,
       scrollHeight: 0,
       clientHeight: 0,
@@ -818,6 +917,10 @@ async function runCollection(opts) {
       telemetry.mutationRecordOverflow = sample.mutationRecordOverflow;
       telemetry.truncationReasons = sample.truncationReasons;
       telemetry.surfaceNodeCount = sample.surfaceNodeCount;
+      telemetry.rowSweepChildren = sample.rowSweepChildren;
+      telemetry.rowSweepNamedRows = sample.rowSweepNamedRows;
+      telemetry.rowSweepBlankRows = sample.rowSweepBlankRows;
+      telemetry.rowSweepTruncated = sample.rowSweepTruncated;
       telemetry.scrollTop = sample.scrollTop;
       telemetry.scrollHeight = sample.scrollHeight;
       telemetry.clientHeight = sample.clientHeight;
@@ -834,6 +937,7 @@ async function runCollection(opts) {
       if (!sample) return 'capture-unavailable';
       if (sample.mutationRecordOverflow) return 'mutation-record-overflow';
       if (sample.captureTruncated) return 'capture-truncated';
+      if (sample.rowSweepTruncated) return 'capture-truncated';
       if (sample.queueOverflow || sample.dropped > 0) return 'capture-buffer-overflow';
       return '';
     }
